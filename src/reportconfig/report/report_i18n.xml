@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	 <local-resources>
+        <resource-file>resources/resources_system_i18n.xml</resource-file>
+    </local-resources>
+	<page id="i18npage1" js="/webresources/script/validate.js,/wabacusdemo/js/clientvalidate.js">
+		<report id="report1" title="i18n{title.label}"  dataexport="richexcel">
+			<display>
+				<col column="{sequence:0}" label="i18n{sequence.label}"/>
+				<col column="no" label="i18n{no.label}" clickorderby="true" width="100px" filter="condition{txtno}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="i18n{group.label}">
+					<col column="name" label="i18n{name.label}" width="100px" filter="true" filterwidth="120px" clickorderby="true"/>
+					<col column="sex" label="i18n{sex.label}" width="60px" clickorderby="true"/>
+					<col column="age" label="i18n{age.label}" width="60px" clickorderby="true"/>
+					<col column="birthday" label="i18n{birthday.label}" clickorderby="true"/>
+				</group>
+				<col column="salary" label="i18n{salary.label}" clickorderby="true"/>
+				<col column="joinindate" label="i18n{joinindate.label}" clickorderby="true"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,salary FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="i18n{condition.txtno.label}">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox jsvalidate="isNotEmpty(i18n{invalid.isnotempty}),isNumeric(i18n{invalid.number})"/>
+				</condition>
+				<condition name="txtage" label="i18n{condition.txtage.label}">
+					<value>
+						<![CDATA[(age =#data#)]]>
+					</value>
+					<inputbox jsvalidate="isNumeric(i18n{invalid.number}),isValidAge(i18n{invalid.age})"/>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+					joinindate=joinindate==null?"":joinindate.trim();
+					idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) joinindate=joinindate.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+		<footer>i18n{i18npage1.report1.footer}</footer>
+	</page>
+</applications>

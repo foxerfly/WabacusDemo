@@ -1,0 +1,909 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	<page id="pagetitlepage1" title="页面标题" titlealign="center" margin="10px">
+		<report id="report1" extends="listpage1.report1">
+			<sql>
+				<value>
+					<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno1" label="工号">
+					<value>
+						<![CDATA[(no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+						<typeprompt width="200" count="15">
+							<promptcol label="no" title="工号" matchmode="anywhere"/>
+							<datasource>
+								<option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/>
+							</datasource>
+						</typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtname1" label="姓名">
+					<value>
+						<![CDATA[(name like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+						<typeprompt width="-1" count="15">
+							<promptcol label="name"  matchmode="anywhere"/>
+							<datasource>
+								<option source="@{select name from tbl_baseinfo where {#matchcondition#}}"/>
+							</datasource>
+						</typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtsex1" label="性别">
+					<value>
+						<![CDATA[(sex =#data#)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option value="" label="性别"/>
+						<option value="1" label="男"/> 
+						<option value="0" label="女" />
+					</inputbox>
+				</condition>
+			</sql>
+		</report>
+		<report id="report2" extends="detailpage1.report1" top="15px"/>
+		<report id="report3" title="部门信息列表" dataexport="richexcel" top="15px">
+			<display>
+				<col column="performance" label="表现" clickorderby="true" width="150px" treerowgroup="true" filter="condition{txtperformance}"/>
+				<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+				<col column="deptname" label="部门名" clickorderby="true" width="15%"/>
+				<col column="manager" label="部门经理"/>
+				<col column="builtdate" label="创建日期" clickorderby="true" width="100px"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+				</value>
+				<condition name="txtdeptno" label="部门编号">
+					<value>
+						<![CDATA[(deptno like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="200" count="15">
+						<promptcol label="deptno" matchmode="anywhere"/>
+						<datasource>
+							<option source="@{select deptno from tbl_department where {#matchcondition#}}"/>
+						</datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtperformance" label="表现">
+					<value>
+						<![CDATA[(performance like '%#data#%')]]>
+					</value>
+					<inputbox type="selectbox">
+						<option value="" label="全部"/>
+						<option value="优秀" label="优秀"/> 
+						<option value="良好" label="良好" />
+						<option value="较好" label="较好" />
+						<option value="很差" label="很差" />
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+			  		builtdate=builtdate==null?"":builtdate.trim();
+					int idx=builtdate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) builtdate=builtdate.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+	</page>
+	
+	<page id="pageborderpage1" title="页面标题" titlealign="center" border="1" bordercolor="#FF0000" margin="10px">
+		<report id="report1" extends="pagetitlepage1.report1"/>
+		<report id="report2" extends="pagetitlepage1.report2" top="15px"/>
+		<report id="report3" extends="pagetitlepage1.report3" top="15px"/>
+	</page>
+	<page id="pagescrollpage1" title="页面标题" titlealign="center" border="1" bordercolor="#FF0000" margin="10px"
+			scrollX="true" scrollY="true" scrollstyle="image" width="800px" height="600px">
+		<report id="report1" extends="pagetitlepage1.report1" width="1000px"/>
+		<report id="report2" extends="pagetitlepage1.report2" top="15px" width="1000px"/>
+		<report id="report3" extends="pagetitlepage1.report3" top="15px" width="1000px"/>
+	</page>
+	
+	<page id="pageinterceptorpage1" margin="10px" interceptor="com.wabacusdemo.testpageinterceptor.PageInterceptor4;com.wabacusdemo.testpageinterceptor.PageInterceptor2">
+	  	<interceptor>
+	  		<preaction>
+	  			System.out.println("pageinterceptorpage1.preaction...");
+	  		</preaction>
+	  		<postaction>
+	  			System.out.println("pageinterceptorpage1.postaction...");
+	  		</postaction>
+	  	</interceptor>
+		<report id="report1" extends="pagetitlepage1.report2" top="0"/>
+		<report id="report2" extends="pagetitlepage1.report1" top="15px">
+			<display>
+				<col column="{sequence:1}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+				<col column="name" label="姓名" clickorderby="true" width="15%"/>
+				<group label="基本信息">
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+					<col column="birthday" label="出生日期" clickorderby="true"/>
+				</group>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+			</display>
+		</report>
+		<footer>${pageinterceptorpage1.footer}</footer>
+	</page>
+	
+	<page id="tabpaneltitletoppage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<tabpanel id="tabpanel11" parenttitle="标题显示在左边" margin="10px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report3" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel12" parenttitle="标题显示在中间" margin="10px" titlealign="center">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report6" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel13" parenttitle="标题显示在右边" margin="10px" titlealign="right">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel14" parenttitle="显示副标题" margin="10px">
+				<report id="report10" parentsubtitle="副标题一" extends="pagetitlepage1.report1"/>
+				<report id="report11" parentsubtitle="副标题二" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report12" parentsubtitle="副标题三" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="tabpaneltitletoppage2">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<tabpanel id="tabpanel11" parenttitle="标题显示在左边" margin="10px" titlestyle="2">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report3" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel12" parenttitle="标题显示在中间" margin="10px" titlestyle="2" titlealign="center">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report6" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel13" parenttitle="标题显示在右边" margin="10px" titlestyle="2" titlealign="right">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel14" parenttitle="显示副标题" margin="10px" titlestyle="2">
+				<report id="report10" parentsubtitle="副标题一" extends="pagetitlepage1.report1"/>
+				<report id="report11" parenttitle="员工详细资料" parentsubtitle="副标题二" extends="pagetitlepage1.report2"/>
+				<report id="report12" extends="pagetitlepage1.report3" parentsubtitle="副标题三"/>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="tabpaneltitlebottompage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<tabpanel id="tabpanel11" titleposition="bottom" parenttitle="标题显示在左边" margin="10px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report3" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel12" titleposition="bottom" parenttitle="标题显示在中间" margin="10px" titlealign="center">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report6" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel13" titleposition="bottom" parenttitle="标题显示在右边" margin="10px" titlealign="right">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel14" titleposition="bottom" parenttitle="显示副标题" margin="10px">
+				<report id="report10" parentsubtitle="副标题一" extends="pagetitlepage1.report1"/>
+				<report id="report11" parenttitle="员工详细资料" parentsubtitle="副标题二" extends="pagetitlepage1.report2"/>
+				<report id="report12" extends="pagetitlepage1.report3" parentsubtitle="副标题三"/>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	<page id="tabpaneltitleleftpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<tabpanel id="tabpanel11" titleposition="left" titlealign="top" parenttitle="标题显示在顶部" margin="10px" height="600px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report3" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel12" titleposition="left" parenttitle="标题显示在中间" margin="10px" titlealign="middle" height="600px">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report6" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel13" titleposition="left" parenttitle="标题显示在底部" margin="10px" titlealign="bottom" height="600px">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel14" titleposition="left" titlealign="top" parenttitle="显示副标题" margin="10px" height="600px">
+				<report id="report10" parentsubtitle="副标题一" extends="pagetitlepage1.report1"/>
+				<report id="report11" parenttitle="员工详细资料" parentsubtitle="副标题二" extends="pagetitlepage1.report2"/>
+				<report id="report12" parentsubtitle="副标题三" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	<page id="tabpaneltitleleftpage2">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<tabpanel id="tabpanel11" titleposition="left" titlealign="top" titlestyle="2" parenttitle="标题显示在顶部" margin="10px" height="600px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report3" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel12" titleposition="left" parenttitle="标题显示在中间" titlestyle="2" margin="10px" titlealign="middle" height="600px">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report6" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel13" titleposition="left" parenttitle="标题显示在底部" titlestyle="2" margin="10px" titlealign="bottom" height="600px">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="tabpaneltitlerightpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<tabpanel id="tabpanel11" titleposition="right" titlealign="top" parenttitle="标题显示在顶部" margin="10px" height="600px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report3" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel12" titleposition="right" parenttitle="标题显示在中间" margin="10px" titlealign="middle" height="600px">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report6" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel13" titleposition="right" parenttitle="标题显示在底部" margin="10px" titlealign="bottom" height="600px">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel14" titleposition="right" titlealign="top" parenttitle="显示副标题" margin="10px" height="600px">
+				<report id="report10" parentsubtitle="副标题一" extends="pagetitlepage1.report1"/>
+				<report id="report11" parenttitle="员工详细资料" parentsubtitle="副标题二" extends="pagetitlepage1.report2"/>
+				<report id="report12" extends="pagetitlepage1.report3" parentsubtitle="副标题三"/>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	<page id="tabpaneltitlerightpage2">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<tabpanel id="tabpanel11" titleposition="right" titlestyle="2" titlealign="top" parenttitle="标题显示在顶部" margin="10px" height="600px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report3" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel12" titleposition="right" titlestyle="2" parenttitle="标题显示在中间" margin="10px" titlealign="middle" height="600px">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report6" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel13" titleposition="right" titlestyle="2" parenttitle="标题显示在底部" margin="10px" titlealign="bottom" height="600px">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	
+	
+	<page id="tabpanelborderpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="280px" margin="10px">
+			<tabpanel id="tabpanel11" parenttitle="无边框" titlestyle="2" margin="10px" border="0">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report3" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel12" parenttitle="有边框" titlestyle="2" margin="10px" border="1">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report6" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel13" parenttitle="改变边框颜色" titlestyle="2" margin="10px" border="1" bordercolor="#ff0000">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel14" parenttitle="改变边框粗细" titlestyle="2" margin="10px" border="3">
+				<report id="report10" extends="pagetitlepage1.report1"/>
+				<report id="report11" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report12" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="tabpanelscrollpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="100px" margin="10px">
+			<tabpanel id="tabpanel11" parenttitle="横向滚动条" titlestyle="2" margin="10px" 
+				scrollX="true" scrollstyle="image" width="800px">
+				<report id="report1" extends="pagetitlepage1.report1" width="1000px"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2" width="1000px"/>
+				<report id="report3" extends="pagetitlepage1.report3" width="1000px"/>
+			</tabpanel>
+			<tabpanel id="tabpanel12" parenttitle="纵向滚动条" titlestyle="2" margin="10px" 
+				scrollY="true" scrollstyle="image" height="400px">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report6" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel13" parenttitle="纵横滚动条" titlestyle="2" margin="10px" 
+				scrollX="true" scrollY="true" scrollstyle="image" width="800px" height="400px">
+				<report id="report7" extends="pagetitlepage1.report1" width="1000px"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2" width="1000px"/>
+				<report id="report9" extends="pagetitlepage1.report3" width="1000px"/>
+			</tabpanel>
+			<tabpanel id="tabpanel14" parenttitle="普通滚动条" titlestyle="2" margin="10px" 
+				scrollX="true" scrollY="true" width="800px" height="400px">
+				<report id="report10" extends="pagetitlepage1.report1" width="1000px"/>
+				<report id="report11" parenttitle="员工详细资料" extends="pagetitlepage1.report2" width="1000px"/>
+				<report id="report12" extends="pagetitlepage1.report3" width="1000px"/>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="tabpanelSelectedItempage1">
+		<interceptor>
+			<preaction>
+				String selectedIndex=rrequest.getStringAttribute("tabpanel11_selectedIndex","");
+				if(selectedIndex.equals(""))
+				{//没有传入要选中的tab标签页
+					rrequest.setAttribute("tabpanel11_selectedIndex","1");//设置默认选中第二个标签页
+				}
+			</preaction>
+		</interceptor>
+		<tabpanel id="tabpanel11" titlestyle="2" margin="10px" border="0">
+			<report id="report1" extends="pagetitlepage1.report1"/>
+			<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+			<report id="report3" extends="pagetitlepage1.report3"/>
+		</tabpanel>
+	</page>
+	
+	<page id="tabpanelSwitchpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="100px" margin="10px">
+			<tabpanel id="tabpanel11" titlestyle="2" margin="10px"  parenttitle="异步切换">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report3" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+			<tabpanel id="tabpanel12" titlestyle="2" margin="10px" parenttitle="客户端切换" asyn="false">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+				<report id="report6" extends="pagetitlepage1.report3"/>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="paneltitletoppage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<panel id="panel11" title="测试panel标题" border="1" parenttitle="标题显示在左边" margin="10px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+			</panel>
+			<panel id="panel12" title="测试panel标题" border="1" parenttitle="标题显示在中间" margin="10px" titlealign="center">
+				<report id="report5" extends="pagetitlepage1.report2"/>
+			</panel>
+			<panel id="panel13" title="测试panel标题" border="1" parenttitle="标题显示在右边" margin="10px" titlealign="right">
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</panel>
+			<panel id="panel14" title="测试panel标题" subtitle="副标题" border="1" parenttitle="显示副标题" margin="10px">
+				<report id="report10" extends="pagetitlepage1.report1"/>
+			</panel>
+		</tabpanel>
+	</page>
+	<page id="paneltitlebottompage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<panel id="panel11" titleposition="bottom" title="测试panel标题" border="1" parenttitle="标题显示在左边" margin="10px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+			</panel>
+			<panel id="panel12" titleposition="bottom" title="测试panel标题" border="1" parenttitle="标题显示在中间" margin="10px" titlealign="center">
+				<report id="report5" extends="pagetitlepage1.report2"/>
+			</panel>
+			<panel id="panel13" titleposition="bottom" title="测试panel标题" border="1" parenttitle="标题显示在右边" margin="10px" titlealign="right">
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</panel>
+			<panel id="panel14" titleposition="bottom" title="测试panel标题" subtitle="副标题" border="1" parenttitle="显示副标题" margin="10px">
+				<report id="report10" extends="pagetitlepage1.report1"/>
+			</panel>
+		</tabpanel>
+	</page>
+	<page id="paneltitleleftpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<panel id="panel11" titleposition="left" titlealign="top" title="测试标题" border="1" parenttitle="标题显示在顶部" margin="10px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+			</panel>
+			<panel id="panel12" titleposition="left" title="测试标题" border="1" parenttitle="标题显示在中间" margin="10px" titlealign="middle">
+				<report id="report5" extends="pagetitlepage1.report2"/>
+			</panel>
+			<panel id="panel13" titleposition="left" title="测试标题" border="1" parenttitle="标题显示在底部" margin="10px" titlealign="bottom">
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</panel>
+			<panel id="panel14" titleposition="left" title="测试标题" titlealign="top" subtitle="副标题" border="1" parenttitle="显示副标题" margin="10px">
+				<report id="report10" extends="pagetitlepage1.report1"/>
+			</panel>
+		</tabpanel>
+	</page>
+	<page id="paneltitlerightpage1">
+		<tabpanel id="tabpanel1" titlealign="center"  border="0" margin="10px">
+			<panel id="panel11" titleposition="right" titlealign="top" title="测试标题" border="1" parenttitle="标题显示在顶部" margin="10px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+			</panel>
+			<panel id="panel12" titleposition="right" title="测试标题" border="1" parenttitle="标题显示在中间" margin="10px" titlealign="middle">
+				<report id="report5" extends="pagetitlepage1.report2"/>
+			</panel>
+			<panel id="panel13" titleposition="right" title="测试标题" border="1" parenttitle="标题显示在底部" margin="10px" titlealign="bottom">
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</panel>
+			<panel id="panel14" titleposition="right" title="测试标题" titlealign="top" subtitle="副标题" border="1" parenttitle="显示副标题" margin="10px">
+				<report id="report10" extends="pagetitlepage1.report1"/>
+			</panel>
+		</tabpanel>
+	</page>
+	
+	<page id="panelborderpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="100px" margin="10px">
+			<panel id="panel11" parenttitle="无边框" margin="10px" border="0">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+			</panel>
+			<panel id="panel12" parenttitle="有边框" margin="10px" border="1">
+				<report id="report5" extends="pagetitlepage1.report2"/>
+			</panel>
+			<panel id="panel13" parenttitle="改变边框颜色" margin="10px"  border="1" bordercolor="#ff0000">
+				<report id="report9" extends="pagetitlepage1.report3"/>
+			</panel>
+			<panel id="panel14" parenttitle="改变边框粗细" margin="10px" border="3">
+				<report id="report10" extends="pagetitlepage1.report1"/>
+			</panel>
+		</tabpanel>
+	</page>
+	
+	<page id="panelscrollpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="100px" margin="10px">
+			<panel id="panel11" parenttitle="横向滚动条" margin="10px" border="1"
+				scrollX="true" scrollstyle="image" width="800px">
+				<report id="report1" extends="pagetitlepage1.report1" width="1000px"/>
+			</panel>
+			<panel id="panel12" parenttitle="纵向滚动条" margin="10px" border="1"
+				scrollY="true" scrollstyle="image" height="200px">
+				<report id="report5" extends="pagetitlepage1.report2"/>
+			</panel>
+			<panel id="panel13" parenttitle="纵横滚动条" margin="10px" border="1"
+				scrollX="true" scrollY="true" scrollstyle="image" width="800px" height="400px">
+				<report id="report9" extends="pagetitlepage1.report3" width="1000px"/>
+			</panel>
+			<panel id="panel14" parenttitle="普通滚动条" margin="10px" border="1"
+				scrollX="true" scrollY="true" width="800px" height="400px">
+				<report id="report10" extends="pagetitlepage1.report3" width="1000px"/>
+			</panel>
+		</tabpanel>
+	</page>
+	
+	<page id="framepanelborderpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="100px" margin="10px">
+			<framepanel id="framepanel12" title="我的标题" parenttitle="有边框" margin="10px" border="1">
+				<report id="report5" extends="pagetitlepage1.report2" top="0"/>
+			</framepanel>
+			<framepanel id="framepanel13" title="我的标题" parenttitle="改变边框颜色" margin="10px" border="1" bordercolor="#ff0000">
+				<report id="report9" extends="pagetitlepage1.report3" top="0"/>
+			</framepanel>
+			<framepanel id="framepanel14" title="我的标题" parenttitle="改变边框粗细" margin="10px" border="3">
+				<report id="report10" extends="pagetitlepage1.report1" top="0"/>
+			</framepanel>
+			<framepanel id="framepanel11" title="我的标题" parenttitle="无边框" margin="10px" border="0">
+				<report id="report1" extends="pagetitlepage1.report1" top="0"/>
+			</framepanel>
+		</tabpanel>
+	</page>
+	
+	<page id="framepanelscrollpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="100px" margin="10px">
+			<framepanel id="framepanel11" title="我的标题" parenttitle="横向滚动条" margin="10px" 
+				scrollX="true" scrollstyle="image" width="800px">
+				<report id="report1" extends="pagetitlepage1.report1" width="1000px"/>
+			</framepanel>
+			<framepanel id="framepanel12" title="我的标题" parenttitle="纵向滚动条" margin="10px" 
+				scrollY="true" scrollstyle="image" height="200px">
+				<report id="report5" extends="pagetitlepage1.report2" top="0"/>
+			</framepanel>
+			<framepanel id="framepanel13" title="我的标题" parenttitle="纵横滚动条" margin="10px"
+				scrollX="true" scrollY="true" scrollstyle="image" width="800px" height="400px">
+				<report id="report9" extends="pagetitlepage1.report3" width="1000px" top="0"/>
+			</framepanel>
+			<framepanel id="framepanel14" title="我的标题" parenttitle="普通滚动条" margin="10px"
+				scrollX="true" scrollY="true" width="800px" height="400px">
+				<report id="report10" extends="pagetitlepage1.report3" width="1000px" top="0"/>
+			</framepanel>
+		</tabpanel>
+	</page>
+	
+	<page id="vpaneltitletoppage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<vpanel id="vpanel11" title="我的标题" parenttitle="标题显示在左边" margin="10px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report3" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel12" title="我的标题" parenttitle="标题显示在中间" margin="10px" titlealign="center">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report6" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel13" title="我的标题" parenttitle="标题显示在右边" margin="10px" titlealign="right">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report9" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+		</tabpanel>
+	</page>
+	<page id="vpaneltitlebottompage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<vpanel id="vpanel11" title="我的标题" titleposition="bottom" parenttitle="标题显示在左边" margin="10px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report3" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel12" title="我的标题" titleposition="bottom" parenttitle="标题显示在中间" margin="10px" titlealign="center">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report6" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel13" title="我的标题" titleposition="bottom" parenttitle="标题显示在右边" margin="10px" titlealign="right">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report9" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+		</tabpanel>
+	</page>
+	<page id="vpaneltitleleftpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<vpanel id="vpanel11" title="我的标题" titleposition="left" parenttitle="标题显示在顶部" titlealign="top" margin="10px" height="600px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report3" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel12" title="我的标题" titleposition="left" parenttitle="标题显示在中间" margin="10px" titlealign="middle" height="600px">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report6" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel13" title="我的标题" titleposition="left" parenttitle="标题显示在底部" margin="10px" titlealign="bottom" height="600px">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report9" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+		</tabpanel>
+	</page>
+	<page id="vpaneltitlerightpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px">
+			<vpanel id="vpanel11" title="我的标题" titleposition="right" titlealign="top" parenttitle="标题显示在顶部" margin="10px" height="600px">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report3" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel12" title="我的标题" titleposition="right" parenttitle="标题显示在中间" margin="10px" titlealign="middle" height="600px">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report6" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel13" title="我的标题" titleposition="right" parenttitle="标题显示在底部" margin="10px" titlealign="bottom" height="600px">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report9" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="vpanelborderpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="100px" margin="10px">
+			<vpanel id="vpanel11" parenttitle="无边框" margin="10px" border="0">
+				<report id="report1" extends="pagetitlepage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report3" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel12" parenttitle="有边框" margin="10px" border="1">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report6" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel13" parenttitle="改变边框颜色" margin="10px" border="1" bordercolor="#ff0000">
+				<report id="report7" extends="pagetitlepage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report9" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel14" parenttitle="改变边框粗细" margin="10px" border="3">
+				<report id="report10" extends="pagetitlepage1.report1"/>
+				<report id="report11" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report12" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="vpanelscrollpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="100px" margin="10px">
+			<vpanel id="vpanel11" parenttitle="横向滚动条" margin="10px" border="1"
+				scrollX="true" scrollstyle="image" width="800px">
+				<report id="report1" extends="pagetitlepage1.report1" width="1000px"/>
+				<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2" width="1000px" top="15px"/>
+				<report id="report3" extends="pagetitlepage1.report3" width="1000px" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel12" parenttitle="纵向滚动条" margin="10px" border="1"
+				scrollY="true" scrollstyle="image" height="400px">
+				<report id="report4" extends="pagetitlepage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="pagetitlepage1.report2" top="15px"/>
+				<report id="report6" extends="pagetitlepage1.report3" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel13" parenttitle="纵横滚动条" margin="10px" border="1"
+				scrollX="true" scrollY="true" scrollstyle="image" width="800px" height="400px">
+				<report id="report7" extends="pagetitlepage1.report1" width="1000px"/>
+				<report id="report8" parenttitle="员工详细资料" extends="pagetitlepage1.report2" width="1000px" top="15px"/>
+				<report id="report9" extends="pagetitlepage1.report3" width="1000px" top="15px"/>
+			</vpanel>
+			<vpanel id="vpanel14" parenttitle="普通滚动条" margin="10px" border="1"
+				scrollX="true" scrollY="true" width="800px" height="400px">
+				<report id="report10" extends="pagetitlepage1.report1" width="1000px"/>
+				<report id="report11" parenttitle="员工详细资料" extends="pagetitlepage1.report2" width="1000px" top="15px"/>
+				<report id="report12" extends="pagetitlepage1.report3" width="1000px" top="15px"/>
+			</vpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="hpaneltitletoppage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px" width="2000px">
+			<hpanel id="hpanel11" title="我的标题" parenttitle="标题显示在左边" margin="10px" border="1">
+				<report id="report1" extends="pagetitlepage1.report1" width="30%" top="0"/>
+				<report id="report2" parenttitle="员工详细信息列表" extends="reportborderlistpage1.report1" left="15px" width="40%"/>
+				<report id="report3" extends="pagetitlepage1.report3" left="15px" top="0px"/>
+			</hpanel>
+			<hpanel id="hpanel12" title="我的标题" parenttitle="标题显示在中间" margin="10px" titlealign="center" border="1">
+				<report id="report4" extends="hpaneltitletoppage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2"/>
+				<report id="report6" extends="hpaneltitletoppage1.report3"/>
+			</hpanel>
+			<hpanel id="hpanel13" title="我的标题" parenttitle="标题显示在右边" margin="10px" titlealign="right" border="1">
+				<report id="report7" extends="hpaneltitletoppage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2"/>
+				<report id="report9" extends="hpaneltitletoppage1.report3"/>
+			</hpanel>
+		</tabpanel>
+	</page>
+	<page id="hpaneltitlebottompage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px" width="2000px">
+			<hpanel id="hpanel11" title="我的标题" titleposition="bottom" parenttitle="标题显示在左边" margin="10px" border="1">
+				<report id="report1" extends="hpaneltitletoppage1.report1" width="650px"/>
+				<report id="report2" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px" width="650px"/>
+				<report id="report3" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel12" title="我的标题" titleposition="bottom" parenttitle="标题显示在中间" margin="10px" titlealign="center" border="1">
+				<report id="report4" extends="hpaneltitletoppage1.report1" width="650px"/>
+				<report id="report5" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px" width="650px"/>
+				<report id="report6" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel13" title="我的标题" titleposition="bottom" parenttitle="标题显示在右边" margin="10px" titlealign="right" border="1">
+				<report id="report7" extends="hpaneltitletoppage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px"/>
+				<report id="report9" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+		</tabpanel>
+	</page>
+	<page id="hpaneltitleleftpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px" width="2000px">
+			<hpanel id="hpanel11" title="我的标题" titleposition="left" titlealign="top" margin="10px" parenttitle="标题显示在顶部" height="600px" border="1">
+				<report id="report1" extends="hpaneltitletoppage1.report1" width="700px"/>
+				<report id="report2" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px" width="650px"/>
+				<report id="report3" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel12" title="我的标题" titleposition="left" parenttitle="标题显示在中间" margin="10px" titlealign="middle" height="600px" border="1">
+				<report id="report4" extends="hpaneltitletoppage1.report1" width="700px"/>
+				<report id="report5" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px" width="650px"/>
+				<report id="report6" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel13" title="我的标题" titleposition="left" parenttitle="标题显示在底部" margin="10px" titlealign="bottom" height="600px" border="1">
+				<report id="report7" extends="hpaneltitletoppage1.report1" width="700px"/>
+				<report id="report8" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px" width="650px"/>
+				<report id="report9" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+		</tabpanel>
+	</page>
+	<page id="hpaneltitlerightpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" margin="10px" width="2000px">
+			<hpanel id="hpanel11" title="我的标题" titleposition="right" titlealign="top" parenttitle="标题显示在顶部" margin="10px" height="600px" border="1">
+				<report id="report1" extends="hpaneltitletoppage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px"/>
+				<report id="report3" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel12" title="我的标题" titleposition="right" parenttitle="标题显示在中间" margin="10px" titlealign="middle" height="600px" border="1">
+				<report id="report4" extends="hpaneltitletoppage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px"/>
+				<report id="report6" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel13" title="我的标题" titleposition="right" parenttitle="标题显示在底部" margin="10px" titlealign="bottom" height="600px" border="1">
+				<report id="report7" extends="hpaneltitletoppage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px"/>
+				<report id="report9" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="hpanelborderpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="100px" margin="10px" width="2000px">
+			<hpanel id="hpanel11" parenttitle="无边框" margin="10px" border="0">
+				<report id="report1" extends="hpaneltitletoppage1.report1"/>
+				<report id="report2" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px"/>
+				<report id="report3" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel12" parenttitle="有边框" margin="10px" border="1">
+				<report id="report4" extends="hpaneltitletoppage1.report1"/>
+				<report id="report5" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px"/>
+				<report id="report6" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel13" parenttitle="改变边框颜色" margin="10px" border="1" bordercolor="#ff0000">
+				<report id="report7" extends="hpaneltitletoppage1.report1"/>
+				<report id="report8" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px"/>
+				<report id="report9" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel14" parenttitle="改变边框粗细" margin="10px" border="3">
+				<report id="report10" extends="hpaneltitletoppage1.report1"/>
+				<report id="report11" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px"/>
+				<report id="report12" extends="hpaneltitletoppage1.report3" left="15px"/>
+			</hpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="hpanelscrollpage1">
+		<tabpanel id="tabpanel1" titlealign="center" border="0" titlewidth="100px" margin="10px">
+			<hpanel id="hpanel11" parenttitle="横向滚动条" margin="10px" 
+				scrollX="true" scrollstyle="image" width="800px">
+				<report id="report1" extends="hpaneltitletoppage1.report1" width="700px"/>
+				<report id="report2" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" width="700px" left="15px"/>
+				<report id="report3" extends="hpaneltitletoppage1.report3" width="700px" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel12" parenttitle="纵向滚动条" margin="10px"
+				scrollY="true" scrollstyle="image" height="400px" width="1800px">
+				<report id="report4" extends="hpaneltitletoppage1.report1" width="30%"/>
+				<report id="report5" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" left="15px"/>
+				<report id="report6" extends="hpaneltitletoppage1.report3" left="15px" width="30%"/>
+			</hpanel>
+			<hpanel id="hpanel13" parenttitle="纵横滚动条" margin="10px" 
+				scrollX="true" scrollY="true" scrollstyle="image" width="800px" height="400px">
+				<report id="report7" extends="hpaneltitletoppage1.report1" width="700px"/>
+				<report id="report8" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" width="700px" left="15px"/>
+				<report id="report9" extends="hpaneltitletoppage1.report3" width="700px" left="15px"/>
+			</hpanel>
+			<hpanel id="hpanel14" parenttitle="普通滚动条" margin="10px" 
+				scrollX="true" scrollY="true" width="800px" height="400px">
+				<report id="report10" extends="hpaneltitletoppage1.report1" width="700px"/>
+				<report id="report11" parenttitle="员工详细资料" extends="hpaneltitletoppage1.report2" width="700px" left="15px"/>
+				<report id="report12" extends="hpaneltitletoppage1.report3" width="700px" left="15px"/>
+			</hpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="containerheaderpage1">
+		<interceptor>
+			<preaction>
+				rrequest.getRequest().setAttribute("header_key","测试Header动态内容");
+				rrequest.getRequest().getSession().setAttribute("footer_key","测试Footer动态内容");
+			</preaction>
+		</interceptor>
+		<header>
+			<![CDATA[<p align="center"><font size="3" color="red"><b>页面Header部分</b>(<wx:output value="request{header_key}"/>)</font></p>]]>
+		</header>
+		<footer>
+			<![CDATA[<p align="center"><font size="3" color="red"><b>页面Footer部分</b>(<wx:output value="session{footer_key}"/>)</font></p>]]>
+		</footer>
+		<tabpanel id="tabpanel1" margin="10px" titlestyle="2">
+			<header>${containerheaderpage1.tabpanel1.header}</header>
+			<footer>${containerheaderpage1.tabpanel1.footer}</footer>
+			<report id="report1" extends="pagetitlepage1.report1"/>
+			<report id="report2" parenttitle="员工详细资料" extends="pagetitlepage1.report2"/>
+			<report id="report3" extends="pagetitlepage1.report3"/>
+		</tabpanel>
+	</page>
+	
+	<page id="complexcontainerpage1" width="2500px">
+		<hpanel id="hp1"  border="1" margin="10px">
+			<framepanel id="fp1" title="我的Framepanel标题" margin="5px">
+				<tabpanel id="tp1" titlestyle="2" titlewidth="120px" margin="15px" height="600px" scrollX="true" width="800px" scrollY="true" scrollstyle="image">
+					<vpanel id="vp1" parenttitle="部门信息" width="1000px">
+						<report id="report1" extends="pagetitlepage1.report3" top="0"/>
+						<report id="report2" title="request{dept_name}详细资料1" type="detail" dataexport="richexcel" top="15px">
+							<display valuetdwidth="100px" labeltdwidth="80px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+								<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'"/>
+								<col column="deptname" label="部门名"/>
+								<col column="manager" label="部门经理" br="true"/>
+								<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'"/>
+								<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true"/>
+								<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'"/>
+							</display>
+							<sql>
+								<value>
+									<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+								</value>
+								<condition name="txtdeptno2" label="部门编号">
+								<value>
+									<![CDATA[(deptno like '%#data#%' )]]>
+								</value>
+								</condition>
+							</sql>
+							<format>
+							  <value>
+							  	 rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+			  					 builtdate=builtdate==null?"":builtdate.trim();
+								 int idx=builtdate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+								 if(idx>0) builtdate=builtdate.substring(0,idx);
+							  </value>
+							</format>
+						</report>
+					</vpanel>
+					<panel id="p1" width="1000px">
+						<report id="report3" extends="pagetitlepage1.report1"/>
+					</panel>
+				</tabpanel>
+			</framepanel>
+			<report id="report4" extends="pagetitlepage1.report2" valign="bottom" left="15px" width="1000px" scrollstyle="image" scrollwidth="700px"/>
+			<vpanel id="vp2" left="15px" height="670px" scrollY="true" border="1" bordercolor="#c0c0c0" margin="5px">
+				<report id="report5" title="request{dept_name}详细资料2" type="detail" dataexport="richexcel">
+					<display valuetdwidth="100px" labeltdwidth="80px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="deptname" label="部门名"/>
+						<col column="manager" label="部门经理" br="true"/>
+						<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'"/>
+						<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true"/>
+						<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'"/>
+					</display>
+					<sql>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+						</value>
+						<condition name="txtdeptno3" label="部门编号">
+						<value>
+							<![CDATA[(deptno like '%#data#%' )]]>
+						</value>
+						</condition>
+					</sql>
+					<format>
+						<value>
+						  rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+			  			  builtdate=builtdate==null?"":builtdate.trim();
+						  int idx=builtdate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						  if(idx>0) builtdate=builtdate.substring(0,idx);
+					   </value>
+					</format>
+				</report>
+				<report id="report6" title="部门信息列表2" dataexport="richexcel" top="15px" pagesize="-1">
+					<display>
+						<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+						<col column="deptname" label="部门名" clickorderby="true" width="15%"/>
+						<col column="manager" label="部门经理"/>
+						<col column="builtdate" label="创建日期" clickorderby="true" width="100px"/>
+						<col column="performance" label="表现" clickorderby="true" width="150px"/>
+					</display>
+					<sql>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+						</value>
+						<condition name="txtdeptno4" label="部门编号">
+							<value>
+								<![CDATA[(deptno like  '%#data#%' )]]>
+							</value>
+						</condition>
+					</sql>
+					<format>
+			  			<value>
+			  				builtdate=builtdate==null?"":builtdate.trim();
+							int idx=builtdate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+							if(idx>0) builtdate=builtdate.substring(0,idx);
+			 			 </value>
+					</format>
+				</report>
+			</vpanel>
+		</hpanel>
+	</page>
+</applications>

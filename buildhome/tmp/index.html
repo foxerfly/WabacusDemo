@@ -1,0 +1,365 @@
+<html style="height:100%">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Wabacus框架 Demo演示</title>
+		<LINK rel="stylesheet" type="text/css" href="webresources/skin/qq/ymPrompt.css"/>
+		<link rel="STYLESHEET" type="text/css" href="dhtmlx/codebase/dhtmlxtree.css">
+		<link rel="STYLESHEET" type="text/css" href="dhtmlx/codebase/dhtmlxtabbar.css">
+		<STYLE type=text/css>
+		<!--
+			A:visited {
+				COLOR: #01468e; TEXT-DECORATION: none
+			}
+			A:hover {
+				COLOR: #ff0000; TEXT-DECORATION: none
+			}
+			A:link {
+				COLOR: #000000; TEXT-DECORATION: none
+			}
+		-->
+		</STYLE>
+		<script language="javascript"  src="webresources/component/ymPrompt/ymPrompt.js"></script>
+		<script src="dhtmlx/codebase/dhtmlxcommon.js"></script>
+		<script src="dhtmlx/codebase/dhtmlxtabbar.js"></script>
+		<script src="dhtmlx/codebase/dhtmlxtabbar_start.js"></script>
+	</head>
+	<body onLoad="loadReadonlyTree();" onResize="correctSizes();a_tabbar.enableAutoReSize(true,true);"
+		style="padding: 0; margin: 0; overflow: hidden; height: 100%;">
+		<script src="dhtmlx/codebase/dhtmlxcommon.js"></script>
+		<script src="dhtmlx/codebase/dhtmlxtree.js"></script>
+		<script>
+		String.prototype._dhx_trim = function(){
+                     return this.replace(/&nbsp;/g," ").replace(/(^[ \t\n\r]*)|([ \t\n\r]*$)/g,"");
+                  }
+		var node=null;
+		var t=document.location.href.split("?");
+		var displaytype='readonly';//可取值为readonly,editable,form，代表显示哪个tab的类型
+		function correctSizes(){
+			var tabbarObj=document.getElementById('tabbarconteiner');
+			tabbarObj.style.height = (document.body.offsetHeight - 65)+'px';
+			//下面的操作是防止在IE中执行此方法是隐藏掉了菜单
+			tabbarObj.style.display='none';
+			tabbarObj.style.display='';
+		}
+		var currentTreeObj;//当前点中的树对象
+		var currentPageId;//当前显示的报表页面ID
+		var currentReportId;//当前显示的报表ID
+		var currentTreeItemId;//当前显示的树枝（叶）节点
+		var loadedTypeMessageId=null;
+		
+		var treeReadOnly=null;
+		var treeEditable=null;
+		var treeForm=null;
+		var treeOther=null;
+		function loadReadonlyTree(){
+			if(treeReadOnly!=null) return;
+			loadedTypeMessageId='readonlytree_message';
+			treeReadOnly=new dhtmlXTreeObject("readonlytree_box","100%","100%",0);
+			treeReadOnly.setImagePath("dhtmlx/codebase/imgs/");
+			treeReadOnly.setOnClickHandler(function(id){openReportPage(this,id);});
+			treeReadOnly.attachEvent("onOpenEnd",updateTreeSize);
+			treeReadOnly.enableCheckBoxes(false);
+			treeReadOnly.loadXML("dhtmlx/xml/readonly_reportsTree.xml?nu=1",loadXMLCallBack);
+			correctSizes();
+		}
+		function loadEditableTree(){
+			if(treeEditable!=null) return;
+			loadedTypeMessageId='editabletree_message';
+			treeEditable=new dhtmlXTreeObject("editabletree_box","100%","100%",0);
+			treeEditable.setImagePath("dhtmlx/codebase/imgs/");
+			treeEditable.setOnClickHandler(function(id){openReportPage(this,id);});
+			treeEditable.attachEvent("onOpenEnd",updateTreeSize);
+			treeEditable.enableCheckBoxes(false);
+			treeEditable.loadXML("dhtmlx/xml/editable_reportsTree.xml?nu=1",loadXMLCallBack);
+			correctSizes();
+		}
+		function loadFormTree(){
+			if(treeForm!=null) return;
+			loadedTypeMessageId='formtree_message';
+			treeForm=new dhtmlXTreeObject("formtree_box","100%","100%",0);
+			treeForm.setImagePath("dhtmlx/codebase/imgs/");
+			treeForm.setOnClickHandler(function(id){openReportPage(this,id);});
+			treeForm.attachEvent("onOpenEnd",updateTreeSize);
+			treeForm.enableCheckBoxes(false);
+			treeForm.loadXML("dhtmlx/xml/form_reportsTree.xml?nu=1",loadXMLCallBack);
+			correctSizes();
+		}
+		
+		function loadOtherTree(){
+			if(treeOther!=null) return;
+			loadedTypeMessageId='othertree_message';
+			treeOther=new dhtmlXTreeObject("othertree_box","100%","100%",0);
+			treeOther.setImagePath("dhtmlx/codebase/imgs/");
+			treeOther.setOnClickHandler(function(id){openReportPage(this,id);});
+			treeOther.attachEvent("onOpenEnd",updateTreeSize);
+			treeOther.enableCheckBoxes(false);
+			treeOther.loadXML("dhtmlx/xml/other_reportsTree.xml?nu=1",loadXMLCallBack);
+			correctSizes();
+		}
+		
+		function openReportPage(treeObj,id)
+		{
+			var isGroupNode=treeObj.getUserData(id,"groupnode");
+			if(isGroupNode!=null&&isGroupNode=='true')
+			{//树枝节点
+				var description=treeObj.getUserData(id,'desc');
+				if(description&&description!='')
+				{
+					ymPrompt.win("<div style='font-family:Tahoma, Verdana, Geneva, Arial, Helvetica, sans-serif;font-size:15px;'>"
+					+treeObj.getUserData(id,'desc')
+					+"</div>",800,600,'说明');
+				}
+				//document.getElementById('func_buttons_div').style.display="none";
+				return;
+			}
+			var pageid = treeObj.getUserData(id,"pageid");
+			var reportid = treeObj.getUserData(id,"reportid");
+			if(!pageid||pageid=='') return;
+			if(pageid=='[message]')
+			{//只是提示desc中配置的介绍内容
+				ymPrompt.win("<div style='font-family:Tahoma, Verdana, Geneva, Arial, Helvetica, sans-serif;font-size:15px;'>"
+					+treeObj.getUserData(id,'desc')
+					+"</div>",800,600,'说明');
+				return;
+			}
+			currentPageId_temp=pageid;
+			currentReportId_temp=reportid;
+			currentTreeObj_temp=treeObj;
+			currentTreeItemId_temp=id;
+			try
+			{
+				if(currentPageId!=null&currentPageId!=''&&sampleframe.WX_UPDATE_ALLDATA!=null)
+				{
+					var updateallDataLocal=sampleframe.WX_UPDATE_ALLDATA;
+					for(var reportguidTmp in updateallDataLocal)
+					{
+						if(reportguidTmp==null) continue;
+						if(reportguidTmp.indexOf(currentPageId+'_guid_')==0&&updateallDataLocal[reportguidTmp]!=null&&updateallDataLocal[reportguidTmp]!='')
+						{
+							ymPrompt.confirmInfo({message:'<b>是否放弃当前页面报表数据的修改？</b><br><br>[这是在菜单中自定义实现的确认提示，参看DEMO的index.html实现]',title:'确认',width:350,height:230,handler:loadNewReportPage});
+							return;
+						}
+					}
+				}
+			}catch(e)
+			{
+			}
+			loadNewReportPage('ok');
+		}
+		var currentPageId_temp,currentReportId_temp,currentTreeObj_temp,currentTreeItemId_temp;
+		function loadNewReportPage(input)
+		{
+			if(input!='ok') return;
+			var pageid=currentPageId_temp;
+			var reportid=currentReportId_temp;
+			var treeObj=currentTreeObj_temp;
+			var id=currentTreeItemId_temp;
+			currentPageId=pageid;
+			currentReportId=reportid;
+			currentTreeObj=treeObj;
+			currentTreeItemId=id;
+			document.getElementById('title_tr1').style.display='';
+			document.getElementById('title_tr2').style.display='';
+			var url='';
+			var params=treeObj.getUserData(id,"params");
+			if(pageid.indexOf('/')>=0&&(pageid.indexOf('.jsp')>pageid.indexOf('/')||pageid.indexOf('.html')>pageid.indexOf('/')))
+			{
+				//不是报表，而是一个普通的JSP页面
+				url=pageid;
+			}else
+			{//是报表
+				url='/WabacusDemo/ShowReport.wx?PAGEID='+pageid;
+				if(reportid&&reportid!='')
+				{
+					url=url+'&REPORTID='+reportid;
+				}
+				if(params&&params!='')
+				{
+					url=url+params;
+				}
+			}
+			document.getElementById('func_url_a').innerHTML="<b>"+url+"</b>";
+			document.getElementById('func_url_a').setAttribute('url',url);
+			window.frames.sampleframe.location.href = url;
+		}
+		
+		function updateTreeSize(){
+			this.allTree.style.overflow = "visible";
+			this.allTree.style.height = this.allTree.scrollHeight+"px";
+			
+		}
+		
+		function loadXMLCallBack()
+		{
+			var domObj=document.getElementById(loadedTypeMessageId);
+			if(domObj!=null) domObj.style.display='none';
+		}
+		
+		/*function autoselectNode(){
+			if(displaytype=="form")
+			{
+				treeForm.selectItem(node,true);
+				treeForm.openItem(node);
+			}else if(displaytype=="editable")
+			{
+				treeEditable.selectItem(node,true);
+				treeEditable.openItem(node);
+			}else
+			{
+				treeReadOnly.selectItem(node,true);
+				treeReadOnly.openItem(node);
+			}
+		}*/
+		var isBarOpen=true;
+		function showOrHideNaviBar()
+		{
+			if(isBarOpen)
+			{
+				document.getElementById('tabbartd').style.display='none';
+				document.getElementById('imgShowHideNavi').src='dhtmlx/codebase/imgs/arrow_right.gif';
+				isBarOpen=false;
+			}else
+			{
+				document.getElementById('tabbartd').style.display='';
+				document.getElementById('imgShowHideNavi').src='dhtmlx/codebase/imgs/arrow_left.gif';
+				isBarOpen=true;
+			}
+		} 
+		
+		function viewReportConfig()
+		{
+			if(currentPageId.indexOf('/')>=0&&currentPageId.indexOf('.jsp')>currentPageId.indexOf('/'))
+			{
+				ymPrompt.alert('本页面是一个JSP，不能查看其配置');
+				return false;
+			}
+			if(currentPageId.indexOf('/')>=0&&currentPageId.indexOf('.html')>currentPageId.indexOf('/'))
+			{
+				ymPrompt.alert('本页面是一个HTML，不能查看其配置');
+				return false;
+			}
+			var otherfilename=currentTreeObj.getUserData(currentTreeItemId,'otherfilename');
+			if(!otherfilename) otherfilename='';
+			var url="/WabacusDemo/wabacusdemo/jsp/viewReportConfig.jsp?configfilename="
+			+currentTreeObj.getUserData(currentTreeItemId,'configfilename')
+			+"&otherfilename="+otherfilename
+			+"&pageid="
+			+currentPageId;
+			ymPrompt.win({message:url,width:800,height:600,title:"查看当前页面配置",handler:null,maxBtn:true,minBtn:false,iframe:true});
+		}
+		
+		function viewCharacteristic()
+		{
+			ymPrompt.win("<div style='font-size:14px;'>"
+				+currentTreeObj.getUserData(currentTreeItemId,'desc')
+				+"</div>",800,600,'当前页面演示特性');
+		}
+		function openReportUrl(aTag)
+		{
+			window.open(aTag.getAttribute('url'));
+		}
+	</script>
+		<table width="100%" height="100%" cellpadding="0" cellspacing="0"
+			border="0" style="table-layout: fixed;">
+			<tr>
+				<td height="55" width="90" valign=top
+					background="logo.gif" style="font-family:Arial Black;">
+					&nbsp;
+							
+				</td>
+				<td height="55" width="206" valign=top
+					background="dhtmlx/codebase/imgs/bg_sampleexplorer_header.gif" style="font-family:Arial Black;">
+					<a href="http://code.google.com/p/wabacus">
+							<FONT SIZE='6px' COLOR="#7CB9F3"><B><FONT COLOR="#FCB9F3">W</FONT>ABACUS</B></FONT>
+					</a>
+				</td>
+				<td background="dhtmlx/codebase/imgs/bg_sampleexplorer_header.gif"
+					align=right valign=top height="55"></td>
+				<td background="dhtmlx/codebase/imgs/bg_sampleexplorer_header.gif"
+					align=right valign=middle height="55" style="font-family:Arial Black;">
+					<FONT SIZE='2px' COLOR="#7CB9F3"><B>The&nbsp; Terminator&nbsp; Of &nbsp;SSH</B></FONT>&nbsp;&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td width="100%" height="100%" colspan="4">
+					<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr><td height="2"></td></tr>
+						<tr>
+							<td id="tabbartd" valign="top" width="270">
+								<div id="tabbarconteiner" style="width: 270px; height: 100%; margin: 0 0 0 8px;">
+									<div id="a_tabbar" class="dhtmlxTabBar" tabstyle="scbr"
+										tabheight="28" imgpath="dhtmlx/codebase/imgs/"
+										style="width: 270px; height: 100%;"
+										skinColors="#FFFFFF,#F4F3EE" mode="left" offset="3"
+										oninit="a_tabbar.setTabActive(displaytype+'tab')" select="readonlytab">
+										<div id="readonlytab" width="120" name="&lt;table width='100%' height='100%' cellspacing='0' cellpadding='0' border='0' style='margin-left: 3px;'&gt; &lt;tr&gt;&lt;td width='100%' height='100%' valign='middle' align='center'&gt;数据展示篇&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="padding: 8px 8px 0 8px;display:none;">
+											<div id="readonlytree_box" style="width: 220px; height: 100%;">
+												<span id="readonlytree_message"><font size='2'>正在加载菜单项，请稍候...</font></span>
+											</div>
+										</div>
+										<div id="editabletab" width="120" name="&lt;table width='100%' height='100%' cellspacing='0' cellpadding='0' border='0' style='margin-left: 3px;'&gt;&lt;tr&gt;&lt;td onmousedown='loadEditableTree();' width='100%' height='100%' valign='middle' align='center'&gt;数据编辑篇&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="padding: 8px 8px 0 8px;display:none;" select="1">
+											<div id="editabletree_box" style="width: 220px; height: 100%;">
+												<span id="editabletree_message"><font size='2'>正在加载菜单项，请稍候...</font></span>
+											</div>
+										</div>
+										<div id="formtab" width="120" name="&lt;table width='100%' height='100%' cellspacing='0' cellpadding='0' border='0' style='margin-left: 3px;'&gt; &lt;tr&gt;&lt;td onmousedown='loadFormTree();' width='100%' height='100%' valign='middle' align='center'&gt;表单篇&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="padding: 8px 8px 0 8px;display:none;" select="1">
+											<div id="formtree_box" style="width: 220px; height: 100%;">
+												<span id="formtree_message"><font size='2'>正在加载菜单项，请稍候...</font></span>
+											</div>
+										</div>
+										<div id="othertab" width="120" name="&lt;table width='100%' height='100%' cellspacing='0' cellpadding='0' border='0' style='margin-left: 3px;'&gt; &lt;tr&gt;&lt;td onmousedown='loadOtherTree();' width='100%' height='100%' valign='middle' align='center'&gt;其它功能篇&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="padding: 8px 8px 0 8px;display:none;" select="1">
+											<div id="othertree_box" style="width: 220px; height: 100%;">
+												<span id="othertree_message"><font size='2'>正在加载菜单项，请稍候...</font></span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</td>
+							<td width="10">
+								<div><img id="imgShowHideNavi" src="dhtmlx/codebase/imgs/arrow_left.gif" onmouseover="this.style.cursor='pointer';" onclick='showOrHideNaviBar();'></div>
+							</td>
+							<td align="right" valign="top">
+							  <table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
+									<tr id="title_tr1" style="display:none;">
+									  <td  valign="top" height="15">
+											<table width="100%" style="margin:0;z-index:101;" height="100%">
+											  <tr>
+											    <td align="left" height="15">
+													<div  style="font-size:10pt;">
+														<font color="#2F4F4F"><b>当前页面访问URL：</b></font>
+														<a id="func_url_a" href="#" onClick="openReportUrl(this);"></a>
+													</div>
+												 </td>
+												 <td align="right" height="15">
+													<div  style="font-size:10pt;">
+														<a href="#" onClick="viewReportConfig();"><b>查看配置</b></a>&nbsp;&nbsp;
+														<a href="#" onClick="viewCharacteristic();"><b>演示说明</b></a>&nbsp;&nbsp;
+													</div>
+												 </td>
+											  </tr>
+											</table>
+									 	</td>
+									</tr>
+									<tr id="title_tr2" style="display:none;">
+								  		<td height="2" colspan="2" valign="top"><hr/></td>
+									</tr>
+									<tr>
+										<td align="right" colspan="2"  valign="top">
+											<iframe id="sampleframe" name="sampleframe" width="100%" height="99%" frameborder="0" src="dhtmlx/description.html" style="border: 0px solid #cecece;"></iframe>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td height="6" width="100%" colspan="4">
+					<div></div>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
+

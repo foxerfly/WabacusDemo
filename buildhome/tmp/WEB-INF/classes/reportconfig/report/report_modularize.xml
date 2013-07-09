@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	<local-resources>
+    	<resource-file>resources/resources_modularize_test.xml</resource-file>
+    </local-resources>
+    
+	<page id="reportinheritpage1">
+		<report id="report1" title="继承外面的报表" extends="listpage1.report1">
+			<display>
+				<col column="{sequence:1}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+				<col column="name" label="姓名" clickorderby="true" width="15%"/>
+				<col column="sex" label="性别"/>
+				<col column="age" label="年龄" clickorderby="true" width="100px" filter="true" filterwidth="120px"/>
+				<col column="birthday" label="出生日期" clickorderby="true" width="150px"/>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+			</display>
+		</report>
+		<report id="report2" title="继承本页面报表" extends="reportinheritpage1.report1" top="10">
+			<display>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+				<col column="name" label="姓名" clickorderby="true" width="15%"/>
+				<col column="sex" label="性别"/>
+				<col column="age" label="年龄" clickorderby="true" width="100px" filter="true" filterwidth="120px"/>
+				<col column="birthday" label="出生日期" clickorderby="true" width="150px"/>
+				<col column="deptname" label="所属部门"/>
+			</display>
+		</report>
+		<report id="report3" title="完全使用父报表配置"  extends="reportinheritpage1.report2" top="10"/>
+	</page>
+	
+	<page id="refdisplaypage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="员工信息列表" parenttitle="完全引用外部定义的display" dataexport="richexcel">
+			<display ref="${refdisplaypage1.report1.display1}"/>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtname" label="中文名">
+					<value>
+						<![CDATA[(name like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt count="15">
+						<promptcol label="name" matchmode="anywhere"/>
+						<datasource><option source="@{select name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+		<report id="report2" title="员工信息列表" parenttitle="引用多个外部定义的display" extends="refdisplaypage1.report1">
+			<display ref="${refdisplaypage1.report2.display1}|${refdisplaypage1.report2.display2}">
+				<col column="{sequence:1}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" width="100px" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+			</display>
+		</report>
+		<report id="report3" title="员工信息列表" parenttitle="使用&lt;ref/&gt;标签引用外部定义的display" extends="refdisplaypage1.report1">
+			<display ref="${refdisplaypage1.report2.display2}">
+				<col column="{sequence:1}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" width="100px" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				
+				<ref key="${refdisplaypage1.report2.display3}"/>
+				
+				<col column="sex" label="性别" width="60px" clickorderby="true"/>
+				<group label="姓名">
+					<col column="name" label="中文名" width="100px" filter="condition{txtname}" clickorderby="true"/>
+					<col column="ename" label="英文名" width="100px" filter="true" filterwidth="150px" clickorderby="true"/>
+				</group>
+			</display>
+		 </report>
+	  </tabpanel>
+	</page>
+	
+	<page id="refsqlpage1">
+	  <tabpanel id="tab1" titlestyle="2" titleposition="top" margin="10">
+		 <report id="report1" title="员工信息列表" parenttitle="完全引用外部定义的sql" dataexport="richexcel">
+			<display ref="${refdisplaypage1.report1.display1}"/>
+			<sql ref="${refsqlpage1.report1.sql1}"/>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+		<report id="report2" title="员工信息列表" parenttitle="引用多个外部定义的sql" extends="refsqlpage1.report1">
+			<sql ref="${refsqlpage1.report2.sql1}|${refsqlpage1.report2.sql2}">
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			</sql>
+		 </report>
+	  </tabpanel>
+	</page>
+	<page id="refbuttonspage1">
+	  <tabpanel id="tab1" margin="10">
+		<report id="report1" title="员工信息列表" parenttitle="完全引用外部定义的buttons" extends="refdisplaypage1.report1">
+			<buttons ref="${refbuttonspage1.report1.buttons1}"/>
+		</report>
+		<report id="report2" title="员工信息列表" parenttitle="引用多个外部定义的buttons" extends="refdisplaypage1.report1">
+			<buttons ref="${refbuttonspage1.report2.buttons1}|${refbuttonspage1.report2.buttons2}" buttonspacing="2">
+				<button name="button1" position="searchbox" label="按钮一">
+					<![CDATA[alert('按钮一');]]>
+				</button>
+				<button name="button2" position="searchbox" label="按钮二">
+					<![CDATA[alert('按钮二');]]>
+				</button>
+			</buttons>
+		</report>
+		<report id="report3" title="员工信息列表" parenttitle="使用&lt;ref/&gt;标签引用外部定义的buttons" extends="refdisplaypage1.report1">
+			<buttons ref="${refbuttonspage1.report2.buttons2}" buttonspacing="2">
+				<button name="button1" position="searchbox" label="按钮一">
+					<![CDATA[alert('按钮一');]]>
+				</button>
+				<ref key="${refbuttonspage1.report2.buttons1}"/>
+				<button name="button2" position="searchbox" label="按钮二">
+					<![CDATA[alert('按钮二');]]>
+				</button>
+			</buttons>
+		 </report>
+	  </tabpanel>
+	</page>
+	<page id="refformatpage1">
+		<report id="report1" title="引用外部定义的format" dataexport="richexcel">
+			<display ref="${refdisplaypage1.report1.display1}"/>
+			<sql ref="${refsqlpage1.report1.sql1}"/>
+			<format ref="${refformatpage1.report1.format1}"/>
+		</report>
+	</page>
+</applications>

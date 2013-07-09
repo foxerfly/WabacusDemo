@@ -1,0 +1,60 @@
+<?xml version="1.0"  encoding="UTF-8" ?>
+
+<project name="WabacusDemo" default="build" basedir=".">
+
+	<property name="app.home" value="." />
+	<property name="app.name" value="WabacusDemo" />
+	<property name="src.home" value="${app.home}/src" />
+	<property name="lib.home" value="${app.home}/WebRoot/WEB-INF/lib" />
+	<property name="classes.home" value="${app.home}/WebRoot/WEB-INF/classes" />
+	<property name="build.home" value="${app.home}\buildhome" />
+	
+	<path id="compile.classpath">
+		<pathelement location="${classes.home}" />
+		<fileset dir="${lib.home}">
+			<include name="**/*.jar" />
+			<include name="**/*.zip" />
+		</fileset>
+	</path>
+
+	<target name="compile">
+			<delete dir="${classes.home}"/>
+			<mkdir dir="${classes.home}"/>		
+			<javac fork="true" memoryMaximumSize="512M" srcdir="${src.home}"
+				destdir="${classes.home}" debug="true" encoding="utf-8">
+				<classpath refid="compile.classpath" />
+			</javac>
+			<copy todir="${classes.home}">
+				<fileset dir="${src.home}">
+					<include name="**/*.xml" />
+					<include name="**/*.properties"/>
+				</fileset>
+			</copy>
+	</target>
+	<target name="build" depends="compile">
+		<delete file="${app.home}/${app.name}.war" />
+		<mkdir dir="${build.home}/tmp" />
+		<copy todir="${build.home}/tmp">
+			<fileset dir="${app.home}/WebRoot">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+		<delete file="${build.home}/tmp/WEB-INF/lib/weblogic.jar" />
+		<delete dir="${build.home}/tmp/wabacus-generatejs"/>
+		<mkdir dir="${build.home}/tmp/wabacus-generatejs" />
+		<copy todir="${build.home}/tmp/wabacus-generatejs">
+			<fileset dir="D:\Program Files\workspace\.metadata\.plugins\com.genuitec.eclipse.easie.tomcat.myeclipse\tomcat\webapps\WabacusDemo\wabacus-generatejs">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+		<!--delete file="${build.home}/tmp/WEB-INF/classes/reportconfig/wabacus.cfg.xml" />
+		<copy file="${build.home}/wabacus.cfg.xml"
+							todir="${build.home}/tmp/WEB-INF/classes/reportconfig" /-->
+		<jar jarfile="${app.home}/${app.name}.war"
+			basedir="${build.home}/tmp" />
+		<delete dir="${build.home}/tmp" />
+	</target>
+</project>
+
+
+

@@ -1,0 +1,2158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	<page id="defaultnormalprintpage1">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="150px" margin="10px">
+			<vpanel id="vp1" border="1" bordercolor="#c0c0c0" parenttitle="打印当前页" margin="10px">
+				<report id="report1" title="员工信息列表" dataexport="plainexcel">
+					<print type="default" printpagesize="A3;A4;A2"/>
+					<display>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="姓名" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+						<group label="籍贯">
+							<col column="province" label="省"/>
+							<col column="city" label="市"/>
+							<col column="county" label="县"/>
+						</group>
+						<col column="photo" label="照片" printwidth="100px"/>
+					</display>
+					<sql>
+				 	 <select>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+						  		<typeprompt width="-1" count="15">
+									<promptcol label="no" matchmode="anywhere"/>
+									<datasource>
+										<option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/>
+									</datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT)
+					   	{
+					   		if(photo!=null&&!photo.trim().equals("")) photo="<img src=\""+photo+"\">";
+					    		no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					   	}
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report2" title="request{employeename}员工详细资料" type="detail" pagesize="1"  dataexport="plainexcel" top="20px">
+					<print type="default" printpagesize="A3;A4;A2"/>
+					<display valuetdwidth="100px" labeltdwidth="71px" printlabelwidth="80px" printvaluewidth="100px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="中文名"/>
+						<col column="ename" label="英文名" br="true"/>
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄"/>
+						<col column="marriage" label="婚否" br="true"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptname" label="所属部门" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}"/>
+						<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="province" label="省"/>
+						<col column="city" label="市"/>
+						<col column="county" label="县" br="true"/>
+						<col column="photo" label="照片" valuestyleproperty="colspan='5' align='center'" br="true"/>
+						<col column="description" label="评价" datatype="clob" valuestyleproperty="colspan='5'"/>
+					</display>
+					<sql>
+				  	  <select>
+						<value>
+							<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,photo,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where   {#condition#}]]>
+						</value>
+						<condition name="txtgonghao" label="工号或姓名">
+							<value>
+								<![CDATA[(A.no like '%#data#%' or A.name like '%#data#%')]]>
+							</value>
+							<inputbox>
+						  		<typeprompt count="15">
+									<promptcol label="no" title="工号" matchmode="anywhere"/>
+									<promptcol label="name" title="姓名" matchmode="anywhere"/>
+									<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				    		<![CDATA[
+				  				if(photo!=null&&!photo.trim().equals("")&&(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT))
+					  		 	{
+					    			photo="<img src=\""+photo+"\">";
+					   		}
+								sex=sex==null?"":sex.trim();
+								if(sex.equals("0")) sex="女";
+								else if(sex.equals("1")) sex="男";
+								marriage=marriage==null?"":marriage.trim();
+								if(marriage.equals("1")) marriage="已婚";
+								else if(marriage.equals("0")) marriage="未婚";
+								rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+							]]>
+				  		</value>
+					</format>
+				</report>
+			</vpanel>
+			<vpanel id="vp2" border="1" bordercolor="#c0c0c0" parenttitle="打印所有页" margin="10px">
+				<report id="report3" extends="defaultnormalprintpage1.report1">
+					<print type="default" printpagesize="A3;A4;A2" include="report3{-1}"/>
+				</report>
+				<report id="report4" extends="defaultnormalprintpage1.report2" top="20px">
+					<print type="default" printpagesize="A3;A4;A2" include="report4{-1}"/>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				    		<![CDATA[
+				  				if(photo!=null&&!photo.trim().equals("")&&(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT))
+					  		 	{
+					    			photo="<img src=\""+photo+"\">";
+					   		}
+								sex=sex==null?"":sex.trim();
+								if(sex.equals("0")) sex="女";
+								else if(sex.equals("1")) sex="男";
+								marriage=marriage==null?"":marriage.trim();
+								if(marriage.equals("1")) marriage="已婚";
+								else if(marriage.equals("0")) marriage="未婚";
+								if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE) rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+							]]>
+				  		</value>
+					</format>
+				</report>
+			</vpanel>
+			<vpanel id="vp3" border="1" bordercolor="#c0c0c0" parenttitle="控制报表打印结构" margin="10px">
+				<header><![CDATA[<font color="#ff0000">说明：</font><font color="#0000ff">这里演示了通过静态模板、动态模板和直接在<print/>标签内容中配置打印内容的三种方式控制报表打印结构，利用这种方法可以实现套打功能</font>]]></header>
+				<print type="default" printpagesize="A3;A4;A2;A1" include="report5{-1};report6{1}">
+					<!-- 因为两个报表中report5不分页打印，report6分页打印，因此需要将它们拆分在两个子页面中，而不是合并在一个子页面中，否则会导致repor5的数据在每页中都打印一份 -->
+					<subpage>
+					<![CDATA[
+						<wx:data componentid="report5"/>
+						<wx:title componentid="report5"/>
+						<hr/>
+					]]>
+					</subpage>
+					<subpage splitprintreport="report6">
+					<![CDATA[
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						  	<tr><td><wx:title componentid="report6"/></td></tr>
+						  	<tr><td><hr></td></tr>
+							<tr><td align='left'><wx:data componentid="report6" col="no" showlabel="true" showdata="false"/>：<wx:data componentid="report6" col="no" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>中文名：<wx:data componentid="report6" col="name" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>英文名：<wx:data componentid="report6" col="ename" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>性别：<wx:data componentid="report6" col="sex" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>年龄：<wx:data componentid="report6" col="age" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>婚否：<wx:data componentid="report6" col="marriage" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>出生日期：<wx:data componentid="report6" col="birthday" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>入职日期：<wx:data componentid="report6" col="joinindate" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>籍贯：<wx:data componentid="report6" col="province" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>照片：<wx:data componentid="report6" col="photo" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>评价：<wx:data componentid="report6" col="description" showlabel="false" showdata="true"/></td></tr>
+						  	<tr><td><hr></td></tr>
+						</table>
+					]]>
+					</subpage>
+				</print>
+				<tabpanel id="tp2" margin="10" titlestyle="2">
+					<report id="report5" parenttitle="打印效果一" extends="defaultnormalprintpage1.report1">
+						<print type="default" printpagesize="A3;A4;A2">
+							<![CDATA[
+								relative{/wabacusdemo/htmltemplate/dataexport/dataexportwordpage1_report3.html}
+							]]>
+						</print>
+					</report>
+					<report id="report51" parenttitle="打印效果二" extends="defaultnormalprintpage1.report1">
+						<print type="default" printpagesize="A3;A4;A2" include="report51{1}">
+							<![CDATA[
+								relative{/wabacusdemo/htmltemplate/print/defaultformatprintpage1_report1.html}
+							]]>
+						</print>
+					</report>
+				</tabpanel>
+				<report id="report6" extends="defaultnormalprintpage1.report4" top="20px">
+					<print type="default" printpagesize="A3;A4;A2" include="report6{1}">
+						<![CDATA[
+							jsp{/wabacusdemo/jsp/tagpages/defaultnormalprintpage1_report6_tpl.jsp}
+						]]>
+					</print>
+				</report>
+			</vpanel>
+			<vpanel id="vp4" border="1" bordercolor="#c0c0c0" parenttitle="同时打印多个报表" margin="10px">
+				<header><![CDATA[<font color="#ff0000">说明：</font><font color="#0000ff">此页面上所有“打印”按钮都会同时打印两个报表，不过有的只打印当前页，有的打印所有页</font>]]></header>
+				<print type="default" printpagesize="A3;A4;A2" include="report7;report8">
+					<![CDATA[
+						<wx:title componentid="report7"/>
+						<wx:data componentid="report7"/>
+						<hr/>
+						<wx:title componentid="report8"/>
+						<wx:data componentid="report8"/>
+					]]>
+				</print>
+				<report id="report7" extends="defaultnormalprintpage1.report1">
+					<print type="default" printpagesize="A3;A4;A2" include="report7{-1};report8{-1}">
+						<![CDATA[
+							<wx:title/>
+							<wx:data/>
+							<hr/>
+							<wx:title componentid="report8"/>
+							<wx:data componentid="report8"/>
+						]]>
+					</print>
+				</report>
+				<report id="report8" extends="defaultnormalprintpage1.report4" top="20px">
+					<print type="default" printpagesize="A3;A4;A2" include="report7;report8">
+						<![CDATA[
+							<wx:title componentid="report7"/>
+							<wx:data componentid="report7"/>
+							<hr/>
+							<wx:title/>
+							<wx:data/>
+						]]>
+					</print>
+				</report>
+			</vpanel>
+		</tabpanel>				
+	</page>		
+	
+	<page id="lodopprintbytplpage1">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="150px" margin="10px">
+			<vpanel id="vp1" border="1" bordercolor="#c0c0c0" parenttitle="打印当前页" margin="10px">
+				<print type="lodop" include="report1;report2" preview="true" jobname="员工信息列表和详细资料" printpagesize="1,2380,3380,''"/>
+				<report id="report1" title="员工信息列表" dataexport="plainexcel">
+					<print type="lodop" preview="true"/>
+					<display>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="姓名" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+						<group label="籍贯">
+							<col column="province" label="省"/>
+							<col column="city" label="市"/>
+							<col column="county" label="县"/>
+						</group>
+						<col column="photo" label="照片" printwidth="100px"/>
+					</display>
+					<sql>
+				 	 <select>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+						  		<typeprompt width="-1" count="15">
+									<promptcol label="no" matchmode="anywhere"/>
+									<datasource>
+										<option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/>
+									</datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT)
+					   	{
+					   		if(photo!=null&&!photo.trim().equals("")) photo="<img src=\""+photo+"\">";
+					    		no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					   	}
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report2" title="request{employeename}员工详细资料" type="detail" pagesize="1"  dataexport="plainexcel" top="20px">
+					<print type="lodop" preview="true"/>
+					<display valuetdwidth="100px" labeltdwidth="71px" printlabelwidth="80px" printvaluewidth="100px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="中文名"/>
+						<col column="ename" label="英文名" br="true"/>
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄"/>
+						<col column="marriage" label="婚否" br="true"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptname" label="所属部门" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}"/>
+						<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="province" label="省"/>
+						<col column="city" label="市"/>
+						<col column="county" label="县" br="true"/>
+						<col column="photo" label="照片" valuestyleproperty="colspan='5' align='center'" br="true"/>
+						<col column="description" label="评价" datatype="clob" valuestyleproperty="colspan='5'"/>
+					</display>
+					<sql>
+				  	  <select>
+						<value>
+							<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,photo,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where   {#condition#}]]>
+						</value>
+						<condition name="txtgonghao" label="工号或姓名">
+							<value>
+								<![CDATA[(A.no like '%#data#%' or A.name like '%#data#%')]]>
+							</value>
+							<inputbox>
+						  		<typeprompt count="15">
+									<promptcol label="no" title="工号" matchmode="anywhere"/>
+									<promptcol label="name" title="姓名" matchmode="anywhere"/>
+									<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				    		<![CDATA[
+				  				if(photo!=null&&!photo.trim().equals("")&&(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT))
+					  		 	{
+					    			photo="<img src=\""+photo+"\">";
+					   		}
+								sex=sex==null?"":sex.trim();
+								if(sex.equals("0")) sex="女";
+								else if(sex.equals("1")) sex="男";
+								marriage=marriage==null?"":marriage.trim();
+								if(marriage.equals("1")) marriage="已婚";
+								else if(marriage.equals("0")) marriage="未婚";
+								rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+							]]>
+				  		</value>
+					</format>
+				</report>
+			</vpanel>
+			<vpanel id="vp2" border="1" bordercolor="#c0c0c0" parenttitle="打印所有页" margin="10px">
+				<print type="lodop" include="report3{8};report4{3}" preview="true" jobname="员工信息列表和详细资料"/>
+				<report id="report3" extends="lodopprintbytplpage1.report1">
+					<print type="lodop" preview="true" include="report3{8}"/>
+				</report>
+				<report id="report4" extends="lodopprintbytplpage1.report2" top="20px">
+					<print type="lodop" preview="true" include="report4{2}"/>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				    		<![CDATA[
+				  				if(photo!=null&&!photo.trim().equals("")&&(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT))
+					  		 	{
+					    			photo="<img src=\""+photo+"\">";
+					   		}
+								sex=sex==null?"":sex.trim();
+								if(sex.equals("0")) sex="女";
+								else if(sex.equals("1")) sex="男";
+								marriage=marriage==null?"":marriage.trim();
+								if(marriage.equals("1")) marriage="已婚";
+								else if(marriage.equals("0")) marriage="未婚";
+								if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE) rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+							]]>
+				  		</value>
+					</format>
+				</report>
+			</vpanel>
+			<vpanel id="vp3" border="1" bordercolor="#c0c0c0" parenttitle="控制报表打印结构" margin="10px">
+				<header><![CDATA[<font color="#ff0000">说明：</font><font color="#0000ff">这里演示了通过静态模板、动态模板和直接在<print/>标签内容中配置打印内容的三种方式控制报表打印结构</font>]]></header>
+				<print type="lodop" include="report5{8};report6{1}" preview="true">
+					<subpage splitprintreport="report5">
+					<![CDATA[
+						<wx:data componentid="report5"/>
+						<wx:title componentid="report5"/>
+						<hr/>
+					]]>
+					</subpage>
+					<subpage mergeup="false" splitprintreport="report6">
+					<![CDATA[
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						  	<tr><td><wx:title componentid="report6"/></td></tr>
+						  	<tr><td><hr></td></tr>
+							<tr><td align='left'><wx:data componentid="report6" col="no" showlabel="true" showdata="false"/>：<wx:data componentid="report6" col="no" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>中文名：<wx:data componentid="report6" col="name" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>英文名：<wx:data componentid="report6" col="ename" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>性别：<wx:data componentid="report6" col="sex" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>年龄：<wx:data componentid="report6" col="age" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>婚否：<wx:data componentid="report6" col="marriage" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>出生日期：<wx:data componentid="report6" col="birthday" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>入职日期：<wx:data componentid="report6" col="joinindate" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>籍贯：<wx:data componentid="report6" col="province" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>照片：<wx:data componentid="report6" col="photo" showlabel="false" showdata="true"/></td></tr>
+							<tr><td align='left'>评价：<wx:data componentid="report6" col="description" showlabel="false" showdata="true"/></td></tr>
+						  	<tr><td><hr></td></tr>
+						</table>
+					]]>
+					</subpage>
+				</print>
+				<report id="report5" extends="defaultnormalprintpage1.report1">
+					<print type="lodop" preview="true">
+						<![CDATA[
+							relative{/wabacusdemo/htmltemplate/dataexport/dataexportwordpage1_report3.html}
+						]]>
+					</print>
+				</report>
+				<report id="report6" extends="defaultnormalprintpage1.report4" top="20px">
+					<print type="lodop" include="report6{1}" preview="true" printpagesize="1,1580,1300,''">
+						<![CDATA[
+							jsp{/wabacusdemo/jsp/tagpages/defaultnormalprintpage1_report6_tpl.jsp}
+						]]>
+					</print>
+				</report>
+			</vpanel>
+			<vpanel id="vp4" border="1" bordercolor="#c0c0c0" parenttitle="同时打印多个报表" margin="10px">
+				<header><![CDATA[<font color="#ff0000">说明：</font><font color="#0000ff">此页面上所有“打印”按钮都会同时打印多个报表，不过有的只打印当前页，有的打印所有页</font>]]></header>
+				<print type="lodop" include="report7;report8;" preview="true" jobname="同时打印二个报表" printpagesize="1,2380,3380,''">
+					<subpage>
+					<![CDATA[
+						<wx:title componentid="report7"/>
+						<wx:data componentid="report7"/>
+					]]>
+					</subpage>
+					<subpage mergeup="false"><!-- 第二个报表单独做为一页 -->
+					<![CDATA[
+						<wx:title componentid="report8"/>
+						<wx:data componentid="report8"/>
+					]]>
+					</subpage>
+				</print>
+				<report id="report7" extends="defaultnormalprintpage1.report1">
+					<print type="lodop" preview="true" include="report7{1};report8{1}" jobname="员工及部门资料">
+						<![CDATA[
+							<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							  	<tr><td><wx:title/></td></tr>
+							  	<tr><td><hr></td></tr>
+								<tr><td align='left'>工号：<wx:data col="no"/></td></tr>
+								<tr><td align='left'>姓名：<wx:data col="name"/></td></tr>
+								<tr><td align='left'>年龄：<wx:data col="age"/></td></tr>
+								<tr><td align='left'>工资：<wx:data col="salary"/></td></tr>
+								<tr><td align='left'>所属部门：<wx:data col="deptname"/></td></tr>
+								<tr><td align='left'>省：<wx:data col="province"/></td></tr>
+								<tr><td align='left'>市：<wx:data col="city"/></td></tr>
+								<tr><td align='left'>县：<wx:data col="county"/></td></tr>
+								<tr><td align='left'>照片：<wx:data col="photo"/></td></tr>
+							  	<tr><td style='height:5px'>&nbsp;</td></tr>
+							  	<tr><td><wx:title componentid="report8"/></td></tr>
+							  	<tr><td><hr></td></tr>
+							  	<tr><td align='left'>部门编号：<wx:data componentid="report8" col="deptno" showlabel="false" showdata="true"/></td></tr>
+								<tr><td align='left'>部门名：<wx:data componentid="report8" col="deptname" showlabel="false" showdata="true"/></td></tr>
+								<tr><td align='left'>部门经理：<wx:data componentid="report8" col="manager" showlabel="false" showdata="true"/></td></tr>
+								<tr><td align='left'>创建日期：<wx:data componentid="report8" col="builtdate" showlabel="false" showdata="true"/></td></tr>
+								<tr><td align='left'>表现：<wx:data componentid="report8" col="performance" showlabel="false" showdata="true"/></td></tr>
+								<tr><td align='left'>简介：<wx:data componentid="report8" col="description" showlabel="false" showdata="true"/></td></tr>
+							</table>
+						]]>
+					</print>
+				</report>
+				<report id="report8" title="部门资料列表" type="detail" dataexport="pdf" pagesize="1" top="20px">
+					<print type="lodop" include="report7{5};report8{1}" preview="true" jobname="员工信息列表和详细资料">
+						<subpage splitprintreport="report7;report8">
+						<![CDATA[
+							<wx:title componentid="report7"/>
+							<wx:data componentid="report7"/>
+							<br><br>
+							<hr color='red'/>
+							<br><br>
+							<wx:title/>
+							<wx:data/>
+						]]>
+						</subpage>
+					</print>
+					<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="deptname" label="部门名" br="true"/>
+						<col column="manager" label="部门经理"/>
+						<col column="builtdate" label="创建日期"  datatype="date{yyyy-MM-dd}" br="true"/>
+						<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='3'"/>
+					</display>
+					<sql>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+						</value>
+						<condition name="txtdeptno" hidden="true">
+							<value>
+								<![CDATA[(deptno like '%#data#%' )]]>
+							</value>
+						</condition>
+					</sql>
+				</report>
+			</vpanel>
+		</tabpanel>				
+	</page>		
+	
+	<page id="lodopprintbylodoppage1">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="150px" margin="10px">
+			<vpanel id="vp1" border="1" bordercolor="#c0c0c0" parenttitle="打印当前页" margin="10px">
+				<print type="lodop" include="report1;report2" preview="true" jobname="员工信息列表和详细资料" printpagesize="1,2380,3380,''">
+					<subpage>
+					<![CDATA[
+					LODOP_OBJ.ADD_PRINT_HTM('0','0','98%','100%',wx_content{report1});
+					]]>
+					</subpage>
+					<subpage mergeup="false">
+					<![CDATA[
+					LODOP_OBJ.ADD_PRINT_HTM('0','0','98%','100%',wx_content{report2});
+					]]>
+					</subpage>
+				</print>
+				<report id="report1" title="员工信息列表" dataexport="plainexcel">
+					<print type="lodop" preview="true">
+					<![CDATA[
+						LODOP_OBJ.ADD_PRINT_HTM('0','0','98%','100%',wx_content{this});
+					]]>
+					</print>
+					<display>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="姓名" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+						<group label="籍贯">
+							<col column="province" label="省"/>
+							<col column="city" label="市"/>
+							<col column="county" label="县"/>
+						</group>
+						<col column="photo" label="照片" printwidth="100px"/>
+					</display>
+					<sql>
+				 	 <select>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+						  		<typeprompt width="-1" count="15">
+									<promptcol label="no" matchmode="anywhere"/>
+									<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT)
+					   	{
+					   		if(photo!=null&&!photo.trim().equals("")) photo="<img src=\""+photo+"\">";
+					    		no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					   	}
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report2" title="request{employeename}员工详细资料" type="detail" pagesize="1"  dataexport="plainexcel" top="20px">
+					<print type="lodop" preview="true">
+					<![CDATA[
+						LODOP_OBJ.ADD_PRINT_HTM('0','0','98%','100%',wx_content{this});
+					]]>
+					</print>
+					<display valuetdwidth="100px" labeltdwidth="71px" printlabelwidth="80px" printvaluewidth="100px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="中文名"/>
+						<col column="ename" label="英文名" br="true"/>
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄"/>
+						<col column="marriage" label="婚否" br="true"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptname" label="所属部门" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}"/>
+						<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="province" label="省"/>
+						<col column="city" label="市"/>
+						<col column="county" label="县" br="true"/>
+						<col column="photo" label="照片" valuestyleproperty="colspan='5' align='center'" br="true"/>
+						<col column="description" label="评价" datatype="clob" valuestyleproperty="colspan='5'"/>
+					</display>
+					<sql>
+				  	  <select>
+						<value>
+							<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,photo,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where   {#condition#}]]>
+						</value>
+						<condition name="txtgonghao" label="工号或姓名">
+							<value>
+								<![CDATA[(A.no like '%#data#%' or A.name like '%#data#%')]]>
+							</value>
+							<inputbox>
+						  		<typeprompt count="15">
+									<promptcol label="no" title="工号" matchmode="anywhere"/>
+									<promptcol label="name" title="姓名" matchmode="anywhere"/>
+									<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				    		<![CDATA[
+				  				if(photo!=null&&!photo.trim().equals("")&&(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT))
+					  		 	{
+					    			photo="<img src=\""+photo+"\">";
+					   		}
+								sex=sex==null?"":sex.trim();
+								if(sex.equals("0")) sex="女";
+								else if(sex.equals("1")) sex="男";
+								marriage=marriage==null?"":marriage.trim();
+								if(marriage.equals("1")) marriage="已婚";
+								else if(marriage.equals("0")) marriage="未婚";
+								rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+							]]>
+				  		</value>
+					</format>
+				</report>
+			</vpanel>
+			<vpanel id="vp2" border="1" bordercolor="#c0c0c0" parenttitle="打印所有页" margin="10px">
+				<print type="lodop" include="report3{8};report4{3}" preview="true" jobname="员工信息列表和详细资料" printpagesize="1,2380,3380,''">
+					<subpage splitprintreport="report3">
+					<![CDATA[
+					LODOP_OBJ.ADD_PRINT_HTM('0','0','98%','100%',wx_content{report3});
+					]]>
+					</subpage>
+					<subpage mergeup="false" splitprintreport="report4">
+					<![CDATA[
+					LODOP_OBJ.ADD_PRINT_HTM('0','0','98%','100%',wx_content{report4});
+					]]>
+					</subpage>
+				</print>
+				<report id="report3" extends="lodopprintbytplpage1.report1">
+					<print type="lodop" preview="true" include="report3{8}">
+					<![CDATA[
+						LODOP_OBJ.ADD_PRINT_HTM('0','0','98%','100%',wx_content{this});
+					]]>
+					</print>
+				</report>
+				<report id="report4" extends="lodopprintbytplpage1.report2" top="20px">
+					<print type="lodop" preview="true" include="report4{2}">
+					<![CDATA[
+						LODOP_OBJ.ADD_PRINT_HTM('0','0','98%','100%',wx_content{this});
+					]]>
+					</print>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				    		<![CDATA[
+				  				if(photo!=null&&!photo.trim().equals("")&&(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT))
+					  		 	{
+					    			photo="<img src=\""+photo+"\">";
+					   		}
+								sex=sex==null?"":sex.trim();
+								if(sex.equals("0")) sex="女";
+								else if(sex.equals("1")) sex="男";
+								marriage=marriage==null?"":marriage.trim();
+								if(marriage.equals("1")) marriage="已婚";
+								else if(marriage.equals("0")) marriage="未婚";
+								if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE) rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+							]]>
+				  		</value>
+					</format>
+				</report>
+			</vpanel>
+			<vpanel id="vp3" border="1" bordercolor="#c0c0c0" parenttitle="控制报表打印结构" margin="10px">
+				<report id="report5" extends="defaultnormalprintpage1.report1">
+					<print type="lodop" preview="true" include="report5{8}">
+						<subpage mergeup="true">
+						<![CDATA[
+							LODOP_OBJ.ADD_PRINT_HTM(0, 30, 800, 30, "<hr>");
+							LODOP_OBJ.ADD_PRINT_HTM(35, 30, 800, 75, wx_content{this.title.title}+"<font color='red'><b>(只打印在第一页上)</b></font>");
+							LODOP_OBJ.ADD_PRINT_HTM(78, 30, 800, 85, "<hr>");
+						]]>
+						</subpage>
+						<subpage mergeup="true" splitprintreport="report5">
+						<![CDATA[
+							LODOP_OBJ.ADD_PRINT_RECT(110, 27, 900, 1200, 0, 1);
+							LODOP_OBJ.ADD_PRINT_HTM(120, 30, 810, 200, wx_content{this.data.[title]});
+							LODOP_OBJ.ADD_PRINT_HTM(210, 30, 810, 1000, wx_content{this.data.[data]});
+						]]>
+						</subpage>
+					</print>
+				</report>
+				<report id="report6" extends="defaultnormalprintpage1.report4" top="20px">
+					<print type="lodop" preview="true" include="report6{1}">
+						<subpage>
+						<![CDATA[
+							LODOP_OBJ.ADD_PRINT_HTM(0, 30, 800, 30, "<hr>");
+							LODOP_OBJ.ADD_PRINT_HTM(35, 30, 800, 75, wx_content{this.title.title}+"<font color='red'><b>(只打印在第一页上)</b></font>");
+							LODOP_OBJ.ADD_PRINT_HTM(78, 30, 800, 85, "<hr>");
+						]]>
+						</subpage>
+						<subpage mergeup="true" splitprintreport="report6">
+						<![CDATA[
+							LODOP_OBJ.ADD_PRINT_RECT(110, 17, 770, 1000, 0, 1);
+							LODOP_OBJ.ADD_PRINT_HTM(120, 20, 740, 800, wx_content{this.data});
+						]]>
+						</subpage>
+					</print>
+				</report>
+			</vpanel>
+			<vpanel id="vp4" border="1" bordercolor="#c0c0c0" parenttitle="同时打印多个报表" margin="10px">
+				<header><![CDATA[<font color="#ff0000">说明：</font><font color="#0000ff">此页面上所有“打印”按钮都会同时打印多个报表，不过有的只打印当前页，有的打印所有页</font>]]></header>
+				<print type="lodop" include="report7{5};report8{1}" preview="true">
+					<subpage mergeup="true" splitprintreport="report7;">
+					<![CDATA[
+						LODOP_OBJ.ADD_PRINT_RECT(50, 27, 734, 1000, 0, 1);
+						LODOP_OBJ.ADD_PRINT_HTM(60, 30, 700, 60, "<font color='red'><b>"+wx_content{report7.title}+"</b></font>");
+						LODOP_OBJ.ADD_PRINT_HTM(100, 30, 700, 900, wx_content{report7.data});
+					]]>
+					</subpage>
+					<subpage mergeup="false" splitprintreport="report8">
+					<![CDATA[
+						LODOP_OBJ.ADD_PRINT_RECT(50, 27, 734, 1000, 0, 1);
+						LODOP_OBJ.ADD_PRINT_HTM(60, 30, 700, 40, "<font color='red'><b>"+wx_content{report8.title.title}+"</b></font>");
+						LODOP_OBJ.ADD_PRINT_HTM(100, 30, 700, 880, wx_content{report8.data});
+					]]>
+					</subpage>
+				</print>
+				<report id="report7" extends="defaultnormalprintpage1.report1">
+					<print type="lodop" include="report7{5};report8{1}" preview="true">
+						<subpage mergeup="true" splitprintreport="report7;report8">
+						<![CDATA[
+							LODOP_OBJ.ADD_PRINT_RECT(50, 27, 734, 1000, 0, 1);
+							LODOP_OBJ.ADD_PRINT_HTM(60, 30, 700, 60, "<font color='red'><b>"+wx_content{this.title}+"</b></font>");
+							LODOP_OBJ.ADD_PRINT_HTM(100, 30, 700, 650, wx_content{this.data});
+							LODOP_OBJ.ADD_PRINT_HTM(760, 30, 700, 30, "<font color='red'><b>"+wx_content{report8.title.title}+"</b></font>");
+							LODOP_OBJ.ADD_PRINT_HTM(800, 30, 700, 240, wx_content{report8.data});
+						]]>
+						</subpage>
+					</print>
+				</report>
+				<report id="report8" title="部门资料列表" type="detail" dataexport="pdf" pagesize="1" top="20px">
+					<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="deptname" label="部门名" br="true"/>
+						<col column="manager" label="部门经理"/>
+						<col column="builtdate" label="创建日期"  datatype="date{yyyy-MM-dd}" br="true"/>
+						<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='3'"/>
+					</display>
+					<sql>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+						</value>
+						<condition name="txtdeptno" hidden="true">
+							<value>
+								<![CDATA[(deptno like '%#data#%' )]]>
+							</value>
+						</condition>
+					</sql>
+				</report>
+			</vpanel>
+		</tabpanel>				
+	</page>		
+	
+	<page id="lodopformatprintpage1" border="1" bordercolor="#c0c0c0" margin="10px">
+		<print type="lodop" include="report1{1};report2{1}" preview="true" jobname="员工信息列表和详细资料" printpagesize="1,2380,3380,''">
+			<![CDATA[
+				LODOP_OBJ.ADD_PRINT_TEXT(35,302,427,38,wx_content{report1.data.name.value}+"详细资料");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontName","黑体");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(85,57,64,31,"工号：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_SHAPE(2,22,16,858,746,0,1,"#0000FF");
+				LODOP_OBJ.ADD_PRINT_TEXT(84,129,157,33,wx_content{report1.data.no.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(84,328,64,31,"姓名：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(83,406,157,33,wx_content{report1.data.name.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(86,583,64,31,"年龄：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(85,684,157,33,wx_content{report1.data.age.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(144,56,64,31,"工资：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(141,127,162,33,wx_content{report1.data.salary.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(142,333,64,31,"籍贯：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(138,405,436,33,wx_content{report1.data.province.value}+' '+wx_content{report1.data.city.value}+' '+wx_content{report1.data.county.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(188,54,64,31,"照片");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_HTM(197,133,483,122,wx_content{report1.data.photo.value});
+				LODOP_OBJ.ADD_PRINT_SHAPE(4,350,41,814,6,0,1,"#0080FF");
+				LODOP_OBJ.ADD_PRINT_TEXT(389,274,427,38,wx_content{report2.data.deptname.value}+"详细资料");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontName","黑体");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(437,33,100,31,"部门编号：\n");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(436,144,157,33,wx_content{report2.data.deptno.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(435,314,85,31,"部门名：\n");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(436,410,157,33,wx_content{report2.data.deptname.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(440,583,101,31,"部门经理：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(437,695,157,33,wx_content{report2.data.manager.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(485,31,100,31,"创建日期：\n");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(483,142,157,33,wx_content{report2.data.builtdate.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(482,311,88,31,"表现：\n");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(481,422,427,33,wx_content{report2.data.performance.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(528,34,97,36,"简介：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(523,140,710,228,wx_content{report2.data.description.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+			]]>
+		</print>
+		<report id="report1" extends="defaultnormalprintpage1.report1">
+			<print type="lodop" preview="true" include="report1{1}" printpagesize="1,2300,2100,''">
+			<![CDATA[
+				LODOP_OBJ.ADD_PRINT_TEXT(32,219,545,65,wx_content{this.data.name.value}+"详细资料");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontName","黑体");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",19);
+				LODOP_OBJ.ADD_PRINT_TEXT(149,57,64,31,"工号：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_SHAPE(2,129,27,675,393,0,1,"#0000FF");
+				LODOP_OBJ.ADD_PRINT_TEXT(148,129,157,33,wx_content{this.data.no.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(148,357,64,31,"姓名：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(147,429,157,33,wx_content{this.data.name.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(228,55,64,31,"年龄：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(227,127,157,33,wx_content{this.data.age.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(227,355,64,31,"工资：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(226,427,162,33,wx_content{this.data.salary.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(294,52,64,31,"籍贯：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(293,124,465,33,wx_content{this.data.province.value}+' '+wx_content{this.data.city.value}+' '+wx_content{this.data.county.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(361,55,64,31,"照片");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_HTM(359,128,483,122,wx_content{this.data.photo.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+			]]>
+			</print>
+			<format>
+				<imports>
+					<import>com.wabacus.util.*</import>
+			  	</imports>
+		  		<value>
+		  		<![CDATA[
+		  			if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT)
+			   	{
+			   		if(photo!=null&&!photo.trim().equals("")) photo="<img src=\""+photo+"\">";
+			    		if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE) no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+			   	}
+		  		]]>
+		  		</value>
+			</format>
+		</report>
+		<report id="report2" title="部门资料列表" type="detail" dataexport="pdf" pagesize="1" top="20px">
+			<print type="lodop" preview="true" include="report2{1}" printpagesize="1,2300,2100,''">
+			<![CDATA[
+				LODOP_OBJ.ADD_PRINT_TEXT(32,219,545,65,wx_content{this.data.deptname.value}+" 详细资料");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontName","黑体");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",19);
+				LODOP_OBJ.ADD_PRINT_SHAPE(2,129,27,675,423,0,1,"#0000FF");
+				LODOP_OBJ.ADD_PRINT_TEXT(148,357,108,31,"部门名：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(148,479,157,33,wx_content{this.data.deptname.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(228,55,105,31,"部门经理：");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(227,173,157,33,wx_content{this.data.manager.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(227,477,162,33,wx_content{this.data.builtdate.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(284,55,106,31,"表现：\n");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(282,173,465,33,wx_content{this.data.performance.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(357,56,107,31,"简介：\n");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(148,56,103,38,"部门编号：\n");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(150,173,157,33,wx_content{this.data.deptno.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+				LODOP_OBJ.ADD_PRINT_TEXT(227,355,107,31,"创建日期：\n");
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",13);
+				LODOP_OBJ.ADD_PRINT_TEXT(357,171,475,165,wx_content{this.data.description.value});
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontSize",12);
+				LODOP_OBJ.SET_PRINT_STYLEA(0,"FontColor","#000080");
+			]]>
+			</print>
+			<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="guid" displaytype="hidden"/>
+				<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'"/>
+				<col column="deptname" label="部门名" br="true"/>
+				<col column="manager" label="部门经理"/>
+				<col column="builtdate" label="创建日期"  datatype="date{yyyy-MM-dd}" br="true"/>
+				<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true"/>
+				<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='3'"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+				</value>
+				<condition name="txtdeptno" hidden="true">
+					<value>
+						<![CDATA[(deptno like '%#data#%' )]]>
+					</value>
+				</condition>
+			</sql>
+		</report>
+	</page>
+	
+	<page id="lodopprintpageinfopage1">
+		<framepanel id="fp1" title="控制方式一" margin="10px">
+			<report id="report1" extends="lodopprintbytplpage1.report1">
+				<print type="lodop" preview="true" include="report1{8}">
+					<pageinfo>
+				  		'当前第'+wx_content{pageno}+'页，共'+wx_content{pagecount}+'页'
+				  	</pageinfo>
+				</print>
+			</report>
+		</framepanel>
+		<framepanel id="fp2" title="控制方式二" margin="10px" top="10px">
+			<report id="report2" extends="lodopprintbytplpage1.report2" top="20px">
+				<print type="lodop" preview="true" include="report2{2}">
+					<pageinfo>
+				  		LODOP_OBJ.ADD_PRINT_HTM(750, 300, 485, 800,'当前第'+wx_content{pageno}+'页，共'+wx_content{pagecount}+'页');
+				  	</pageinfo>
+				</print>
+				<format>
+					<imports>
+						<import>com.wabacus.util.*</import>
+				  	</imports>
+			  		<value>
+			    		<![CDATA[
+			  				if(photo!=null&&!photo.trim().equals("")&&(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE||rrequest.getShowtype()==Consts.DISPLAY_ON_PRINT))
+				  		 	{
+				    			photo="<img src=\""+photo+"\">";
+				   		}
+							sex=sex==null?"":sex.trim();
+							if(sex.equals("0")) sex="女";
+							else if(sex.equals("1")) sex="男";
+							marriage=marriage==null?"":marriage.trim();
+							if(marriage.equals("1")) marriage="已婚";
+							else if(marriage.equals("0")) marriage="未婚";
+							if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE) rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+						]]>
+			  		</value>
+				</format>
+			</report>
+		</framepanel>
+	</page>
+	
+	<page id="pdfnormalprintpage1">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="150px" margin="10px">
+			<vpanel id="vp1" border="1" bordercolor="#c0c0c0" parenttitle="打印当前页" margin="10px">
+				<print type="pdf" include="report1{0};report2{0}"/>
+				<report id="report1" title="员工信息列表">
+					<print type="pdf" include="report1{0}"/>
+					<display>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="姓名" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="sex" label="性别" clickorderby="true"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+						<group label="籍贯">
+							<col column="province" label="省"/>
+							<col column="city" label="市"/>
+							<col column="county" label="县"/>
+						</group>
+					</display>
+					<sql>
+				 	 <select>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+						  		<typeprompt width="-1" count="15">
+									<promptcol label="no" matchmode="anywhere"/>
+									<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PDF)
+				  			{
+					  			no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					  		}
+					  		if("1".equals(sex)) sex="男";
+					  		else if("0".equals(sex)) sex="女";
+					  		else sex="";
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report2" title="部门资料列表" type="detail" pagesize="1">
+					<print type="pdf" include="report2{0}"/>
+					<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="deptname" label="部门名" br="true"/>
+						<col column="manager" label="部门经理"/>
+						<col column="builtdate" label="创建日期"  datatype="date{yyyy-MM-dd}" br="true"/>
+						<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='3'"/>
+					</display>
+					<sql>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+						</value>
+						<condition name="txtdeptno" hidden="true">
+							<value>
+								<![CDATA[(deptno like '%#data#%' )]]>
+							</value>
+						</condition>
+					</sql>
+				</report>
+			</vpanel>
+			<tabpanel id="tp2" titleposition="left" titlewidth="150px" margin="10px" parenttitle="打印所有页">
+				<vpanel id="vp2" border="1" bordercolor="#c0c0c0" parenttitle="默认页大小" margin="10px">
+					<print type="pdf" include="report3;report4"/>
+					<report id="report3" title="员工信息列表" extends="pdfnormalprintpage1.report1">
+						<print type="pdf"/>
+					</report>
+					<report id="report4" title="部门资料列表" extends="pdfnormalprintpage1.report2" pagesize="1">
+						<print type="pdf"/>
+					</report>
+				</vpanel>
+				<vpanel id="vp21" border="1" bordercolor="#c0c0c0" parenttitle="改变页大小" margin="10px">
+					<print type="pdf" include="report31;report41"/>
+					<report id="report31" title="员工信息列表" extends="pdfnormalprintpage1.report1">
+						<print type="pdf"  pagesize="30"/>
+					</report>
+					<report id="report41" title="部门资料列表" extends="pdfnormalprintpage1.report2" pagesize="1">
+						<print type="pdf" pagesize="10"/>
+					</report>
+				</vpanel>
+				<vpanel id="vp22" border="1" bordercolor="#c0c0c0" parenttitle="自动分页显示" margin="10px">
+					<print type="pdf" include="report32;report42"/>
+					<report id="report32" title="员工信息列表" extends="pdfnormalprintpage1.report1">
+						<print type="pdf"  pagesize="-1"/>
+					</report>
+					<report id="report42" title="部门资料列表" extends="pdfnormalprintpage1.report2" pagesize="1">
+						<print type="pdf" pagesize="-1"/>
+					</report>
+				</vpanel>
+				<vpanel id="vp23" border="1" bordercolor="#c0c0c0" parenttitle="另一种打印结构" margin="10px">
+					<print type="pdf" include="report33;report43" pagesize="30" fullpagesplit="false"/>
+					<report id="report33" title="员工信息列表" extends="pdfnormalprintpage1.report1">
+						<print type="pdf" pagesize="30" fullpagesplit="false"/>
+					</report>
+					<report id="report43" title="部门资料列表" extends="pdfnormalprintpage1.report2" pagesize="1">
+						<print type="pdf" pagesize="10" fullpagesplit="false"/>
+					</report>
+				</vpanel>
+			</tabpanel>
+			<vpanel id="vp3" border="1" bordercolor="#c0c0c0" parenttitle="控制PDF页大小" margin="10px">
+				<print type="pdf" include="report5;report6"/>
+				<report id="report5" title="员工信息列表" extends="pdfnormalprintpage1.report1">
+					<print type="pdf" printpagesize="A5" pagesize="-1"/>
+				</report>
+				<report id="report6" title="部门资料列表" extends="pdfnormalprintpage1.report2" pagesize="1">
+					<print type="pdf" printpagesize="A4" pagesize="-1"/>
+				</report>
+			</vpanel>
+			<tabpanel id="tp4" parenttitle="打印图片" titleposition="left" titlealign="top" titlewidth="160px" margin="10px">
+				<vpanel id="vp6" border="1" bordercolor="#c0c0c0" parenttitle="打印报表中图片" margin="10px">
+					<report id="report11" title="员工信息列表">
+						<print type="pdf" printpagesize="A4" pagesize="-1" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						<display>
+							<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+							<col column="name" label="姓名" clickorderby="true"/>
+							<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+							<col column="salary" label="工资" datatype="float"/>
+							<col column="deptno" label="所属部门" displaytype="hidden"/>
+							<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+							<group label="籍贯">
+								<col column="province" label="省"/>
+								<col column="city" label="市"/>
+								<col column="county" label="县"/>
+							</group>
+							<col column="photo" label="照片"/>
+						</display>
+						<sql>
+					 	 <select>
+							<value>
+								<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+							</value>
+							<condition name="txtno" label="工号">
+								<value>
+									<![CDATA[(A.no like  '%#data#%' )]]>
+								</value>
+								<inputbox>
+							  		<typeprompt width="-1" count="15">
+										<promptcol label="no" matchmode="anywhere"/>
+										<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+							  		</typeprompt>
+								</inputbox>
+							</condition>
+							<condition name="txtname" label="姓名">
+								<value>
+									<![CDATA[(name like  '%#data#%' )]]>
+								</value>
+							</condition>
+					  	  </select>
+						</sql>
+						<format>
+							<imports>
+								<import>com.wabacus.util.*</import>
+						  	</imports>
+					  		<value>
+					  		<![CDATA[
+					  			if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE)
+						   	{
+						   		if(photo!=null&&!photo.trim().equals("")) photo="<img src=\""+photo+"\">";
+						    		no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+						   	}
+					  		]]>
+					  		</value>
+						</format>
+					</report>
+					<report id="report12" extends="dataexportwordpage1.report2" dataexport="none" top="20px">
+						<print type="pdf" printpagesize="A4" pagesize="-1" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						<format>
+							<imports>
+								<import>com.wabacus.util.*</import>
+						  	</imports>
+					  		<value>
+					    		<![CDATA[
+					  				if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE&&photo!=null&&!photo.trim().equals(""))
+						  		 	{
+						    			photo="<img src=\""+photo+"\">";
+						   		}
+									sex=sex==null?"":sex.trim();
+									if(sex.equals("0")) sex="女";
+									else if(sex.equals("1")) sex="男";
+									marriage=marriage==null?"":marriage.trim();
+									if(marriage.equals("1")) marriage="已婚";
+									else if(marriage.equals("0")) marriage="未婚";
+									rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+								]]>
+					  		</value>
+						</format>
+					</report>
+				</vpanel>
+				<vpanel id="vp7" border="1" bordercolor="#c0c0c0" parenttitle="动态增加图片" margin="10px">
+					<report id="report13" title="员工信息列表" extends="pdfnormalprintpage1.report1">
+						<print type="pdf" pagesize="10" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp7"/>
+					</report>
+					<report id="report14" title="部门资料列表" extends="pdfnormalprintpage1.report2" pagesize="1">
+						<print type="pdf" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp7"/>
+					</report>
+				</vpanel>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="pdfformatprintpage1" border="1" bordercolor="#c0c0c0" margin="10px">
+		<print type="pdf" include="report9{0};report10{10}">relative{/wabacusdemo/pdftemplate/pdftpl_src3.pdf}</print><!-- 导第一个报表的当前页记录以及导第二个报表前10条记录 -->
+		<report id="report9" extends="pdfnormalprintpage1.report1">
+			<print type="pdf" include="report9{0}">relative{/wabacusdemo/pdftemplate/pdftpl_src1.pdf}</print>
+		</report>
+		<report id="report10"  title="部门资料列表" extends="pdfnormalprintpage1.report2" top="20px">
+			<print type="pdf">relative{/wabacusdemo/pdftemplate/pdftpl_src2.pdf}</print>
+		</report>
+	</page>
+	
+	<page id="dataexportwordpage1">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="150px" margin="10px">
+			<vpanel id="vp1" border="1" bordercolor="#c0c0c0" dataexport="word" parenttitle="默认导出结构" margin="10px">
+				<dataexports>
+					<dataexport type="word" filename="员工信息列表和细览信息"/>
+				</dataexports>
+				<report id="report1" title="员工信息列表" dataexport="word">
+					<display>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="姓名" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+						<group label="籍贯">
+							<col column="province" label="省"/>
+							<col column="city" label="市"/>
+							<col column="county" label="县"/>
+						</group>
+					</display>
+					<sql>
+				 	 <select>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+						  		<typeprompt width="-1" count="15">
+									<promptcol label="no" matchmode="anywhere"/>
+									<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+				  		<value>
+				  		<![CDATA[
+					  		no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report2" title="request{employeename}员工详细资料" type="detail"  dataexport="word" top="20px">
+					<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="中文名"/>
+						<col column="ename" label="英文名" br="true"/>
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄"/>
+						<col column="marriage" label="婚否" br="true"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptname" label="所属部门" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}"/>
+						<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="province" label="省"/>
+						<col column="city" label="市"/>
+						<col column="county" label="县" br="true"/>
+						<col column="photo" label="照片" valuestyleproperty="colspan='5' align='center'" br="true"/>
+						<col column="description" label="评价" datatype="clob" valuestyleproperty="colspan='5'"/>
+					</display>
+					<sql>
+				  	  <select>
+						<value>
+							<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,photo,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where   {#condition#}]]>
+						</value>
+						<condition name="txtgonghao" label="工号或姓名">
+							<value>
+								<![CDATA[(A.no like '%#data#%' or A.name like '%#data#%')]]>
+							</value>
+							<inputbox>
+						  		<typeprompt count="15">
+									<promptcol label="no" title="工号" matchmode="anywhere"/>
+									<promptcol label="name" title="姓名" matchmode="anywhere"/>
+									<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+				  		<value>
+				    		<![CDATA[
+				  				if(photo!=null&&!photo.trim().equals(""))
+					  		 	{
+					    			photo="<img src=\""+photo+"\">";
+					   		}
+								sex=sex==null?"":sex.trim();
+								if(sex.equals("0")) sex="女";
+								else if(sex.equals("1")) sex="男";
+								marriage=marriage==null?"":marriage.trim();
+								if(marriage.equals("1")) marriage="已婚";
+								else if(marriage.equals("0")) marriage="未婚";
+								rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+							]]>
+				  		</value>
+					</format>
+				</report>
+			</vpanel>
+			<vpanel id="vp2" border="1" bordercolor="#c0c0c0" dataexport="word" parenttitle="通过模板控制导出结构" margin="10px">
+				<dataexports>
+					<dataexport type="word" filename="员工信息列表和细览信息" template="relative{/wabacusdemo/htmltemplate/dataexport/dataexportwordpage1_vp2.html}"/>
+				</dataexports>
+				<report id="report3" dataexport="word" extends="dataexportwordpage1.report1">
+					<dataexports>
+						<dataexport type="word" template="relative{/wabacusdemo/htmltemplate/dataexport/dataexportwordpage1_report3.html}"/>
+					</dataexports>
+				</report>
+				<report id="report4" dataexport="word" extends="dataexportwordpage1.report2" top="20px">
+					<dataexports>
+						<dataexport type="word" template="relative{/wabacusdemo/htmltemplate/dataexport/dataexportwordpage1_report4.html}"/>
+					</dataexports>
+				</report>
+			</vpanel>
+		</tabpanel>
+	</page>
+	<page id="dataexportrichexcelpage1">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="150px" margin="10px">
+			<vpanel id="vp1" border="1" bordercolor="#c0c0c0" dataexport="richexcel" parenttitle="默认导出结构" margin="10px">
+				<dataexports>
+					<dataexport type="richexcel" filename="员工信息列表和细览信息"/>
+				</dataexports>
+				<report id="report1" title="员工信息列表" dataexport="richexcel">
+					<display>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="姓名" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+						<group label="籍贯">
+							<col column="province" label="省"/>
+							<col column="city" label="市"/>
+							<col column="county" label="县"/>
+						</group>
+					</display>
+					<sql>
+				 	 <select>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+						  		<typeprompt width="-1" count="15">
+									<promptcol label="no" matchmode="anywhere"/>
+									<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+				  		<value>
+				  		<![CDATA[
+					  		no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report2" title="request{employeename}员工详细资料" type="detail"  dataexport="richexcel" top="20px">
+					<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="中文名"/>
+						<col column="ename" label="英文名" br="true"/>
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄"/>
+						<col column="marriage" label="婚否" br="true"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptname" label="所属部门" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}"/>
+						<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="province" label="省"/>
+						<col column="city" label="市"/>
+						<col column="county" label="县" br="true"/>
+						<col column="description" label="评价" datatype="clob" valuestyleproperty="colspan='5'"/>
+					</display>
+					<sql>
+				  	  <select>
+						<value>
+							<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,photo,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where   {#condition#}]]>
+						</value>
+						<condition name="txtgonghao" label="工号或姓名">
+							<value>
+								<![CDATA[(A.no like '%#data#%' or A.name like '%#data#%')]]>
+							</value>
+							<inputbox>
+						  		<typeprompt count="15">
+									<promptcol label="no" title="工号" matchmode="anywhere"/>
+									<promptcol label="name" title="姓名" matchmode="anywhere"/>
+									<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+				  		<value>
+				    		<![CDATA[
+								sex=sex==null?"":sex.trim();
+								if(sex.equals("0")) sex="女";
+								else if(sex.equals("1")) sex="男";
+								marriage=marriage==null?"":marriage.trim();
+								if(marriage.equals("1")) marriage="已婚";
+								else if(marriage.equals("0")) marriage="未婚";
+								rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+							]]>
+				  		</value>
+					</format>
+				</report>
+			</vpanel>
+			<vpanel id="vp2" border="1" bordercolor="#c0c0c0" dataexport="richexcel" parenttitle="通过模板控制导出结构" margin="10px">
+				<dataexports>
+					<dataexport type="richexcel" filename="员工信息列表和细览信息" template="relative{/wabacusdemo/htmltemplate/dataexport/dataexportrichexcelpage1_vp2.html}"/>
+				</dataexports>
+				<report id="report3" dataexport="richexcel" extends="dataexportrichexcelpage1.report1">
+					<dataexports>
+						<dataexport type="richexcel" template="relative{/wabacusdemo/htmltemplate/dataexport/dataexportrichexcelpage1_report3.html}"/>
+					</dataexports>
+				</report>
+				<report id="report4" dataexport="richexcel" extends="dataexportrichexcelpage1.report2" top="20px">
+					<dataexports>
+						<dataexport type="richexcel" template="relative{/wabacusdemo/htmltemplate/dataexport/dataexportrichexcelpage1_report4.html}"/>
+					</dataexports>
+				</report>
+			</vpanel>
+		</tabpanel>
+	</page>
+	<page id="dataexportplainexcelpage1">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="140px" margin="10px">
+			<vpanel id="vp1" border="1" bordercolor="#c0c0c0" dataexport="plainexcel" parenttitle="以label做为列标题" margin="10px">
+				<dataexports>
+					<dataexport type="plainexcel" filename="员工信息列表和细览信息"/>
+				</dataexports>
+				<report id="report1" extends="dataexportrichexcelpage1.report1" dataexport="plainexcel">
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PLAINEXCEL)
+				  			{
+					  			no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					  		}
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report2" extends="dataexportrichexcelpage1.report2"  dataexport="plainexcel"/>
+			</vpanel>
+			<vpanel id="vp2" border="1" bordercolor="#c0c0c0" dataexport="plainexcel" parenttitle="以column做为列标题" margin="10px">
+				<dataexports>
+					<dataexport type="plainexcel" plainexceltitle="column" filename="员工信息列表和细览信息"/>
+				</dataexports>
+				<report id="report3" extends="dataexportrichexcelpage1.report1" dataexport="plainexcel">
+					<dataexports>
+						<dataexport type="plainexcel" plainexceltitle="column"/>
+					</dataexports>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PLAINEXCEL)
+				  			{
+					  			no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					  		}
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report4" extends="dataexportrichexcelpage1.report2"  dataexport="plainexcel">
+					<dataexports>
+						<dataexport type="plainexcel" plainexceltitle="column"/>
+					</dataexports>
+				</report>
+			</vpanel>
+			<vpanel id="vp3" border="1" bordercolor="#c0c0c0" dataexport="plainexcel" parenttitle="不显示列标题" margin="10px">
+				<dataexports>
+					<dataexport type="plainexcel" plainexceltitle="none" filename="员工信息列表和细览信息"/>
+				</dataexports>
+				<report id="report5" extends="dataexportrichexcelpage1.report1" dataexport="plainexcel">
+					<dataexports>
+						<dataexport type="plainexcel" plainexceltitle="none"/>
+					</dataexports>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PLAINEXCEL)
+				  			{
+					  			no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					  		}
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report6" extends="dataexportrichexcelpage1.report2"  dataexport="plainexcel">
+					<dataexports>
+						<dataexport type="plainexcel" plainexceltitle="none"/>
+					</dataexports>
+				</report>
+			</vpanel>
+			<vpanel id="vp4" parenttitle="控制每个sheet记录数">
+				<report id="report7" extends="dataexportrichexcelpage1.report1" dataexport="plainexcel">
+					<dataexports>
+						<dataexport type="plainexcel" sheetsize="10"/>
+					</dataexports>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PLAINEXCEL)
+				  			{
+					  			no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					  		}
+				  		]]>
+				  		</value>
+					</format>
+					<footer><![CDATA[<font color="#ff0000">导出时，每个Sheet只显示10条记录</font>]]></footer>
+				</report>
+			</vpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="dataexportpdfpage1">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="150px" margin="10px">
+			<vpanel id="vp1" border="1" bordercolor="#c0c0c0" dataexport="pdf" parenttitle="默认PDF导出" margin="10px">
+				<dataexports>
+					<dataexport type="pdf" filename="员工信息列表和细览信息"/>
+				</dataexports>
+				<report id="report1" title="员工信息列表" dataexport="pdf">
+					<display>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="姓名" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="sex" label="性别" clickorderby="true"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+						<group label="籍贯">
+							<col column="province" label="省"/>
+							<col column="city" label="市"/>
+							<col column="county" label="县"/>
+						</group>
+					</display>
+					<sql>
+				 	 <select>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+						  		<typeprompt width="-1" count="15">
+									<promptcol label="no" matchmode="anywhere"/>
+									<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PDF)
+				  			{
+					  			no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					  		}
+					  		if("1".equals(sex)) sex="男";
+					  		else if("0".equals(sex)) sex="女";
+					  		else sex="";
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report2" title="部门资料列表" type="editabledetail" dataexport="pdf" pagesize="1">
+					<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="deptname" label="部门名" br="true"/>
+						<col column="manager" label="部门经理"/>
+						<col column="builtdate" label="创建日期"  datatype="date{yyyy-MM-dd}" br="true"/>
+						<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true"/>
+						<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='3'"/>
+					</display>
+					<sql>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+						</value>
+						<condition name="txtdeptno" hidden="true">
+							<value>
+								<![CDATA[(deptno like '%#data#%' )]]>
+							</value>
+						</condition>
+					</sql>
+				</report>
+			</vpanel>
+			<vpanel id="vp2" border="1" bordercolor="#c0c0c0" dataexport="pdf" parenttitle="控制每页记录数" margin="10px">
+				<dataexports>
+					<dataexport type="pdf" filename="员工信息列表和细览信息"/>
+				</dataexports>
+				<report id="report3" title="员工信息列表" dataexport="pdf" extends="dataexportpdfpage1.report1">
+					<dataexports>
+						<dataexport type="pdf" pagesize="30"/>
+					</dataexports>
+				</report>
+				<report id="report4" title="部门资料列表" extends="dataexportpdfpage1.report2" dataexport="pdf" pagesize="1">
+					<dataexports>
+						<dataexport type="pdf" pagesize="10"/>
+					</dataexports>
+				</report>
+			</vpanel>
+			<vpanel id="vp3" border="1" bordercolor="#c0c0c0" dataexport="pdf" parenttitle="控制PDF页大小" margin="10px">
+				<dataexports>
+					<dataexport type="pdf" printpagesize="A5" filename="员工信息列表和细览信息"/>
+				</dataexports>
+				<report id="report5" title="员工信息列表" dataexport="pdf" extends="dataexportpdfpage1.report1">
+					<dataexports>
+						<dataexport type="pdf" printpagesize="A5"/>
+					</dataexports>
+				</report>
+				<report id="report6" title="部门资料列表" extends="dataexportpdfpage1.report2" dataexport="pdf" pagesize="1">
+					<dataexports>
+						<dataexport type="pdf" printpagesize="A5"/>
+					</dataexports>
+				</report>
+			</vpanel>
+			<tabpanel id="tp2" parenttitle="控制导出结构" titleposition="left" titlealign="top" titlewidth="180px" margin="10px">
+				<vpanel id="vp4" border="1" bordercolor="#c0c0c0" dataexport="pdf" parenttitle="通过配置改变导出结构" margin="10px">
+					<dataexports>
+						<dataexport type="pdf" printpagesize="A4" pagesize="30" fullpagesplit="false" filename="员工信息列表和细览信息"/>
+					</dataexports>
+					<report id="report7" title="员工信息列表" dataexport="pdf" extends="dataexportpdfpage1.report1">
+						<dataexports>
+							<dataexport type="pdf" printpagesize="A4" fullpagesplit="false" pagesize="30"/>
+						</dataexports>
+					</report>
+					<report id="report8" title="部门资料列表" extends="dataexportpdfpage1.report2" dataexport="pdf" pagesize="1">
+						<dataexports>
+							<dataexport type="pdf" printpagesize="A4" fullpagesplit="false" pagesize="20"/>
+						</dataexports>
+					</report>
+				</vpanel>
+				<vpanel id="vp5" border="1" bordercolor="#c0c0c0" dataexport="pdf" parenttitle="通过pdf模板控制导出结构" margin="10px">
+					<dataexports>
+						<dataexport type="pdf" filename="员工信息列表和细览信息" template="relative{/wabacusdemo/pdftemplate/pdftpl_src3.pdf}" include="report9{0};report10{10}"/><!-- 导第一个报表的当前页记录以及导第二个报表前10条记录 -->
+					</dataexports>
+					<report id="report9" dataexport="pdf" extends="dataexportpdfpage1.report1">
+						<dataexports>
+							<dataexport type="pdf" template="relative{/wabacusdemo/pdftemplate/pdftpl_src1.pdf}"/>
+						</dataexports>
+					</report>
+					<report id="report10"  title="部门资料列表" dataexport="pdf" extends="dataexportpdfpage1.report2" top="20px">
+						<dataexports>
+							<dataexport type="pdf" template="relative{/wabacusdemo/pdftemplate/pdftpl_src2.pdf}"/>
+						</dataexports>
+					</report>
+					<footer><![CDATA[<font color="#ff0000">说明：</font><font color="#0000ff">点击第一个“导出Pdf”按钮时，只利用PDF模板导出“员工信息列表”报表当前页的记录以及“部门资料列表”报表的前10条记录</font>]]></footer>
+				</vpanel>
+			</tabpanel>
+			<tabpanel id="tp3" parenttitle="导出图片" titleposition="left" titlealign="top" titlewidth="160px" margin="10px">
+				<vpanel id="vp6" border="1" bordercolor="#c0c0c0" parenttitle="导出报表中图片" margin="10px">
+					<report id="report11" title="员工信息列表" dataexport="pdf">
+						<dataexports>
+							<dataexport type="pdf" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						</dataexports>
+						<display>
+							<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+							<col column="name" label="姓名" clickorderby="true"/>
+							<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+							<col column="salary" label="工资" datatype="float"/>
+							<col column="deptno" label="所属部门" displaytype="hidden"/>
+							<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+							<group label="籍贯">
+								<col column="province" label="省"/>
+								<col column="city" label="市"/>
+								<col column="county" label="县"/>
+							</group>
+							<col column="photo" label="照片"/>
+						</display>
+						<sql>
+					 	 <select>
+							<value>
+								<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+							</value>
+							<condition name="txtno" label="工号">
+								<value>
+									<![CDATA[(A.no like  '%#data#%' )]]>
+								</value>
+								<inputbox>
+							  		<typeprompt width="-1" count="15">
+										<promptcol label="no" matchmode="anywhere"/>
+										<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+							  		</typeprompt>
+								</inputbox>
+							</condition>
+							<condition name="txtname" label="姓名">
+								<value>
+									<![CDATA[(name like  '%#data#%' )]]>
+								</value>
+							</condition>
+					  	  </select>
+						</sql>
+						<format>
+							<imports>
+								<import>com.wabacus.util.*</import>
+						  	</imports>
+					  		<value>
+					  		<![CDATA[
+					  			if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE)
+						   	{
+						   		if(photo!=null&&!photo.trim().equals("")) photo="<img src=\""+photo+"\">";
+						    		no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+						   	}
+					  		]]>
+					  		</value>
+						</format>
+					</report>
+					<report id="report12" dataexport="pdf" extends="dataexportwordpage1.report2" top="20px">
+						<dataexports>
+							<dataexport type="pdf" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						</dataexports>
+						<format>
+							<imports>
+								<import>com.wabacus.util.*</import>
+						  	</imports>
+					  		<value>
+					    		<![CDATA[
+					  				if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE&&photo!=null&&!photo.trim().equals(""))
+						  		 	{
+						    			photo="<img src=\""+photo+"\">";
+						   		}
+									sex=sex==null?"":sex.trim();
+									if(sex.equals("0")) sex="女";
+									else if(sex.equals("1")) sex="男";
+									marriage=marriage==null?"":marriage.trim();
+									if(marriage.equals("1")) marriage="已婚";
+									else if(marriage.equals("0")) marriage="未婚";
+									rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+								]]>
+					  		</value>
+						</format>
+					</report>
+				</vpanel>
+				<vpanel id="vp7" border="1" bordercolor="#c0c0c0" parenttitle="动态增加图片" margin="10px">
+					<report id="report13" title="员工信息列表" dataexport="pdf" extends="dataexportpdfpage1.report1">
+						<dataexports>
+							<dataexport type="pdf" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp7"/>
+						</dataexports>
+					</report>
+					<report id="report14" title="部门资料列表" extends="dataexportpdfpage1.report2" dataexport="pdf" pagesize="1">
+						<dataexports>
+							<dataexport type="pdf" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp7"/>
+						</dataexports>
+					</report>
+				</vpanel>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	<page id="dataexportcountpage1">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="150px" margin="10px">
+			<vpanel id="vp1" border="1" bordercolor="#c0c0c0" dataexport="pdf|plainexcel" parenttitle="导出当前页数据" margin="10px">
+				<dataexports filename="员工信息列表和细览信息">
+					<dataexport type="pdf" include="report1{0};report2{0}" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+					<dataexport type="plainexcel" include="report1{0};report2{0}"/>
+				</dataexports>
+				<report id="report1" title="员工信息列表" dataexport="pdf|plainexcel">
+					<dataexports>
+						<dataexport type="pdf" include="report1{0}" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						<dataexport type="plainexcel" include="report1{0}"/>
+					</dataexports>
+					<display>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="姓名" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+						<group label="籍贯">
+							<col column="province" label="省"/>
+							<col column="city" label="市"/>
+							<col column="county" label="县"/>
+						</group>
+						<col column="photo" label="照片" plainexcelwidth="7500" pdfwidth="60"/>
+					</display>
+					<sql>
+				 	 <select>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+						  		<typeprompt width="-1" count="15">
+									<promptcol label="no" matchmode="anywhere"/>
+									<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE)
+					   	{
+					   		if(photo!=null&&!photo.trim().equals("")) photo="<img src=\""+photo+"\">";
+					    		no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					   	}
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report2" dataexport="pdf|plainexcel" pagesize="1" extends="dataexportwordpage1.report2" top="20px">
+					<dataexports>
+						<dataexport type="pdf" include="report2{0}" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						<dataexport type="plainexcel" include="report2{0}"/>
+					</dataexports>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				    		<![CDATA[
+				  				if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PDF&&rrequest.getShowtype()!=Consts.DISPLAY_ON_PLAINEXCEL&&photo!=null&&!photo.trim().equals(""))
+					  		 	{
+					    			photo="<img src=\""+photo+"\">";
+					   		}
+								sex=sex==null?"":sex.trim();
+								if(sex.equals("0")) sex="女";
+								else if(sex.equals("1")) sex="男";
+								marriage=marriage==null?"":marriage.trim();
+								if(marriage.equals("1")) marriage="已婚";
+								else if(marriage.equals("0")) marriage="未婚";
+							]]>
+				  		</value>
+					</format>
+				</report>
+			</vpanel>
+			<vpanel id="vp2" border="1" bordercolor="#c0c0c0" dataexport="pdf|plainexcel" parenttitle="导出所有页数据" margin="10px">
+				<dataexports filename="员工信息列表和细览信息">
+					<dataexport type="pdf" include="report1{-1};report2{-1}" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+					<dataexport type="plainexcel" include="report1{-1};report2{-1}"/>
+				</dataexports>
+				<report id="report3" extends="dataexportcountpage1.report1">
+					<dataexports>
+						<dataexport type="pdf" include="report1{-1};report2{-1}" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						<dataexport type="plainexcel" include="report1{-1};report2{-1}"/>
+					</dataexports>
+				</report>
+				<report id="report4" extends="dataexportcountpage1.report2" top="20px">
+					<dataexports>
+						<dataexport type="pdf" include="report1{-1};report2{-1}" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						<dataexport type="plainexcel" include="report1{-1};report2{-1}"/>
+					</dataexports>
+				</report>
+			</vpanel>
+			<vpanel id="vp3" border="1" bordercolor="#c0c0c0" dataexport="pdf|plainexcel" parenttitle="限制导出记录数" margin="10px">
+				<header><![CDATA[<font color="#ff0000">说明：</font><font color="#0000ff">这里限制只能导出前8条记录，后面的记录不导出</font>]]></header>
+				<dataexports filename="员工信息列表和细览信息">
+					<dataexport type="pdf" include="report1{8};report2{8}" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+					<dataexport type="plainexcel" include="report1{8};report2{8}"/>
+				</dataexports>
+				<report id="report5" extends="dataexportcountpage1.report1">
+					<dataexports>
+						<dataexport type="pdf" include="report1{8};report2{8}" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						<dataexport type="plainexcel" include="report1{8};report2{8}"/>
+					</dataexports>
+				</report>
+				<report id="report6" extends="dataexportcountpage1.report2" top="20px">
+					<dataexports>
+						<dataexport type="pdf" include="report1{8};report2{8}" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						<dataexport type="plainexcel" include="report1{8};report2{8}"/>
+					</dataexports>
+				</report>
+			</vpanel>
+			<vpanel id="vp4" border="1" bordercolor="#c0c0c0" dataexport="pdf|plainexcel" parenttitle="分批导出海量数据" margin="10px">
+				<header><![CDATA[<font color="#ff0000">说明：</font><font color="#0000ff">这里演示每次从数据库取10条记录进行导出，适用于海量数据导出</font>]]></header>
+				<dataexports filename="员工信息列表和细览信息" batchselectcount="10">
+					<dataexport type="pdf" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+					<dataexport type="plainexcel"/>
+				</dataexports>
+				<report id="report7" extends="dataexportcountpage1.report1">
+					<dataexports batchselectcount="10">
+						<dataexport type="pdf" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						<dataexport type="plainexcel"/>
+					</dataexports>
+				</report>
+				<report id="report8" extends="dataexportcountpage1.report2" top="20px">
+					<dataexports batchselectcount="10">
+						<dataexport type="pdf" interceptor="com.wabacusdemo.PdfInterceptor_dataexportpdfpage1_vp6"/>
+						<dataexport type="plainexcel"/>
+					</dataexports>
+				</report>
+			</vpanel>
+		</tabpanel>
+	</page>
+	<page id="multidataexportpage1">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="180px" margin="10px">
+			<header><![CDATA[<font color="#ff0000">说明：</font><font color="#0000ff">这里所有导出按钮都是同时导出两个报表的数据</font><br><br>]]></header>
+			<vpanel id="vp1" border="1" bordercolor="#c0c0c0" dataexport="pdf|word|richexcel|plainexcel" parenttitle="直接指定导出多个报表" margin="10px">
+				<dataexports filename="员工信息列表和细览信息">
+					<dataexport type="pdf" include="report1;report2"/>
+					<dataexport type="word" include="report1;report2"/>
+					<dataexport type="richexcel" include="report1;report2"/>
+					<dataexport type="plainexcel" include="report1;report2"/>
+				</dataexports>
+				<report id="report1" title="员工信息列表" dataexport="pdf|plainexcel">
+					<dataexports>
+						<dataexport type="pdf" include="report1;report2"/>
+						<dataexport type="plainexcel" include="report1;report2"/>
+					</dataexports>
+					<display>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="姓名" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+						<group label="籍贯">
+							<col column="province" label="省"/>
+							<col column="city" label="市"/>
+							<col column="county" label="县"/>
+						</group>
+					</display>
+					<sql>
+				 	 <select>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+						  		<typeprompt width="-1" count="15">
+									<promptcol label="no" matchmode="anywhere"/>
+									<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE)
+					   	{
+					    		no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					   	}
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report2" title="员工详细资料列表" dataexport="pdf|plainexcel" pagesize="1" extends="dataexportrichexcelpage1.report2" top="20px">
+					<dataexports>
+						<dataexport type="pdf" include="report1;report2"/>
+						<dataexport type="plainexcel" include="report1;report2"/>
+					</dataexports>
+				</report>
+			</vpanel>
+			<vpanel id="vp2" border="1" bordercolor="#c0c0c0" parenttitle="通过按钮指定导出多个报表" margin="10px">
+				<report id="report3" dataexport="" extends="multidataexportpage1.report1">
+					<buttons>
+				    <button name="btn1" extends="${word.button.default}" label="导出到Word">report3;report4</button>
+				    <button name="btn2" extends="${richexcel.button.default}" label="导出到Excel">report3;report4</button>
+				    <button name="btn3" extends="${plainexcel.button.default}" label="导出纯数据">report3;report4</button>
+				    <button name="btn4" extends="${pdf.button.default}" label="导出到Pdf">report3;report4</button>
+			   	</buttons>
+				</report>
+				<report id="report4" dataexport="" extends="multidataexportpage1.report2" top="20px">
+					<buttons>
+				    <button name="btn1" extends="${word.button.default}" label="导出到Word">report3;report4</button>
+				    <button name="btn2" extends="${richexcel.button.default}" label="导出到Excel">report3;report4</button>
+				    <button name="btn3" extends="${plainexcel.button.default}" label="导出纯数据">report3;report4</button>
+				    <button name="btn4" extends="${pdf.button.default}" label="导出到Pdf">report3;report4</button>
+			   	</buttons>
+				</report>
+				<buttons align="center">
+				    <button name="btn1" position="top" extends="${word.button.default}" label="导出到Word">report3;report4</button>
+				    <button name="btn2" position="top" extends="${richexcel.button.default}" label="导出到Excel">report3;report4</button>
+				    <button name="btn3" position="top" extends="${plainexcel.button.default}" label="导出纯数据">report3;report4</button>
+				    <button name="btn4" position="top" extends="${pdf.button.default}" label="导出到Pdf">report3;report4</button>
+			   </buttons>
+			</vpanel>
+			<vpanel id="vp3" border="1" bordercolor="#c0c0c0" dataexport="word|richexcel" parenttitle="通过模板导出多个报表" margin="10px">
+				<header><![CDATA[<font color="#ff0000">说明：</font><font color="#0000ff">这种导出多个报表的方式只对richexcel和word两种方式有效</font><br><br>]]></header>
+				<dataexports filename="员工信息列表和细览信息">
+					<dataexport type="word" include="report5;report6" template="relative{/wabacusdemo/htmltemplate/dataexport/multidataexportpage1_vp3.html}"/>
+					<dataexport type="richexcel" include="report5;report6" template="relative{/wabacusdemo/htmltemplate/dataexport/multidataexportpage1_vp3.html}"/>
+				</dataexports>
+				<report id="report5" extends="multidataexportpage1.report1" dataexport="word|richexcel">
+					<dataexports>
+						<dataexport type="word" include="report5;report6" template="relative{/wabacusdemo/htmltemplate/dataexport/multidataexportpage1_vp3.html}"/>
+						<dataexport type="richexcel" include="report5;report6" template="relative{/wabacusdemo/htmltemplate/dataexport/multidataexportpage1_vp3.html}"/>
+					</dataexports>
+					<display>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="姓名" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="salary" label="工资" datatype="float"/>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+						<group label="籍贯">
+							<col column="province" label="省"/>
+							<col column="city" label="市"/>
+							<col column="county" label="县"/>
+						</group>
+					</display>
+					<sql>
+				 	 <select>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+						  		<typeprompt width="-1" count="15">
+									<promptcol label="no" matchmode="anywhere"/>
+									<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  		</typeprompt>
+							</inputbox>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+				  	  </select>
+					</sql>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+					  	</imports>
+				  		<value>
+				  		<![CDATA[
+				  			if(rrequest.getShowtype()==Consts.DISPLAY_ON_PAGE)
+					   	{
+					    		no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+					   	}
+				  		]]>
+				  		</value>
+					</format>
+				</report>
+				<report id="report6" title="员工详细资料列表" dataexport="" pagesize="1" extends="multidataexportpage1.report2" top="20px"/>
+			</vpanel>
+		</tabpanel>
+	</page>
+</applications>

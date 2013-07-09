@@ -1,0 +1,1889 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	<!-- 数据展示篇报表类型 -->
+	<page id="listpage1">
+		<report id="report1" title="员工信息列表" dataexport="richexcel|word">
+			<display>
+				<col column="{sequence:1}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+				<col column="name" label="姓名" clickorderby="true" width="15%"/>
+				<group label="基本信息">
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+					<col column="birthday" label="出生日期" clickorderby="true" displaytype="always"/>
+				</group>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(no like  '%#data#%' )]]>
+					</value>
+				</condition>
+				<condition name="txtname" label="姓名">
+					<value>
+						<![CDATA[(name like  '%#data#%' )]]>
+					</value>
+				</condition>
+				<condition name="txtsex" label="性别">
+					<value>
+						<![CDATA[(sex =#data#)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option value="" label="性别"/>
+						<option value="1" label="男"/> 
+						<option value="0" label="女" />
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+	</page>
+	
+	<page id="listreportpage1">
+		<tabpanel id="tp1" margin="10px" titlestyle="2">
+			<report id="report1" title="员工信息列表" parenttitle="普通数据列表报表" dataexport="richexcel|word">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true" displaytype="always"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<sql>
+					<value>
+						<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(no like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtsex" label="性别">
+						<value>
+							<![CDATA[(sex =#data#)]]>
+						</value>
+						<inputbox type="selectbox">
+							<option value="" label="性别"/>
+							<option value="1" label="男"/> 
+							<option value="0" label="女" />
+						</inputbox>
+					</condition>
+				</sql>
+				<format>
+				  <value>
+						sex=sex==null?"1":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else sex="男";
+						birthday=birthday==null?"":birthday.trim();
+						int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						if(idx>0) birthday=birthday.substring(0,idx);
+				  </value>
+				</format>
+			</report>
+			<report id="report2" title="部门简介列表" parenttitle="新闻列表效果" border="horizontal2" dataexport="richexcel|plainexcel|word" template="${articlelist.report.template}">
+				<display dataheader="">
+					<col column="deptno" label="部门编号" displaytype="hidden"/>
+					<col column="builtdate" label="创建日期" displaytype="hidden"/>
+					<col property="prexdot" column="{non-fromdb}" valuestyleproperty="align='right' width='5px'"/>
+					<col column="description" label="标题" datatype="clob" valuestyleproperty="align='left'"/>
+				</display>
+				<sql>
+					<value>
+						<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+					</value>
+					<condition name="txtdeptno" label="部门编号">
+						<value>
+							<![CDATA[(deptno like  '%#data#%' )]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="200" count="15">
+							<promptcol label="deptno" matchmode="anywhere"/>
+							<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+				</sql>
+				<format>
+					<value>
+					<![CDATA[
+						prexdot="<img src='/WabacusDemo/wabacusdemo/images/dot_prex.gif'>";//显示在标题前面的点
+						builtdate=builtdate==null?"":builtdate.trim();
+						if(builtdate.indexOf(" ")>0) builtdate=builtdate.substring(0,builtdate.indexOf(" "));//去除掉时间部分
+						description=description==null?"":description.trim();
+						if(!description.equals(""))
+						{
+							String fulldesc=description;
+							if(description.length()>40) description=description.substring(0,40)+"...";
+							description=description.replaceAll("<p>","");
+							description=description.replaceAll("</p>","");
+							description="&nbsp;&nbsp;<span onmouseover=\"this.style.cursor='pointer'\"  onclick=\"wx_win('"+fulldesc+"',{width:400,height:200})\">"+description+"</span>";
+							description=description+"&nbsp;&nbsp;<font color='#505050'>["+builtdate+"]</font>";
+						}
+					]]>
+					</value>
+				</format>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="blocklistpage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+			<report id="report1" title="员工信息列表" parenttitle="显示图片效果" type="blocklist" width="1000px"
+					pagesize="15" dataexport="word" template="${articlelist.report.template}"><!-- 指定template为这个内置的静态模板是为了更友好的显示报表标题 -->
+				<display blockwidth="200px" blockheight="200px"><!-- 指定每一块的宽和高 -->
+					<col column="photo" label="照片"/>
+					<col column="no" label="工号" valuestyleproperty="style='mso-number-format:\@;margin-top:10px;'"/><!-- 指定工号与上面照片的垂直距离为10个象素 -->
+					<col column="name" label="姓名"/>
+					<col column="deptname" label="所属部门"/>
+				</display>
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%' )]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%' )]]>
+						</value>
+					</condition>
+				</sql>
+				<format>
+				  <imports>
+						<import>com.wabacus.util.*</import>
+				  </imports>
+				  <value>
+				  <![CDATA[
+				  	if(photo!=null&&!photo.trim().equals(""))
+					{
+					   photo="<img src=\""+photo+"\">";
+					}else
+					{
+						photo="无照片";
+					}
+				  ]]>
+				  </value>
+				</format>
+			</report>
+			<report id="report2" title="员工信息列表" parenttitle="显示普通数据" type="blocklist" width="1000px"
+					pagesize="15" dataexport="word" template="${articlelist.report.template}"><!-- 指定template为这个内置的静态模板是为了更友好的显示报表标题 -->
+				<display valuestyleproperty="style='width:190px;height:100px;border:solid 1px #cccccc;BORDER-COLLAPSE:collapse;'"><!-- 另一种指定块样式的方式 -->
+					<col column="no" label="工号" valuestyleproperty="style='mso-number-format:\@;text-align:left;'"/>
+					<col column="name" label="姓名" valuestyleproperty="style='text-align:left;'"/>
+					<col column="sex" label="性别" valuestyleproperty="style='text-align:left;'"/>
+					<col column="age" label="年龄" valuestyleproperty="style='text-align:left;'"/>
+					<col column="deptname" label="所属部门" valuestyleproperty="style='text-align:left;margin-bottom:10px;'"/><!-- 指定当前块与下面的块的间距 -->
+				</display>
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%' )]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%' )]]>
+						</value>
+					</condition>
+				</sql>
+				<format>
+				  <imports>
+						<import>com.wabacus.util.*</import>
+				  </imports>
+				  <value>
+				  <![CDATA[
+				  if(no==null) no="";
+				  if(name==null) name="";
+				  if(age==null) age="";
+				  if(deptname==null) deptname="";
+				  if("0".equals(sex))
+				  {
+				  		sex="女";
+				  }else if("1".equals(sex))
+				  {
+				  		sex="男";
+				  }else
+				  {
+				  		sex="";
+				  }
+				  	no="<b>工号</b>: "+no;
+				  	name="<b>姓名</b>: "+name;
+				  	sex="<b>性别</b>: "+sex;
+				  	age="<b>年龄</b>: "+age;
+				  	deptname="<b>部门</b>: "+deptname;
+				  ]]>
+				  </value>
+				</format>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="commoncrossslistpage1">
+		<tabpanel id="tp1" margin="10px" titlestyle="2" titlewidth="180px">
+			<vpanel id="vp1" parenttitle="通过SQL语句查询动态列">
+				<framepanel id="fp1" title="普通动态列" margin="10px">
+					<report id="report1" title="员工信息列表" dataexport="richexcel|plainexcel|word|pdf" type="crosslist">
+						<display>
+							<col column="{sequence:1}" label="序号"/>
+							<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+							<col column="layer3" realvalue="col_column" dataset="select * from tbl_dynamicolumns"/>
+							<group label="地区">
+								<col column="province"  label="省份"/>
+								<col column="city"  label="城市"/>
+								<col column="county"  label="县城"/>
+							</group>
+						</display>
+						<sql>
+							<value>
+								<![CDATA[SELECT A.no,[#dynamic-columns#],marriage,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+							</value>
+							<condition name="txtgonghao" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%')]]>
+							</value>
+							<inputbox>
+							  <typeprompt width="-1" count="15">
+								<promptcol label="no" matchmode="anywhere"/>
+								<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+							  </typeprompt>
+							</inputbox>
+							</condition>
+							<condition name="txtname" label="中文名">
+								<value>
+									<![CDATA[(name like  '%#data#%')]]>
+								</value>
+								<inputbox>
+								  <typeprompt count="15">
+									<promptcol label="name" matchmode="anywhere"/>
+									<datasource><option source="@{select name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+								  </typeprompt>
+								</inputbox>
+							</condition>
+						</sql>
+						<format>
+						  <value>
+						  <![CDATA[
+								if(mDynamicColData!=null&&mDynamicColData.size()>0)
+								{//查询到了统计数据，对它进行格式化
+									String sex=(String)mDynamicColData.get("sex");
+									if("1".equals(sex)) sex="男";
+									else if("0".equals(sex)) sex="女";
+									else if(sex==null) sex="";
+									mDynamicColData.put("sex",sex);
+									String birthday=(String)mDynamicColData.get("birthday");
+									if(birthday==null) birthday="";
+									int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+									if(idx>0) birthday=birthday.substring(0,idx);
+									mDynamicColData.put("birthday",birthday);
+								}
+							]]>
+						  </value>
+						</format>
+					</report>
+				</framepanel>
+				<framepanel id="fp2" title="分组动态列" margin="10px" top="10px">
+					<report id="report2" extends="commoncrossslistpage1.report1">
+						<display>
+							<col column="{sequence:1}" label="序号"/>
+							<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+							<group column="layer1" dataset="select * from tbl_dynamicolumns order by layer3 desc">
+								<group column="layer2">
+									<col column="layer3" realvalue="col_column"/>
+								</group>
+							</group>
+							<group label="地区">
+								<col column="province"  label="省份"/>
+								<col column="city"  label="城市"/>
+								<col column="county"  label="县城"/>
+							</group>
+						</display>
+					</report>
+				</framepanel>
+				<header><![CDATA[<font color="red">说明：</font><font color="blue">这里的动态列是在运行时从数据库表中获取</font><br>]]></header>
+			</vpanel>
+			<vpanel id="vp2" parenttitle="通过JAVA类提供动态列">
+				<framepanel id="fp3" title="普通动态列" margin="10px">
+					<report id="report3" extends="commoncrossslistpage1.report1">
+						<display>
+							<col column="{sequence:1}" label="序号"/>
+							<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+							<col column="layer3" realvalue="col_column" dataset="class{com.wabacusdemo.TestCrossListDynColGroupDataset1}"/>
+							<group label="地区">
+								<col column="province"  label="省份"/>
+								<col column="city"  label="城市"/>
+								<col column="county"  label="县城"/>
+							</group>
+						</display>
+					</report>
+				</framepanel>
+				<framepanel id="fp4" title="分组动态列" margin="10px" top="10px">
+					<report id="report4" extends="commoncrossslistpage1.report1">
+						<display>
+							<col column="{sequence:1}" label="序号"/>
+							<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+							<group column="layer1" dataset="class{com.wabacusdemo.TestCrossListDynColGroupDataset2}">
+								<group column="layer2">
+									<col column="layer3" realvalue="col_column"/>
+								</group>
+							</group>
+							<group label="地区">
+								<col column="province"  label="省份"/>
+								<col column="city"  label="城市"/>
+								<col column="county"  label="县城"/>
+							</group>
+						</display>
+					</report>
+				</framepanel>
+				<header><![CDATA[<font color="red">说明：</font><font color="blue">这里的动态列是在运行时从JAVA类中获取</font><br>]]></header>
+			</vpanel>
+			<report id="report5" title="员工信息列表" parenttitle="行分组报表中的动态列" dataexport="richexcel|plainexcel|word|pdf" type="crosslist">
+				<display>
+					<col column="val1.province" label="地区" filter="true" treerowgroup="true" width="120px"/>
+					<col column="val1.city"  label="城市" filter="true" treerowgroup="true"/>
+					<col column="val1.county"  label="县城" treerowgroup="true"/>
+					<col column="{sequence:0}" label="序号1"/>
+					<col column="val1.no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<group column="val2.layer1" dataset="select * from tbl_dynamicolumns">
+						<group column="val2.layer2">
+							<col column="val2.layer3" realvalue="col_column"/>
+						</group>
+					</group>
+					<col column="val2.joinindate" label="入职日期"/>
+				</display>
+				<sql>
+					<value id="val1">
+						<![CDATA[SELECT no,province,city,county FROM tbl_detailinfo  where  {#condition#} order by no]]>
+					</value>
+					<value id="val2" depends="no='val1.no'" dependscondition=" A.no in (#val1.no#)">
+						<![CDATA[SELECT A.no,[#dynamic-columns#],joinindate FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where {#dependscondition#} order by no]]>
+					</value>
+					<condition name="txtgonghao" label="工号" belongto="*.val1">
+						<value>
+							<![CDATA[no like  '%#data#%']]>
+						</value>
+						<inputbox>
+						  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+				</sql>
+				<format>
+				  <value>
+				  <![CDATA[
+						if(mDynamicColData!=null&&mDynamicColData.size()>0)
+						{//查询到了统计数据，对它进行格式化
+							String sex=(String)mDynamicColData.get("sex");
+							if("1".equals(sex)) sex="男";
+							else if("0".equals(sex)) sex="女";
+							else if(sex==null) sex="";
+							mDynamicColData.put("sex",sex);
+							String birthday=(String)mDynamicColData.get("birthday");
+							if(birthday==null) birthday="";
+							int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+							if(idx>0) birthday=birthday.substring(0,idx);
+							mDynamicColData.put("birthday",birthday);
+						}
+						if(joinindate==null) joinindate="";
+						int idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						if(idx>0) joinindate=joinindate.substring(0,idx);
+					]]>
+				  </value>
+				</format>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="crossstatisticpage1">
+		<tabpanel id="tp1" margin="10" titlestyle="2">
+			<vpanel id="vp1" parenttitle="简单交叉统计报表">
+				<framepanel id="fp1" margin="10px" title="通过SQL语句查询交叉统计列">
+					<report id="report11" title="2008年度员工工资表" width="1000px" dataexport="richexcel|word" type="crosslist">
+						<display>
+							<col column="no" label="工号" filter="condition{txtno}" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+							<col column="name" label="姓名" filter="true" filterwidth="120px" clickorderby="true"/>
+							<col column="month" staticondition="month=#data#" dataset="tbl_salary" >
+								<statistic id="static1" type="sum" column="salary" valuestyleproperty="align='center'"/>
+								<format><!-- 对动态表头数据进行格式化 -->
+									<imports>
+					  					<import>java.util.*</import>
+				  					</imports>
+									<value>
+										<![CDATA[
+											if(mDynamicColData!=null&&mDynamicColData.size()>0)
+											{
+												Iterator itKeys=mDynamicColData.keySet().iterator();
+												while(itKeys.hasNext())
+												{
+													String key=(String)itKeys.next();
+													String value=(String)mDynamicColData.get(key);
+													if(value!=null&&!value.trim().equals(""))
+													 	mDynamicColData.put(key,value+"月");
+												}
+											}
+										]]>
+									</value>
+								</format>
+							</col>
+						</display>
+						<sql>
+							<value>
+								<![CDATA[select A.no,A.name,[#dynamic-columns#] from tbl_salary B,tbl_baseinfo A  where A.no=B.no and year=2008 and {#condition#} group by A.no,A.name order by A.no]]>
+							</value>
+							<condition name="txtno" label="工号">
+								<value>
+									<![CDATA[(A.no like  '%#data#%' )]]>
+								</value>
+							</condition>
+						</sql>
+						<format>
+							<imports>
+			  					<import>com.wabacus.util.*</import>
+			  					<import>java.util.*</import>
+		  					</imports>
+							<value>
+								<![CDATA[
+								if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PLAINEXCEL&&mDynamicColData!=null&&mDynamicColData.size()>0)
+								{//查询到了统计数据，对它进行格式化
+									Iterator itKeys=mDynamicColData.keySet().iterator();
+									while(itKeys.hasNext())
+									{
+										String key=(String)itKeys.next();
+										String value=(String)mDynamicColData.get(key);
+										mDynamicColData.put(key,Tools.formatDouble(value,"##,###.##"));
+									}
+								}
+								]]>
+							</value>
+						</format>
+					</report>
+				</framepanel>
+				<framepanel id="fp2" margin="10px" top="10px" title="通过JAVA类查询交叉统计列">
+					<report id="report12" extends="crossstatisticpage1.report11">
+						<display>
+							<col column="no" label="工号" filter="condition{txtno}" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+							<col column="name" label="姓名" filter="true" filterwidth="120px" clickorderby="true"/>
+							<col column="month" staticondition="month=#data#" dataset="class{com.wabacusdemo.TestCrossListDynStatiColGroupDataset1}" >
+								<statistic id="static1" type="sum" column="salary" valuestyleproperty="align='center'"/>
+								<format><!-- 对动态表头数据进行格式化 -->
+									<imports>
+					  					<import>java.util.*</import>
+				  					</imports>
+									<value>
+										<![CDATA[
+											if(mDynamicColData!=null&&mDynamicColData.size()>0)
+											{
+												Iterator itKeys=mDynamicColData.keySet().iterator();
+												while(itKeys.hasNext())
+												{
+													String key=(String)itKeys.next();
+													String value=(String)mDynamicColData.get(key);
+													if(value!=null&&!value.trim().equals(""))
+													 	mDynamicColData.put(key,value+"月");
+												}
+											}
+										]]>
+									</value>
+								</format>
+							</col>
+						</display>
+					</report>
+				</framepanel>
+			</vpanel>
+			<vpanel id="vp2" parenttitle="分组交叉统计报表">
+				<framepanel id="fp3" margin="10px" title="通过SQL语句查询交叉统计列">
+					<report id="report21" title="员工工资统计表" pagesize="-1" dataexport="richexcel|word" type="crosslist"
+							width="2000px" scrollwidth="1000px" scrollstyle="image">
+						<display>
+							<col column="no" label="工号" clickorderby="true" filter="condition{txtno}" valuestyleproperty="style='mso-number-format:\@'"/>
+							<col column="name" label="姓名" clickorderby="true" filter="true" filterwidth="100px"/>
+							<group column="year" staticondition="year=#data#" dataset="select * from tbl_salary">
+							    <col column="jd" staticondition="jd='#data#'"  
+							           realvalue="case when month in(1,2,3) then '1' when month in(4,5,6) then '2' when month in(7,8,9) then '3' when month in(10,11,12) then '4' else '' end">
+									<statistic id="stat1" type="max" column="salary" label="最高"/>
+									<statistic id="stat2" type="avg" column="salary" label="平均"/>
+									<statistic id="stat3" type="sum" column="salary" label="合计"/>
+								</col>
+								<format><!-- 格式化动态表头数据 -->
+									<imports>
+					  					<import>java.util.*</import>
+				  					</imports>
+									<value>
+										<![CDATA[
+											if(mDynamicColData!=null&&mDynamicColData.size()>0)
+											{//查询到了统计数据，对它进行格式化
+												Iterator itKeys=mDynamicColData.keySet().iterator();
+												while(itKeys.hasNext())
+												{
+													String key=(String)itKeys.next();
+													String value=(String)mDynamicColData.get(key);
+													if(key.indexOf("_year_")==0)
+													{//如果是年
+													 	if(value!=null&&!value.trim().equals(""))
+													 		mDynamicColData.put(key,value+"年");
+													}else if(key.indexOf("_jd_")==0)
+													{//如果是季度
+														if(value==null) value="";
+														if(value.equals("1")) value="第一季度";
+														else if(value.equals("2")) value="第二季度";
+														else if(value.equals("3")) value="第三季度";
+														else if(value.equals("4")) value="第四季度";
+													 	mDynamicColData.put(key,value);
+													}
+												}
+											}
+										]]>
+									</value>
+								</format>
+							</group>
+						</display>
+						<sql>
+							<value>
+								<![CDATA[select A.no,A.name,[#dynamic-columns#] from tbl_salary B,tbl_baseinfo A where A.no=B.no and {#condition#} group by A.no,A.name order by A.no]]>
+							</value>
+							<condition name="txtno" label="工号">
+								<value>
+									<![CDATA[(A.no like  '%#data#%' )]]>
+								</value>
+							</condition>
+						</sql>
+						<format>
+							<imports>
+			  					<import>com.wabacus.util.*</import>
+			  					<import>java.util.*</import>
+		  					</imports>
+							<value>
+								<![CDATA[
+								if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PLAINEXCEL&&mDynamicColData!=null&&mDynamicColData.size()>0)
+								{//查询到了统计数据，对它进行格式化
+									Iterator itKeys=mDynamicColData.keySet().iterator();
+									while(itKeys.hasNext())
+									{
+										String key=(String)itKeys.next();
+										String value=(String)mDynamicColData.get(key);
+										mDynamicColData.put(key,Tools.formatDouble(value,"##,###.##"));
+									}
+								}
+								]]>
+							</value>
+						</format>
+					</report>
+				</framepanel>
+				<framepanel id="fp4" margin="10px" title="通过JAVA类查询交叉统计列" top="10px">
+					<report id="report22" title="员工工资统计表" extends="crossstatisticpage1.report21">
+						<display>
+							<col column="no" label="工号" clickorderby="true" filter="condition{txtno}" valuestyleproperty="style='mso-number-format:\@'"/>
+							<col column="name" label="姓名" clickorderby="true" filter="true" filterwidth="100px"/>
+							<group column="year" staticondition="year=#data#" dataset="class{com.wabacusdemo.TestCrossListDynStatiColGroupDataset2}">
+							    <col column="jd" staticondition="jd='#data#'"  
+							           realvalue="case when month in(1,2,3) then '1' when month in(4,5,6) then '2' when month in(7,8,9) then '3' when month in(10,11,12) then '4' else '' end">
+									<statistic id="stat1" type="max" column="salary" label="最高"/>
+									<statistic id="stat2" type="avg" column="salary" label="平均"/>
+									<statistic id="stat3" type="sum" column="salary" label="合计"/>
+								</col>
+								<format><!-- 格式化动态表头数据 -->
+									<imports>
+					  					<import>java.util.*</import>
+				  					</imports>
+									<value>
+										<![CDATA[
+											if(mDynamicColData!=null&&mDynamicColData.size()>0)
+											{//查询到了统计数据，对它进行格式化
+												Iterator itKeys=mDynamicColData.keySet().iterator();
+												while(itKeys.hasNext())
+												{
+													String key=(String)itKeys.next();
+													String value=(String)mDynamicColData.get(key);
+													if(key.indexOf("_year_")==0)
+													{//如果是年
+													 	if(value!=null&&!value.trim().equals(""))
+													 		mDynamicColData.put(key,value+"年");
+													}else if(key.indexOf("_jd_")==0)
+													{//如果是季度
+														if(value==null) value="";
+														if(value.equals("1")) value="第一季度";
+														else if(value.equals("2")) value="第二季度";
+														else if(value.equals("3")) value="第三季度";
+														else if(value.equals("4")) value="第四季度";
+													 	mDynamicColData.put(key,value);
+													}
+												}
+											}
+										]]>
+									</value>
+								</format>
+							</group>
+						</display>
+					</report>
+				</framepanel>
+			</vpanel>
+			<report id="report3" title="员工工资统计表" parenttitle="复杂交叉统计报表" pagesize="-1" dataexport="richexcel|plainexcel" type="crosslist"
+					width="2500px" scrollwidth="1000px" fixedrows="title" fixedcols="2">
+				<display>
+					<col column="no" label="工号" clickorderby="true" filter="condition{txtno}" valuestyleproperty="style='mso-number-format:\@'"/>
+					<col column="name" label="姓名" clickorderby="true"/>
+					<group column="year" staticondition="year=#data#" dataset="select * from tbl_salary where {#condition#}">
+						<datasetconditions>
+							<condition name="ref{txtyear}">
+								<value>year = '#data#'</value>
+							</condition>
+							<condition name="ref{txtjd}">
+								<value>(case when month in(1,2,3) then '1' when month in(4,5,6) then '2' when month in(7,8,9) then '3' when month in(10,11,12) then '4' else '' end)  = '#data#'</value>
+							</condition>
+						</datasetconditions>
+					   <col column="jd" staticondition="jd='#data#'"  verticalstatistic="true" verticallabel="汇总" verticallabelstyleproperty="bgcolor='#DCDCDC' align='center'"
+					           realvalue="case when month in(1,2,3) then '1' when month in(4,5,6) then '2' when month in(7,8,9) then '3' when month in(10,11,12) then '4' else '' end">
+							<statistic id="stat1" type="max" column="salary" label="最高" labelstyleproperty="style='background:red;'"/>
+							<statistic id="stat2" type="min" column="salary" label="最低" labelstyleproperty="style='background:green;'" statitems="jd"/>
+							<statistic id="stat3" type="sum" column="salary" label="合计|总计" labelstyleproperty="style='background:yellow;'|style='background:#00F0FF;'|"  statitems="jd|year|report"/>
+							<statistic id="stat4" type="avg" column="salary" label="平均"  statitems="report"/>
+						</col>
+						<format><!-- 格式化动态表头数据 -->
+							<imports>
+			  					<import>java.util.*</import>
+		  					</imports>
+							<value>
+								<![CDATA[
+									if(mDynamicColData!=null&&mDynamicColData.size()>0)
+									{//查询到了统计数据，对它进行格式化
+										Iterator itKeys=mDynamicColData.keySet().iterator();
+										while(itKeys.hasNext())
+										{
+											String key=(String)itKeys.next();
+											String value=(String)mDynamicColData.get(key);
+											if(key.indexOf("_year_")==0)
+											{//如果是年
+											 	if(value!=null&&!value.trim().equals(""))
+											 		mDynamicColData.put(key,value+"年");
+											}else if(key.indexOf("_jd_")==0)
+											{//如果是季度
+												if(value==null) value="";
+												if(value.equals("1")) value="第一季度";
+												else if(value.equals("2")) value="第二季度";
+												else if(value.equals("3")) value="第三季度";
+												else if(value.equals("4")) value="第四季度";
+											 	mDynamicColData.put(key,value);
+											}
+										}
+									}
+								]]>
+							</value>
+						</format>
+					</group>
+				</display>
+				<sql>
+					<value>
+						<![CDATA[select A.no,A.name,[#dynamic-columns#] from tbl_salary B,tbl_baseinfo A where A.no=B.no and {#condition#} group by A.no,A.name order by A.no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtyear" label="年份">
+						<inputbox type="selectbox">
+							<option label="年份" value=""/>
+							<option label="year" value="year" source="@{select distinct year from tbl_salary order by year}"/>
+						</inputbox>
+					</condition>
+					<condition name="txtjd" label="季度">
+						<inputbox type="selectbox">
+							<option label="季度" value=""/>
+							<option label="第一季度" value="1"/>
+							<option label="第二季度" value="2"/>
+							<option label="第三季度" value="3"/>
+							<option label="第四季度" value="4"/>
+						</inputbox>
+					</condition>
+				</sql>
+				<format>
+					<imports>
+	  					<import>com.wabacus.util.*</import>
+			  			<import>java.util.*</import>
+  					</imports>
+					<value>
+						<![CDATA[
+						if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PLAINEXCEL&&mDynamicColData!=null&&mDynamicColData.size()>0)
+						{//查询到了统计数据，对它进行格式化
+							Iterator itKeys=mDynamicColData.keySet().iterator();
+							while(itKeys.hasNext())
+							{
+								String key=(String)itKeys.next();
+								String value=(String)mDynamicColData.get(key);
+								mDynamicColData.put(key,Tools.formatDouble(value,"##,###.##"));
+							}
+						}
+						]]>
+					</value>
+				</format>
+			</report>
+			<report id="report4" title="员工信息列表" parenttitle="对分组数据的交叉统计" dataexport="richexcel|plainexcel|word|pdf" type="crosslist" pagesize="20" 
+				width="2500px" scrollwidth="1200px" fixedrows="title" fixedcols="3" rowselect="checkbox">
+				<display>
+					<group label="地区">
+						<col column="val1.province" label="省" filter="condition{txtprovince}" rowgroup="true"/>
+						<col column="val1.city"  label="城市" filter="condition{txtcity}" rowgroup="true"/>
+						<col column="val1.county"  label="县城" rowgroup="true"/>
+					</group>
+					<col column="val1.no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<group label="个人资料">
+						<group label="姓名">
+							<col column="val1.name" label="中文名" filter="true" filterwidth="120px" clickorderby="true"/>
+							<col column="val1.ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+						</group>
+						<col column="val1.sex" label="性别" clickorderby="true"/>
+						<col column="val1.age" label="年龄" clickorderby="true"/>
+					</group>
+					<group column="val2.year" staticondition="year='#data#'" dataset="select * from tbl_salary where {#condition#}">
+						<datasetconditions>
+							<condition name="ref{txtyear}">
+								<value>year = '#data#'</value>
+							</condition>
+							<condition name="ref{txtjd}">
+								<value>(case when month in(1,2,3) then '1' when month in(4,5,6) then '2' when month in(7,8,9) then '3' when month in(10,11,12) then '4' else '' end)  = '#data#'</value>
+							</condition>
+						</datasetconditions>
+					   <col column="val2.jd"  verticalstatistic="true" verticallabel="汇总" verticallabelstyleproperty="bgcolor='#DCDCDC' align='center'" 
+					   		staticondition="(jd)='#data#'" realvalue="case when month in(1,2,3) then '1' when month in(4,5,6) then '2' when month in(7,8,9) then '3' when month in(10,11,12) then '4' else '' end">
+							<statistic id="stati1" type="sum" column="salary" statitems="jd|report|year" label="合计|总计" labelstyleproperty="bgcolor='yellow'|bgcolor='red'"/>
+							<statistic id="stati2" type="avg" column="salary" label="平均" labelstyleproperty="bgcolor='green'" statitems="report"/>
+						</col>
+						<format>
+							<imports>
+			  					<import>java.util.*</import>
+		  					</imports>
+							<value>
+								<![CDATA[
+									if(mDynamicColData!=null&&mDynamicColData.size()>0)
+									{//查询到了统计数据，对它进行格式化
+										Iterator itKeys=mDynamicColData.keySet().iterator();
+										while(itKeys.hasNext())
+										{
+											String key=(String)itKeys.next();
+											String value=(String)mDynamicColData.get(key);
+											if(key.indexOf("_year_")==0)
+											{//如果是年
+											 	if(value!=null&&!value.trim().equals(""))
+											 		mDynamicColData.put(key,value+"年");
+											}else if(key.indexOf("_jd_")==0)
+											{//如果是季度
+												if(value==null) value="";
+												if(value.equals("1")) value="第一季度";
+												else if(value.equals("2")) value="第二季度";
+												else if(value.equals("3")) value="第三季度";
+												else if(value.equals("4")) value="第四季度";
+											 	mDynamicColData.put(key,value);
+											}
+										}
+									}
+								]]>
+							</value>
+						</format>
+					</group>
+					<col column="val1.joinindate" label="入职日期" clickorderby="true"/>
+				</display>
+				<sql>
+					<value id="val1">
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+					</value>
+					<value id="val2" depends="no='val1.no'" dependscondition=" A.no in (#val1.no#)">
+						<![CDATA[select A.no,A.name,[#dynamic-columns#] from tbl_salary B left join tbl_baseinfo A on A.no=B.no  where  {#condition#} and {#dependscondition#}
+						 	group by A.no,A.name order by A.no]]>
+					</value>
+					<condition name="txtgonghao" label="工号" belongto="*.val1">
+						<value>
+							<![CDATA[(A.no like  '%#data#%')]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+					<condition name="txtprovince" label="省" belongto="*.val1">
+						<value>
+							<![CDATA[(province like %#data#%)]]>
+						</value>
+						<inputbox type="selectbox">
+							<option label="全部" value=""/>
+							<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+						</inputbox>
+					</condition>
+					<condition name="txtcity" label="市" belongto="*.val1">
+						<value>
+							<![CDATA[(city like %#data#%)]]>
+						</value>
+						<inputbox type="selectbox" depends="txtprovince">
+							<option label="全部" value=""/>
+							<option label="无" value="" type="false"/>
+							<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+						</inputbox>
+					</condition>
+					<condition name="txtyear" label="年份"/>
+					<condition name="txtjd" label="季度">
+						<inputbox type="selectbox">
+							<option label="全部" value=""/>
+							<option label="第一季度" value="1"/>
+							<option label="第二季度" value="2"/>
+							<option label="第三季度" value="3"/>
+							<option label="第四季度" value="4"/>
+						</inputbox>
+					</condition>
+				</sql>
+				<format>
+					<imports>
+	  					<import>com.wabacus.util.*</import>
+	  					<import>java.util.*</import>
+  					</imports>
+				  <value>
+				  <![CDATA[
+						sex=sex==null?"1":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else sex="男";
+						joinindate=joinindate==null?"":joinindate.trim();
+						int idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						if(idx>0) joinindate=joinindate.substring(0,idx);
+						if(mDynamicColData!=null)
+						{//对交叉统计数据进行格式化
+							Iterator itKeys=mDynamicColData.keySet().iterator();
+							while(itKeys.hasNext())
+							{
+								String key=(String)itKeys.next();
+								String value=(String)mDynamicColData.get(key);
+								mDynamicColData.put(key,Tools.formatDouble(value,"##,###.##"));
+							}
+						}
+					]]>
+				  </value>
+				</format>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="crossslistcomplexpage1" js="/webresources/script/validate.js">
+		<report id="report1" title="员工信息列表" dataexport="richexcel|plainexcel|word|pdf" type="crosslist" pagesize="20" 
+			width="2500px" scrollwidth="1500px" rowselect="checkbox" fixedcols="3" fixedrows="title">
+			<interceptor>
+				<preaction>
+				<![CDATA[				
+					String txtdyntitle=rrequest.getStringAttribute("txtdyntitle","");//取到在“选择动态列”中选择的动态列
+					if(txtdyntitle.startsWith(",")) txtdyntitle=txtdyntitle.substring(1);
+					if(txtdyntitle.endsWith(",")) txtdyntitle=txtdyntitle.substring(0,txtdyntitle.length()-1);
+					if(txtdyntitle.equals("")) 
+					{//如果没有选择，则显示所有列
+						txtdyntitle="age,sex,name,ename,birthday";
+						rrequest.setAttribute("txtdyntitle",txtdyntitle);
+					}
+					txtdyntitle=txtdyntitle.replaceAll(",","','");
+					txtdyntitle="'"+txtdyntitle+"'";//将"age,sex,name,ename,birthday"格式转换为"'age','sex','name','ename','birthday'"格式
+					rrequest.setAttribute("mydyntitle",txtdyntitle);//设置到<datasetconditions/>的name为mydyntitle的<condition/>做为条件值
+				]]>
+				</preaction>
+			</interceptor>
+			<display>
+				<group label="籍贯" labelstyleproperty="style='width:200px;'">
+					<col column="val1.province" label="省" filter="condition{txtprovince}" rowgroup="true"/>
+					<col column="val1.city"  label="城市" filter="condition{txtcity}" rowgroup="true"/>
+					<col column="val1.county"  label="县城" rowgroup="true"/>
+				</group>
+				<col column="val1.no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group column="val2.layer1" dataset="select * from tbl_dynamicolumns where {#condition#} order by layer1 desc,layer2 desc,layer3 desc">
+					<datasetconditions>
+						<condition name="mydyntitle" keepkeywords="true">
+							<value>col_column in (#data#)</value>
+						</condition>
+					</datasetconditions>
+					<group column="val2.layer2">
+						<col column="val2.layer3" realvalue="col_column"/>
+					</group>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+							<import>java.util.*</import>
+						</imports>
+						<value>
+						<![CDATA[
+							if(rrequest.getShowtype()!=Consts.DISPLAY_ON_PDF&&rrequest.getShowtype()!=Consts.DISPLAY_ON_PLAINEXCEL&&mDynamicColData!=null)
+					   	{//如果不是显示在PDF或plainexcel中
+					   		Iterator itKeys=mDynamicColData.keySet().iterator();
+								while(itKeys.hasNext())
+								{//对生成的每个普通动态（分组）列标题加上红色*号做为前缀
+									String key=(String)itKeys.next();
+									String value=(String)mDynamicColData.get(key);
+									if(value!=null&&!value.trim().equals("")) value="<font color='red'>*</font>"+value;
+									mDynamicColData.put(key,value);
+								}
+					   	}
+						]]>
+						</value>
+					</format>
+				</group>
+				<group label="两个交叉统计列">
+					<group label="2008年部分员工月薪">
+						<col column="val3.month2" realvalue="month" staticondition="month2=#data#" dataset="tbl_salary" >
+							<statistic id="static1" type="sum" column="salary" valuestyleproperty="align='center'"/>
+							<format><!-- 对动态表头数据进行格式化 -->
+								<imports><import>java.util.*</import></imports>
+								<value>
+									<![CDATA[
+										if(mDynamicColData!=null&&mDynamicColData.size()>0)
+										{
+											Iterator itKeys=mDynamicColData.keySet().iterator();
+											while(itKeys.hasNext())
+											{
+												String key=(String)itKeys.next();
+												String value=(String)mDynamicColData.get(key);
+												if(value!=null&&!value.trim().equals(""))
+												 	mDynamicColData.put(key,value+"月");
+											}
+										}
+									]]>
+								</value>
+							</format>
+						</col>
+					</group>
+					<group column="val4.year" staticondition="year='#data#'" dataset="select * from tbl_salary where {#condition#}">
+						<datasetconditions>
+							<condition name="ref{txtyear}">
+								<value>year = '#data#'</value>
+							</condition>
+							<condition name="ref{txtjd}">
+								<value>(case when month in(1,2,3) then '1' when month in(4,5,6) then '2' when month in(7,8,9) then '3' when month in(10,11,12) then '4' else '' end)  = '#data#'</value>
+							</condition>
+						</datasetconditions>
+					   <col column="val4.jd"  verticalstatistic="true" verticallabel="汇总" verticallabelstyleproperty="bgcolor='#DCDCDC' align='center'" 
+					   		staticondition="(jd)='#data#'" realvalue="case when month in(1,2,3) then '1' when month in(4,5,6) then '2' when month in(7,8,9) then '3' when month in(10,11,12) then '4' else '' end">
+							<statistic id="stati1" type="sum" column="salary" statitems="jd|report|year" label="合计|总计" labelstyleproperty="bgcolor='yellow'|bgcolor='red'"/>
+							<statistic id="stati2" type="avg" column="salary" label="平均" labelstyleproperty="bgcolor='green'" statitems="report"/>
+						</col>
+						<format>
+							<imports><import>java.util.*</import></imports>
+							<value>
+								<![CDATA[
+									if(mDynamicColData!=null&&mDynamicColData.size()>0)
+									{//查询到了统计数据，对它进行格式化
+										Iterator itKeys=mDynamicColData.keySet().iterator();
+										while(itKeys.hasNext())
+										{
+											String key=(String)itKeys.next();
+											String value=(String)mDynamicColData.get(key);
+											if(key.indexOf("_year_")==0)
+											{//如果是年
+											 	if(value!=null&&!value.trim().equals(""))
+											 		mDynamicColData.put(key,value+"年");
+											}else if(key.indexOf("_jd_")==0)
+											{//如果是季度
+												if(value==null) value="";
+												if(value.equals("1")) value="第一季度";
+												else if(value.equals("2")) value="第二季度";
+												else if(value.equals("3")) value="第三季度";
+												else if(value.equals("4")) value="第四季度";
+											 	mDynamicColData.put(key,value);
+											}
+										}
+									}
+								]]>
+							</value>
+						</format>
+					</group>
+				</group>
+				<col column="val2.joinindate" label="入职日期"/>
+			</display>
+			<sql type="statement">
+				<value id="val1">
+					<![CDATA[SELECT no,province,city,county FROM tbl_detailinfo  where  {#condition#} order by no]]>
+				</value>
+				<value id="val2" depends="no='val1.no'" dependscondition=" A.no in (#val1.no#)">
+					<![CDATA[SELECT A.no,[#dynamic-columns#],joinindate FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where {#dependscondition#} order by no]]>
+				</value>
+				<value id="val3" depends="no='val1.no'" dependscondition=" A.no in (#val1.no#)">
+					<![CDATA[select A.no,A.name,[#dynamic-columns#] from tbl_salary B,tbl_baseinfo A  where A.no=B.no and year=2008 and {#condition#} and {#dependscondition#} group by A.no,A.name order by A.no]]>
+				</value>
+				<value id="val4" depends="no='val1.no'" dependscondition=" A.no in (#val1.no#)">
+					<![CDATA[select A.no,A.name,[#dynamic-columns#] from tbl_salary B left join tbl_baseinfo A on A.no=B.no  where  {#condition#} and {#dependscondition#}
+					 	group by A.no,A.name order by A.no]]>
+				</value>
+				<condition name="txtgonghao" label="工号" belongto="*.val1">
+					<value>
+						<![CDATA[(no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省" belongto="*.val1">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcity" label="市" belongto="*.val1">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+					</inputbox>
+				</condition>
+				<condition name="txtyear" label="年份"/>
+				<condition name="txtjd" label="季度" br="true">
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option label="第一季度" value="1"/>
+						<option label="第二季度" value="2"/>
+						<option label="第三季度" value="3"/>
+						<option label="第四季度" value="4"/>
+					</inputbox>
+				</condition>
+				<condition name="txtdyntitle" labelposition="left" label="选择动态列：">
+					<inputbox type="checkbox" separator="," jsvalidate="isNotEmpty(必须选择要显示的动态列)">
+						<option source="@{select distinct layer3,col_column from tbl_dynamicolumns}" label="layer3" value="col_column"/>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+				<imports>
+					<import>java.util.*</import>
+			  		<import>com.wabacus.util.*</import>
+				</imports>
+			  <value>
+			  <![CDATA[
+					joinindate=joinindate==null?"":joinindate.trim();
+					int idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) joinindate=joinindate.substring(0,idx);
+					if(mDynamicColData!=null)
+					{//对交叉统计数据进行格式化
+						Iterator itKeys=mDynamicColData.keySet().iterator();
+						while(itKeys.hasNext())
+						{
+							String key=(String)itKeys.next();
+							String value=(String)mDynamicColData.get(key);
+							if("sex".equals(key)||"age".equals(key)||"name".equals(key)||"ename".equals(key)||"birthday".equals(key)) continue;//是普通动态列
+							mDynamicColData.put(key,Tools.formatDouble(value,"##,###.##"));
+						}
+						String sex=(String)mDynamicColData.get("sex");
+						if("1".equals(sex)) sex="男";
+						else if("0".equals(sex)) sex="女";
+						else if(sex==null) sex="";
+						mDynamicColData.put("sex",sex);
+						String birthday=(String)mDynamicColData.get("birthday");
+						if(birthday==null) birthday="";
+						int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						if(idx>0) birthday=birthday.substring(0,idx);
+						mDynamicColData.put("birthday",birthday);
+					}
+				]]>
+			  </value>
+			</format>
+		</report>
+	</page>
+	
+	<page id="detailpage1">
+		<report id="report1" title="request{employeename}详细资料" type="detail" dataexport="richexcel|word">
+			<display valuetdwidth="100px" labeltdwidth="80px" labelalign="right" valuealign="left">
+				<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<col column="name" label="中文名"/>
+				<col column="ename" label="英文名" br="true"/>
+				<col column="sex" label="性别"/>
+				<col column="age" label="年龄"/>
+				<col column="marriage" label="婚否" br="true"/>
+				<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}"/>
+				<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='3'" br="true"/>
+				<col column="province"  label="籍贯" valuestyleproperty="colspan='5'" br="true"/>
+				<col column="city" displaytype="hidden"/>
+				<col column="county" displaytype="hidden"/>
+				<col label="评价" column="{non-value}" labelstyleproperty="colspan='6' bgcolor='#f0f0f0' align='left'" br="true"/>
+				<col column="description" datatype="clob" valuestyleproperty="colspan='6' align='center'"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#}]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no =  '#data#' )]]>
+					</value>
+					<inputbox>
+						<typeprompt width="200" count="15">
+							<promptcol label="no" title="工号" matchmode="anywhere"/>
+							<promptcol label="name" title="姓名"/>
+							<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						</typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtname" label="姓名">
+					<value>
+						<![CDATA[(name =  '#data#' )]]>
+					</value>
+					<inputbox>
+						<typeprompt width="-1" count="15">
+							<promptcol label="name"  matchmode="anywhere"/>
+							<datasource><option source="@{select name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						</typeprompt>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+			  		rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					marriage=marriage==null?"0":marriage.trim();
+					if(marriage.equals("1")) marriage="已婚";
+					else marriage="未婚";
+					province=province+"省"+city+"市"+county+"县";
+			  </value>
+			</format>
+		</report>
+	</page>
+	
+	<!-- 数据编辑篇报表类型 -->
+	<page id="editablelistreportpage1" js="/webresources/script/validate.js,/wabacusdemo/js/testcallback.js">
+		<tabpanel id="tp1" titlealign="center" margin="10px" titlewidth="120px">
+			<tabpanel id="tp11" parenttitle="编辑方式一&lt;font color='red'&gt;New&lt;font/&gt;" titlestyle="2" titlewidth="150px" margin="10px" height="450px" scrollY="true">
+				<report id="report1" title="部门信息列表" parenttitle="新增行在底部" type="editablelist2" dataexport="richexcel|plainexcel|word">
+					<display>
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'">
+							<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+						</col>
+						<col column="deptname" label="部门名" clickorderby="true"/>
+						<col column="manager" label="部门经理"/>
+						<col column="builtdate" label="创建日期" clickorderby="true" datatype="date{yyyy-MM-dd}">
+							<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+						</col>
+						<col column="performance" label="表现" clickorderby="true" filter="true">
+							<inputbox type="selectbox">
+								<option value="优秀" label="优秀"/> 
+								<option value="良好" label="良好" />
+								<option value="较好" label="较好" />
+								<option value="很差" label="很差" />
+							</inputbox>
+						</col>
+					</display>
+					<sql>
+					  <select>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+						</value>
+						<condition name="txtdeptno" label="部门编号">
+							<value>
+								<![CDATA[(deptno like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+							  <typeprompt width="200" count="15">
+								<promptcol label="deptno" matchmode="anywhere"/>
+								<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+							  </typeprompt>
+							</inputbox>
+						</condition>
+					  </select>
+					  <insert>
+				  		 insert into tbl_department(guid=uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{performance});
+					  </insert>
+					  <update>
+					     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{performance}) where guid=@{guid};
+					     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+					  </update>
+					  <delete>
+					  	 delete from tbl_department where deptno=@{deptno__old};
+					  </delete>
+					</sql>
+				</report>
+				<report id="report12" title="部门信息列表" parenttitle="新增行在顶部" extends="editablelistreportpage1.report1">
+					<sql>
+					  <select>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+						</value>
+						<condition name="txtdeptno" label="部门编号">
+							<value>
+								<![CDATA[(deptno like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+							  <typeprompt width="200" count="15">
+								<promptcol label="deptno" matchmode="anywhere"/>
+								<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+							  </typeprompt>
+							</inputbox>
+						</condition>
+					  </select>
+					  <insert addposition="top">
+				  		 insert into tbl_department(guid=uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{performance});
+					  </insert>
+					  <update>
+					     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{performance}) where guid=@{guid};
+					     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+					  </update>
+					  <delete>
+					  	 delete from tbl_department where deptno=@{deptno__old};
+					  </delete>
+					</sql>
+					<footer><![CDATA[<font color='red'>说明：</font><font color='blue'>添加记录行时，新增的记录行显示在顶部</font>]]></footer>
+				</report>
+				<report id="report13" title="部门信息列表" parenttitle="新增行回调函数" extends="editablelistreportpage1.report1">
+					<sql>
+					  <select>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+						</value>
+						<condition name="txtdeptno" label="部门编号">
+							<value>
+								<![CDATA[(deptno like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+							  <typeprompt width="200" count="15">
+								<promptcol label="deptno" matchmode="anywhere"/>
+								<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+							  </typeprompt>
+							</inputbox>
+						</condition>
+					  </select>
+					  <insert callbackmethod="addNewRowCallback">
+				  		 insert into tbl_department(guid=uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{performance});
+					  </insert>
+					  <update>
+					     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{performance}) where guid=@{guid};
+					     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+					  </update>
+					  <delete>
+					  	 delete from tbl_department where deptno=@{deptno__old};
+					  </delete>
+					</sql>
+					<footer><![CDATA[<font color='red'>说明：</font><font color='blue'>添加记录行时，会回调配置的JS回调函数，并传入新增的行对象</font>]]></footer>
+				</report>
+			</tabpanel>
+			<tabpanel id="tp2" parenttitle="编辑方式二" titleposition="left" titlealign="top" titlewidth="150px" margin="10px">
+				<report id="report2" title="部门信息列表" parenttitle="默认编辑列" type="editablelist" dataexport="richexcel|plainexcel|word">
+					<display>
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'">
+							<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+						</col>
+						<col column="deptname" label="部门名" clickorderby="true"/>
+						<col column="manager" label="部门经理"/>
+						<col column="builtdate" label="创建日期" clickorderby="true" datatype="date{yyyy-MM-dd}">
+							<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+						</col>
+						<col column="performance" label="表现" clickorderby="true" filter="true">
+							<inputbox type="selectbox">
+								<option value="优秀" label="优秀"/> 
+								<option value="良好" label="良好" />
+								<option value="较好" label="较好" />
+								<option value="很差" label="很差" />
+							</inputbox>
+						</col>
+					</display>
+					<sql>
+					  <select>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+						</value>
+						<condition name="txtdeptno" label="部门编号">
+							<value>
+								<![CDATA[(deptno like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+							  <typeprompt width="200" count="15">
+								<promptcol label="deptno" matchmode="anywhere"/>
+								<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+							  </typeprompt>
+							</inputbox>
+						</condition>
+					  </select>
+					  <insert pageurl="report{editforlistpage.report1}" popupparams="{title:'新增部门',width:650,height:400}"/>
+					  <update pageurl="report{editforlistpage.report1}" urlparams="txtdeptno=@{deptno}" popupparams="{title:'编辑部门资料',width:650,height:400}" pageinitsize="max"/>
+					  <delete>
+					  	 delete from tbl_department where deptno=@{deptno__old};
+					  </delete>
+					</sql>
+				</report>
+				<report id="report3" parenttitle="控制编辑列样式" extends="editablelistreportpage1.report2">
+					<display>
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'">
+							<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+						</col>
+						<col column="deptname" label="部门名" clickorderby="true"/>
+						<col column="manager" label="部门经理"/>
+						<col column="builtdate" label="创建日期" clickorderby="true" datatype="date{yyyy-MM-dd}">
+							<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+						</col>
+						<group label="编辑列">
+							<col column="{editablelist-edit}" label="默认编辑图标" valuestyleproperty="bgcolor='#eeeeee'"/>
+							<col column="{editablelist-edit}" label="自定义编辑图标"><![CDATA[<input type="button" class='cls-button' value="编辑"/>]]></col>
+						</group>
+						<col column="performance" label="表现" clickorderby="true" filter="true">
+							<inputbox type="selectbox">
+								<option value="优秀" label="优秀"/> 
+								<option value="良好" label="良好" />
+								<option value="较好" label="较好" />
+								<option value="很差" label="很差" />
+							</inputbox>
+						</col>
+					</display>
+				</report>
+				<footer>
+				<![CDATA[
+					<br><font color="red">说明：</font><font color="blue">这里演示“添加”时以默认窗口打开；“修改”时以最大化窗口打开</font>
+				]]>
+				</footer>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="editforlistpage" js="/webresources/script/validate.js">
+		<report id="report1" title="request{dept_name}详细资料" type="editabledetail">
+			<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="guid" displaytype="hidden"/>
+				<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+				</col>
+				<col column="deptname" label="部门名" br="true"/>
+				<col column="manager" label="部门经理"/>
+				<col column="builtdate" label="创建日期"  datatype="date{yyyy-MM-dd}" br="true">
+					<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true">
+					<inputbox type="selectbox">
+						<option value="优秀" label="优秀"/> 
+						<option value="良好" label="良好" />
+						<option value="较好" label="较好" />
+						<option value="很差" label="很差" />
+					</inputbox>
+				</col>
+				<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='3'">
+					<inputbox type="textareabox" styleproperty="rows='5'"/>
+				</col>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+				</value>
+				<condition name="txtdeptno" hidden="true">
+					<value>
+						<![CDATA[(deptno like '%#data#%' )]]>
+					</value>
+				</condition>
+			  </select>
+			  <insert>
+		  		 insert into tbl_department(guid=uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{performance},@{description});
+			  </insert>
+			  <update>
+			     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{performance},@{description}) where guid=@{guid};
+			     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+			  </update>
+			</sql>
+			<format>
+				<value>
+					rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+				</value>
+			</format>
+		</report>
+	</page>
+	
+	<page id="editabledetailpage1" js="/webresources/script/validate.js">
+		<tabpanel id="tp1" titlestyle="2" margin="10px" titlewidth="120px">
+			<report id="report1" title="request{dept_name}详细资料" parenttitle="编辑方式一" type="editabledetail2" dataexport="richexcel|plainexcel|word">
+				<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+					<col column="guid" displaytype="hidden"/>
+					<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+						<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+					</col>
+					<col column="deptname" label="部门名"/>
+					<col column="manager" label="部门经理" br="true"/>
+					<col column="builtdate" label="创建日期"  datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+					<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true">
+						<inputbox type="selectbox">
+							<option value="优秀" label="优秀"/> 
+							<option value="良好" label="良好" />
+							<option value="较好" label="较好" />
+							<option value="很差" label="很差" />
+						</inputbox>
+					</col>
+					<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+						<inputbox type="textareabox"/>
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+					</value>
+					<condition name="txtdeptno" label="部门编号">
+						<value>
+							<![CDATA[(deptno like '%#data#%' )]]>
+						</value>
+						<inputbox>
+							 <typeprompt count="15">
+							<promptcol label="deptno" matchmode="anywhere"/>
+							<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+				  </select>
+				  <update>
+				     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{performance},@{description}) where guid=@{guid};
+				     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+				  </update>
+				  <delete>
+				  	 delete from tbl_department where deptno=@{deptno__old};
+				  </delete>
+				</sql>
+				<format>
+					<value>
+						rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+					</value>
+				</format>
+			</report>
+			<report id="report2" title="request{dept_name}详细资料" parenttitle="编辑方式二" type="editabledetail" dataexport="richexcel|plainexcel|word">
+				<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+					<col column="guid" displaytype="hidden"/>
+					<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+						<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+					</col>
+					<col column="deptname" label="部门名"/>
+					<col column="manager" label="部门经理" br="true"/>
+					<col column="builtdate" label="创建日期"  datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+					<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true">
+						<inputbox type="selectbox">
+							<option value="优秀" label="优秀"/> 
+							<option value="良好" label="良好" />
+							<option value="较好" label="较好" />
+							<option value="很差" label="很差" />
+						</inputbox>
+					</col>
+					<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+						<inputbox type="textareabox" styleproperty="rows='5'"/>
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+					</value>
+					<condition name="txtdeptno" label="部门编号">
+						<value>
+							<![CDATA[(deptno like '%#data#%' )]]>
+						</value>
+						<inputbox>
+							 <typeprompt count="15">
+							<promptcol label="deptno" matchmode="anywhere"/>
+							<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+				  </select>
+				  <insert condition="txtdeptno=@{deptno}">
+			  		 insert into tbl_department(guid=uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{performance},@{description});
+				  </insert>
+				  <update>
+				     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{performance},@{description}) where guid=@{guid};
+				     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+				  </update>
+				  <delete>
+				  	 delete from tbl_department where deptno=@{deptno__old};
+				  </delete>
+				</sql>
+				<format>
+					<value>
+						rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+					</value>
+				</format>
+				<footer>${editabledetailpage2.footer}</footer>
+			</report>
+		</tabpanel>
+	</page>	
+	<!-- 表单篇报表类型 -->
+	<page id="detailformpage1" js="/webresources/script/validate.js"
+		css="/webresources/component/tiny_mce/themes/advanced/skins/o2k7/ui.css">
+		<report id="report1" title="request{employeename}员工详细资料" type="form" dataexport="richexcel|plainexcel|word" >
+			<display valuetdwidth="200px" labeltdwidth="150px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})" afterdescription="&amp;nbsp;&amp;nbsp;(必填)"/>
+				</col>
+				<col column="name" label="中文名"/>
+				<col column="ename" label="英文名" br="true"/>
+				<col column="sex" label="性别">
+					<inputbox type="radiobox">
+						<option value="0" label="女"/> 
+						<option value="1" label="男"/>
+					</inputbox>
+				</col>
+				<col column="age" label="年龄">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+				</col>
+				<col column="marriage" label="婚否" br="true">
+					<inputbox type="selectbox">
+						<option value="0" label="未婚"/> 
+						<option value="1" label="已婚"/>
+					</inputbox>
+				</col>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="deptno" displaytype="hidden"/>
+				<col column="deptname" label="所属部门" updatecol="@{deptno}" valuestyleproperty="colspan='3'" br="true">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+				<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='3'" br="true">
+					<inputbox type="datepicker" dateformat="MM/dd/yyyy"/>
+				</col>
+				<col column="interest" label="兴趣爱好" valuestyleproperty="colspan='5'" br="true">
+					<inputbox type="checkbox" separator=",">
+						<option label="篮球" value="篮球"/>
+						<option label="足球" value="足球"/>
+						<option label="排球" value="排球"/>
+						<option label="游泳" value="游泳"/>
+						<option label="看书" value="看书"/>
+						<option label="唱歌" value="唱歌"/>
+						<option label="旅游" value="旅游"/>
+						<option label="跑步" value="跑步"/>
+						<option label="健身" value="健身"/>
+						<option label="爬山" value="爬山"/>
+					</inputbox> 
+				</col>
+				<col column="province" label="省">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option label="请选择" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</col>
+				<col column="city" label="市">
+					<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+					</inputbox>
+				</col>
+				<col column="county" label="县" br="true">
+					<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+					</inputbox>
+				</col>
+				<col column="description" label="评价" datatype="clob" valuestyleproperty="colspan='5'" br="true">
+					<inputbox type="richtextbox" inputboxparams="width:'100%',height:'500px'"/>
+				</col>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,interest,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where  {#condition#}]]>
+				</value>
+				<condition name="txtgonghao" hidden="true">
+					<value>
+						<![CDATA[(A.no = '#data#' )]]>
+					</value>
+				</condition>
+			  </select>
+			  <insert condition="txtgonghao=@{no}">
+			     insert into tbl_baseinfo(uuid=uuid{},@{no},@{name},@{sex},@{age},@{birthday},@{deptno});
+			     insert into tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{interest},@{province},@{city},@{county},@{description});
+			  </insert>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{interest},@{province},@{city},@{county},@{description}) where no=@{no__old};
+			  </update>
+			  <delete>
+			     delete from tbl_baseinfo where no=@{no__old};
+			     delete from tbl_detailinfo where no=@{no__old};
+			  </delete>
+			</sql>
+			<format>
+			  <imports>
+					<import>com.wabacus.util.*</import>
+			  </imports>
+			  <value>
+			    <![CDATA[
+			  		rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+			  		if(rrequest.getShowtype() != Consts.DISPLAY_ON_PAGE)
+			  		{
+			  			sex=sex==null?"":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else if(sex.equals("1")) sex="男";
+						marriage=marriage==null?"":marriage.trim();
+						if(marriage.equals("1")) marriage="已婚";
+						else if(marriage.equals("0")) marriage="未婚";
+			  		}
+			  		]]>
+			  </value>
+			</format>
+		</report>
+	</page>
+	
+	
+	
+	<page id="detailformpage2" js="/webresources/script/validate.js"
+		css="/webresources/component/tiny_mce/themes/advanced/skins/o2k7/ui.css">
+		<report id="report1" title="request{employeename}员工详细资料" pagesize="1" type="form" dataexport="richexcel|plainexcel|word" >
+			<display valuetdwidth="200px" labeltdwidth="150px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="name" label="中文名"/>
+				<col column="ename" label="英文名" br="true"/>
+				<col column="sex" label="性别">
+					<inputbox type="radiobox">
+						<option value="0" label="女"/> 
+						<option value="1" label="男"/>
+					</inputbox>
+				</col>
+				<col column="age" label="年龄">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+				</col>
+				<col column="marriage" label="婚否" br="true">
+					<inputbox type="selectbox">
+						<option value="0" label="未婚"/> 
+						<option value="1" label="已婚"/>
+					</inputbox>
+				</col>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="deptno" displaytype="hidden"/>
+				<col column="deptname" label="所属部门" updatecol="@{deptno}" valuestyleproperty="colspan='3'" br="true">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+				<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='3'" br="true">
+					<inputbox type="datepicker" dateformat="MM/dd/yyyy"/>
+				</col>
+				<col column="interest" label="兴趣爱好" valuestyleproperty="colspan='5'" br="true">
+					<inputbox type="checkbox" separator=",">
+						<option label="篮球" value="篮球"/>
+						<option label="足球" value="足球"/>
+						<option label="排球" value="排球"/>
+						<option label="游泳" value="游泳"/>
+						<option label="看书" value="看书"/>
+						<option label="唱歌" value="唱歌"/>
+						<option label="旅游" value="旅游"/>
+						<option label="跑步" value="跑步"/>
+						<option label="健身" value="健身"/>
+						<option label="爬山" value="爬山"/>
+					</inputbox> 
+				</col>
+				<col column="province" label="省">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option label="请选择" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</col>
+				<col column="city" label="市">
+					<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+					</inputbox>
+				</col>
+				<col column="county" label="县" br="true">
+					<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+					</inputbox>
+				</col>
+				<col column="description" label="评价" datatype="clob" valuestyleproperty="colspan='5'" br="true">
+					<inputbox type="richtextbox" inputboxparams="width:'100%',height:'500px'"/>
+				</col>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,interest,province,city,county,B.description 
+					FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where  {#condition#} order by A.no]]>
+				</value>
+				<condition name="txtgonghao" hidden="true">
+					<value>
+						<![CDATA[(A.no = '#data#' )]]>
+					</value>
+				</condition>
+			  </select>
+			  <insert condition="txtgonghao=@{no}">
+			     insert into tbl_baseinfo(uuid=uuid{},@{no},@{name},@{sex},@{age},@{birthday},@{deptno});
+			     insert into tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{interest},@{province},@{city},@{county},@{description});
+			  </insert>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{interest},@{province},@{city},@{county},@{description}) where no=@{no__old};
+			  </update>
+			  <delete>
+			     delete from tbl_baseinfo where no=@{no__old};
+			     delete from tbl_detailinfo where no=@{no__old};
+			  </delete>
+			</sql>
+			<format>
+			  <imports>
+					<import>com.wabacus.util.*</import>
+			  </imports>
+			  <value>
+			    <![CDATA[
+			  		rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+			  		if(rrequest.getShowtype() != Consts.DISPLAY_ON_PAGE)
+			  		{
+			  			sex=sex==null?"":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else if(sex.equals("1")) sex="男";
+						marriage=marriage==null?"":marriage.trim();
+						if(marriage.equals("1")) marriage="已婚";
+						else if(marriage.equals("0")) marriage="未婚";
+			  		}
+			  		]]>
+			  </value>
+			</format>
+		</report>
+	</page>
+	
+	
+	
+	
+	
+	<page id="listformpage1" js="/webresources/script/validate.js">
+		<report id="report1" title="员工信息列表" width="1200px" type="listform" dataexport="richexcel|plainexcel|word" >
+			<display>
+				<col column="no" label="工号" clickorderby="true" width="130px" valuestyleproperty="style='mso-number-format:\@;'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})" styleproperty="style='width:90%;'"/>
+				</col>
+				<col column="name" label="中文名" clickorderby="true">
+					<inputbox styleproperty="style='width:90%;'"/>
+				</col>
+				<group label="基本信息" labelstyleproperty="width='260px'">
+					<col column="sex" label="性别">
+						<inputbox type="radiobox">
+							<option value="0" label="女"/> 
+							<option value="1" label="男"/>
+						</inputbox>
+					</col>
+					<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)" styleproperty="style='width:90%;'"/>
+					</col>
+					<col column="birthday" label="出生日期" clickorderby="true"  datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)" styleproperty="style='width:90%;'"/>
+					</col>
+				</group>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})" styleproperty="style='width:90%;'"/>
+				</col>
+				<col column="deptno" label="所属部门" displaytype="hidden"/>
+				<col column="deptname" label="所属部门" updatecol="@{deptno}" width="100px">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+				<group label="籍贯">
+					<col column="province" label="省">
+						<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option label="请选择" value=""/>
+							<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+						</inputbox>
+					</col>
+					<col column="city" label="市">
+						<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+						</inputbox>
+					</col>
+					<col column="county" label="县">
+						<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+						</inputbox>
+					</col>
+				</group>
+				<col column="interest" label="兴趣爱好" width="200px">
+					<inputbox type="popupbox"  width="600" height="400" styleproperty="style='width:95%;'">
+						<![CDATA[/wabacusdemo/jsp/testpopupbox.jsp?name=@{name}&no=@{no}]]>
+					</inputbox> 
+				</col>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,interest FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			  <insert>
+		  		 insert into tbl_baseinfo(uuid=uuid{},@{no},@{name},@{sex},@{age},@{birthday},@{deptno});
+		  		 insert into tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest});
+			  </insert>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest}) where no=@{no__old};
+			  </update>
+			  <delete>
+			  	 delete from tbl_baseinfo where no=@{no__old};
+			  	 delete from tbl_detailinfo where no=@{no__old}
+			  </delete>
+			</sql>
+		</report>
+	</page>
+</applications>

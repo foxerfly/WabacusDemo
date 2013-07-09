@@ -1,0 +1,1419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	<local-resources>
+    	<resources>
+    		<resource key="navigate.count.info">
+    			<![CDATA[
+  					当前第#currentpage#页 共#totalpage#页	
+  				]]>
+    		</resource>
+    	</resources>
+    </local-resources>
+	<page id="clobpage1" js="/webresources/script/validate.js">
+		<report id="report1" title="部门信息列表" type="editablelist2" dataexport="richexcel">
+			<display>
+				<col column="guid" displaytype="hidden"/>
+				<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+				</col>
+				<col column="deptname" label="部门名" clickorderby="true"/>
+				<col column="manager" label="部门经理">
+					<inputbox type="passwordbox"/>
+				</col>
+				<col column="builtdate" label="创建日期" clickorderby="true" width="100px" datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="description" label="简介" datatype="clob">
+					<inputbox type="textareabox"/>
+				</col>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+				</value>
+				<condition name="txtdeptno" label="部门编号">
+					<value>
+						<![CDATA[(deptno like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="200" count="15">
+						<promptcol label="deptno" matchmode="anywhere"/>
+						<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			  <insert>
+		  		 insert into tbl_department(guid=uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{description});
+			  </insert>
+			  <update>
+			     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{description}) where guid=@{guid};
+			     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+			  </update>
+			  <delete>
+			  	 delete from tbl_department where deptno=@{deptno__old};
+			  </delete>
+			</sql>
+		</report>
+		<footer>${clobpage1.footer}</footer>
+	</page>
+	<page id="increasepage1" js="/webresources/script/validate.js">
+		<report id="report1" title="招聘信息列表" type="editablelist2" dataexport="richexcel">
+			<display>
+				<col column="id" label="ID"/>
+				<col column="zhiwei" label="招聘职位"/>
+				<col column="salary" label="待遇" clickorderby="true"/>
+				<col column="count" label="招聘数量"/>
+				<col column="xueli" label="学历要求" >
+					<inputbox type="selectbox" >
+						<option label="无" value="无"/>
+						<option label="专科以上" value="专科以上"/>
+						<option label="本科以上" value="本科以上"/>
+						<option label="硕士以上" value="硕士以上"/>
+						<option label="博士" value="博士"/>
+					</inputbox>
+				</col>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT * FROM tbl_zhaoping  order by id]]>
+				</value>
+			  </select>
+			  <insert>
+		  		 insert into tbl_zhaoping(@{zhiwei},@{salary},@{count},@{xueli});
+			  </insert>
+			  <update>
+			     update tbl_zhaoping(@{zhiwei},@{salary},@{count},@{xueli}) where id=@{id};
+			  </update>
+			  <delete>
+			  	 delete from tbl_zhaoping where id=@{id};
+			  </delete>
+			</sql>
+		</report>
+		<footer>
+		<![CDATA[<br/><font color='#ff0000'>说明：</font><br/>
+		<font color='#0000FF'>
+		&nbsp;&nbsp;1、只有sqlserver、mysql类型的数据库才能在此报表添加数据，oracle数据库添加时会报错，因为它不支持自动增长列类型的字段；<br/><br/>
+		&nbsp;&nbsp;2、编辑时，ID列是不能编辑的，因为它对应的id字段是自动增长，所以没有配置到＜update/＞的SQL语句的更新字段列表中；<br/><br/>
+		&nbsp;&nbsp;3、这里为了方便，没有配置客户端/服务器端校验，因此在填写时，最好保持合法，否则有可能保存出错，比如故意在招聘人数列输入非数字字符。<br/><br/>
+		</font>]]>
+		</footer>
+	</page>
+	
+	<page id="incrementidpage1" js="/webresources/script/validate.js">
+		<tabpanel id="tp1" margin="10px" titlestyle="2">
+			<report id="report1" title="招聘信息列表2" parenttitle="只做主键" type="editablelist2" dataexport="richexcel">
+				<display>
+					<col column="id" label="ID"/>
+					<col column="zhiwei" label="招聘职位"/>
+					<col column="salary" label="待遇" clickorderby="true"/>
+					<col column="count" label="招聘数量"/>
+					<col column="xueli" label="学历" >
+						<inputbox type="selectbox" >
+							<option label="无" value="无"/>
+							<option label="专科以上" value="专科以上"/>
+							<option label="本科以上" value="本科以上"/>
+							<option label="硕士以上" value="硕士以上"/>
+							<option label="博士" value="博士"/>
+						</inputbox>
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT * FROM tbl_zhaoping2 where  {#condition#} order by id]]>
+					</value>
+				  </select>
+				  <insert>
+			  		 insert into tbl_zhaoping2(id=increment{tbl_zhaoping2.id},@{zhiwei},@{salary},@{count},@{xueli});
+				  </insert>
+				  <update>
+				     update tbl_zhaoping2(@{zhiwei},@{salary},@{count},@{xueli}) where id=@{id__old};
+				  </update>
+				  <delete>
+				  	 delete from tbl_zhaoping2 where id=@{id__old};
+				  </delete>
+				</sql>
+			</report>
+			<report id="report2" title="招聘信息列表2" parenttitle="同时做主键和外键" type="editablelist2" dataexport="richexcel">
+				<display>
+					<col column="id" label="ID"/>
+					<col column="zhiwei" label="招聘职位"/>
+					<col column="salary" label="待遇" clickorderby="true"/>
+					<col column="count" label="招聘数量"/>
+					<col column="xueli" label="学历" >
+						<inputbox type="selectbox" >
+							<option label="无" value="无"/>
+							<option label="专科以上" value="专科以上"/>
+							<option label="本科以上" value="本科以上"/>
+							<option label="硕士以上" value="硕士以上"/>
+							<option label="博士" value="博士"/>
+						</inputbox>
+					</col>
+					<col column="yaoqiu" label="要求" >
+						<inputbox type="textareabox"/>
+					</col>
+					<col column="description" label="职位描述">
+						<inputbox type="textareabox"/>
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT A.id,zhiwei,salary,count,xueli,yaoqiu,description FROM tbl_zhaoping2 A left join tbl_zhaopingdesc2 B on A.id=B.id  where {#condition#}  order by id]]>
+					</value>
+				  </select>
+				  <insert>
+				  	 <params>
+				  		<param name="id" value="increment{tbl_zhaoping2.id}"/>
+				  	 </params>
+			  		 <value>
+			  		 	insert into tbl_zhaoping2(id=#{id},@{zhiwei},@{salary},@{count},@{xueli});
+			  		 	insert into tbl_zhaopingdesc2(id=#{id},@{yaoqiu},@{description});
+			  		 </value>
+				  </insert>
+				  <update>
+				     update tbl_zhaoping2(@{zhiwei},@{salary},@{count},@{xueli}) where id=@{id__old};
+				     update tbl_zhaopingdesc2(@{yaoqiu},@{description}) where id=@{id__old};
+				  </update>
+				  <delete>
+				  	  delete from tbl_zhaoping2 where id=@{id__old};
+				  	  delete from tbl_zhaopingdesc2 where id=@{id__old};
+				  </delete>
+				</sql>
+			</report>
+		</tabpanel>
+		<footer>
+			<![CDATA[<br/><font color='#ff0000'>说明：</font>
+			<font color='#0000FF'>对于在“只做主键”的演示中添加的记录，在“同时做主键和外键”中可能不能修改它的“职位描述”列，这是因为在“只做主键”演示中添加的记录不会在tbl_zhaopingdesc2表中添加记录，导致在此处修改不了它的值</font>]]>
+		</footer>
+	</page>
+	
+	<page id="uuidpage1" js="/webresources/script/validate.js">
+		<tabpanel id="tp1" margin="10px" titlestyle="2">
+			<report id="report1" title="部门信息列表" parenttitle="只做主键" type="editablelist2" dataexport="richexcel">
+				<display>
+					<col column="guid" displaytype="hidden"/>
+					<col column="deptno" label="部门编号" clickorderby="true" formatemplate="&lt;a href='#' onclick=wx_win('uuid：@{guid}')&gt;@{deptno}&lt;/a&gt;">
+						<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+					</col>
+					<col column="deptname" label="部门名" clickorderby="true"/>
+					<col column="manager" label="部门经理"/>
+					<col column="builtdate" label="创建日期" clickorderby="true" width="100px" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+					<col column="performance" label="表现" clickorderby="true" width="150px" filter="true" filterwidth="120px">
+						<inputbox type="selectbox">
+							<option value="优秀" label="优秀"/> 
+							<option value="良好" label="良好" />
+							<option value="较好" label="较好" />
+							<option value="很差" label="很差" />
+						</inputbox>
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+					</value>
+					<condition name="txtdeptno" label="部门编号">
+						<value>
+							<![CDATA[(deptno like  '%#data#%' )]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="200" count="15">
+							<promptcol label="deptno" matchmode="anywhere"/>
+							<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+				  </select>
+				  <insert>
+			  		 insert into tbl_department(guid=uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{performance});
+				  </insert>
+				  <update>
+				     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{performance}) where guid=@{guid};
+				     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+				  </update>
+				  <delete>
+				  	 delete from tbl_department where deptno=@{deptno__old};
+				  </delete>
+				</sql>
+			</report>
+			<report id="report2" title="部门信息列表" parenttitle="同时做主键和外键" type="editablelist2" dataexport="richexcel">
+				<display>
+					<col column="guid" displaytype="hidden"/>
+					<col column="deptno" label="部门编号" clickorderby="true" formatemplate="&lt;a href='#' onclick=wx_win('uuid：@{guid}')&gt;@{deptno}&lt;/a&gt;">
+						<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+					</col>
+					<col column="deptname" label="部门名" clickorderby="true"/>
+					<col column="manager" label="部门经理"/>
+					<col column="builtdate" label="创建日期" clickorderby="true" width="100px" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+					<col column="pingjia" label="评价">
+						<inputbox type="selectbox">
+							<option label="很好" value="很好"/>
+							<option label="较好" value="较好"/>
+							<option label="较差" value="较差"/>
+							<option label="很差" value="很差"/>
+						</inputbox>
+					</col>
+					<col column="description" label="简介" datatype="clob">
+						<inputbox type="textareabox"/>
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT A.guid,deptno,deptname,manager,builtdate,pingjia,description FROM tbl_department A left join tbl_dept_pingjia B on A.guid=B.guid where  {#condition#} order by deptno]]>
+					</value>
+					<condition name="txtdeptno" label="部门编号">
+						<value>
+							<![CDATA[(deptno like  '%#data#%' )]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="200" count="15">
+							<promptcol label="deptno" matchmode="anywhere"/>
+							<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+				  </select>
+				  <insert>
+				  	 <params>
+				  	 	<param name="myguid" value="uuid{}"/>
+				  	 </params>
+				  	 <value>
+			  		 	insert into tbl_department(guid=#{myguid},@{deptno},@{deptname},@{manager},@{builtdate},@{description});
+			  		 	insert into tbl_dept_pingjia(guid=#{myguid},@{pingjia});
+			  		 </value>
+				  </insert>
+				  <update>
+				     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{description}) where guid=@{guid};
+				     update tbl_dept_pingjia(@{pingjia}) where guid=@{guid};
+				     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+				  </update>
+				  <delete>
+				  	 delete from tbl_department where deptno=@{deptno__old};
+				  	 delete from tbl_dept_pingjia where guid=@{guid};
+				  </delete>
+				</sql>
+			</report>
+		</tabpanel>
+		<footer>
+		<![CDATA[<br/><font color='#ff0000'>说明：</font><br/>
+			<font color='#0000FF'>
+			&nbsp;&nbsp;1、点击“部门编号”列数据查看当前记录的UUID字段值；<br/>
+			&nbsp;&nbsp;2、对于在“只做主键”的演示中添加的记录，在“同时做主键和外键”可能不能修改它的“评价”列，这是因为在“只做主键”演示中添加的记录不会在tbl_dept_pingjia表中添加记录，
+			导致在此处修改不了它的值
+			</font>]]>
+		</footer>
+	</page>
+	<page id="sequencecolpage1" js="/webresources/script/validate.js">
+		<tabpanel id="tp1" margin="10px" titlestyle="2">
+			<report id="report1" title="招聘信息列表" parenttitle="只做主键" type="editablelist2" dataexport="richexcel">
+				<display>
+					<col column="id" label="ID"/>
+					<col column="zhiwei" label="招聘职位"/>
+					<col column="salary" label="待遇" clickorderby="true"/>
+					<col column="count" label="招聘数量"/>
+					<col column="xueli" label="学历" >
+						<inputbox type="selectbox" >
+							<option label="无" value="无"/>
+							<option label="专科以上" value="专科以上"/>
+							<option label="本科以上" value="本科以上"/>
+							<option label="硕士以上" value="硕士以上"/>
+							<option label="博士" value="博士"/>
+						</inputbox>
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT * FROM tbl_zhaoping where  {#condition#} order by id]]>
+					</value>
+				  </select>
+				  <insert>
+			  		 insert into tbl_zhaoping(id=sequence{seq_zhaoping},@{zhiwei},@{salary},@{count},@{xueli});
+				  </insert>
+				  <update>
+				     update tbl_zhaoping(@{zhiwei},@{salary},@{count},@{xueli}) where id=@{id__old};
+				  </update>
+				  <delete>
+				  	 delete from tbl_zhaoping where id=@{id__old};
+				  </delete>
+				</sql>
+			</report>
+			<report id="report2" title="招聘信息列表" parenttitle="同时做主键和外键" type="editablelist2" dataexport="richexcel">
+				<display>
+					<col column="id" label="ID"/>
+					<col column="zhiwei" label="招聘职位"/>
+					<col column="salary" label="待遇" clickorderby="true"/>
+					<col column="count" label="招聘数量"/>
+					<col column="xueli" label="学历" >
+						<inputbox type="selectbox" >
+							<option label="无" value="无"/>
+							<option label="专科以上" value="专科以上"/>
+							<option label="本科以上" value="本科以上"/>
+							<option label="硕士以上" value="硕士以上"/>
+							<option label="博士" value="博士"/>
+						</inputbox>
+					</col>
+					<col column="yaoqiu" label="要求" >
+						<inputbox type="textareabox"/>
+					</col>
+					<col column="description" label="职位描述">
+						<inputbox type="textareabox"/>
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT A.id,zhiwei,salary,count,xueli,yaoqiu,description FROM tbl_zhaoping A left join tbl_zhaopingdesc B on A.id=B.id  where {#condition#}  order by id]]>
+					</value>
+				  </select>
+				  <insert>
+				  	 <params>
+				  		<param name="id" value="sequence{seq_zhaoping}"/>
+				  	 </params>
+			  		 <value>
+			  		 	insert into tbl_zhaoping(id=#{id},@{zhiwei},@{salary},@{count},@{xueli});
+			  		 	insert into tbl_zhaopingdesc(id=#{id},@{yaoqiu},@{description});
+			  		 </value>
+				  </insert>
+				  <update>
+				     update tbl_zhaoping(@{zhiwei},@{salary},@{count},@{xueli}) where id=@{id__old};
+				     update tbl_zhaopingdesc(@{yaoqiu},@{description}) where id=@{id__old};
+				  </update>
+				  <delete>
+				  	  delete from tbl_zhaoping where id=@{id__old};
+				  	  delete from tbl_zhaopingdesc where id=@{id__old};
+				  </delete>
+				</sql>
+			</report>
+		</tabpanel>
+		<footer>
+			<![CDATA[<br/><font color='#ff0000'>说明：</font><br/>
+			<font color='#0000FF'>
+			&nbsp;&nbsp;1、只有支持序列的数据库才允许配置sequence类型的字段，比如oracle，DB2等，而对于不支持序列的数据库，比如SQL Server和MySql等，则不允许配置这种类型的字段，否则不能正常添加数据。<br/>
+			&nbsp;&nbsp;2、对于在“只做主键”的演示中添加的记录，在“同时做主键和外键”中可能不能修改它的“职位描述”列，这是因为在“只做主键”演示中添加的记录不会在tbl_zhaopingdesc表中添加记录，导致在此处修改不了它的值
+			</font>]]>
+		</footer>
+	</page>
+	
+	<page id="saveinterceptorreportpage1" js="/webresources/script/validate.js">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="部门信息列表" parenttitle="直接配置拦截器方式" type="editablelist2" dataexport="richexcel">
+		 	<interceptor>
+			<imports>
+  				<import>java.util.*</import>
+  			</imports>
+			<saveaction>
+				<![CDATA[
+				  List lstInsertData=rrequest.getLstInsertedData(rbean);//添加的记录集合
+		        List lstInsertExternalVals=rrequest.getLstInsertedParamValues(rbean);//因为此报表为<insert/>配置了<external-values/>
+		        List lstUpdateData=rrequest.getLstUpdatedData(rbean);//修改的记录集合
+		        List lstDeleteData=rrequest.getLstDeletedData(rbean);//删除的记录集合
+		        if(lstInsertData!=null&&lstInsertData.size()>0||lstUpdateData!=null&&lstUpdateData.size()>0||lstDeleteData!=null&&lstDeleteData.size()>0)
+		        {
+		            System.out.println("--------------拦截器类型：直接配置----------保存前置动作-------------------");
+		        }
+		        Map mData;
+		        if(lstInsertData!=null&&lstInsertData.size()>0)
+		        {//当前在做添加数据的保存操作
+		            Map mParamValues;
+		            for(int i=0;i<lstInsertData.size();i++)
+		            {//循环添加的每条记录
+		            	mData=(Map)lstInsertData.get(i);
+							mParamValues=(Map)lstInsertExternalVals.get(i);
+							if(mData==null) continue;
+							System.out.println("第"+(i+1)+"条添加的记录：");
+							Iterator itKeys=mData.keySet().iterator();
+							while(itKeys.hasNext())
+							{
+								String key=(String)itKeys.next();
+								String value=(String)mData.get(key);
+								System.out.print("["+key+"="+value+"]");
+							}
+							System.out.println();
+	                	System.out.println("此条记录对应的<params/>定义的变量值：");
+	                	itKeys=mParamValues.keySet().iterator();
+							while(itKeys.hasNext())
+							{
+								String key=(String)itKeys.next();
+								String value=(String)mParamValues.get(key);
+								System.out.print("["+key+"="+value+"]");
+							}
+							System.out.println();		            
+		            }
+		        }
+		
+		        if(lstUpdateData!=null&&lstUpdateData.size()>0)
+		        {//当前在做修改数据的保存操作
+		            for(int i=0;i<lstUpdateData.size();i++)
+						{
+							mData=(Map)lstUpdateData.get(i);
+							if(mData==null) continue;
+							System.out.println("第"+(i+1)+"条修改的记录：");
+							Iterator itKeys=mData.keySet().iterator();
+							while(itKeys.hasNext())
+							{
+								String key=(String)itKeys.next();
+								String value=(String)mData.get(key);
+								System.out.print("["+key+"="+value+"]");
+							}
+							System.out.println();
+						}
+		        }
+		
+		        if(lstDeleteData!=null&&lstDeleteData.size()>0)
+		        {//当前在做删除数据的保存操作
+		            for(int i=0;i<lstDeleteData.size();i++)
+						{
+							mData=(Map)lstDeleteData.get(i);
+							if(mData==null) continue;
+							System.out.println("第"+(i+1)+"条删除的记录：");
+							Iterator itKeys=mData.keySet().iterator();
+							while(itKeys.hasNext())
+							{
+								String key=(String)itKeys.next();
+								String value=(String)mData.get(key);
+								System.out.print("["+key+"="+value+"]");
+							}
+							System.out.println();
+						}
+		        }
+		        return super.doSave(rrequest,rbean,editbean);
+				]]>
+			  </saveaction>
+			</interceptor>
+			<display>
+				<col column="guid" displaytype="hidden"/>
+				<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+				</col>
+				<col column="deptname" label="部门名" clickorderby="true"/>
+				<col column="manager" label="部门经理"/>
+				<col column="builtdate" label="创建日期" clickorderby="true" width="100px" datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="pingjia" label="评价">
+					<inputbox type="selectbox">
+						<option label="很好" value="很好"/>
+						<option label="较好" value="较好"/>
+						<option label="较差" value="较差"/>
+						<option label="很差" value="很差"/>
+					</inputbox>
+				</col>
+				<col column="description" label="简介" datatype="clob">
+					<inputbox type="textareabox"/>
+				</col>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.guid,deptno,deptname,manager,builtdate,pingjia,description FROM tbl_department A left join tbl_dept_pingjia B on A.guid=B.guid where  {#condition#} order by deptno]]>
+				</value>
+				<condition name="txtdeptno" label="部门编号">
+					<value>
+						<![CDATA[(deptno like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="200" count="15">
+						<promptcol label="deptno" matchmode="anywhere"/>
+						<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			  <insert>
+			  	 <params>
+			  	 	<param name="myguid" value="uuid{}"/>
+			  	 </params>
+			  	 <value>
+		  		 	insert into tbl_department(guid=#{myguid},@{deptno},@{deptname},@{manager},@{builtdate},@{description});
+		  		 	insert into tbl_dept_pingjia(guid=#{myguid},@{pingjia});
+		  		 </value>
+			  </insert>
+			  <update>
+			     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{description}) where guid=@{guid};
+			     update tbl_dept_pingjia(@{pingjia}) where guid=@{guid};
+			     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+			  </update>
+			  <delete>
+			  	 delete from tbl_department where deptno=@{deptno__old};
+			  	 delete from tbl_dept_pingjia where guid=@{guid};
+			  </delete>
+			</sql>
+			<format>
+				<value>
+				<![CDATA[
+					this.deptno="<a href=\"#\" onclick=\"ymPrompt.win('uuid："+guid+"',300,100,'普通弹窗测试')\">"+deptno+"</a>";
+				]]>
+				</value>
+			</format>
+			<footer>
+			  <![CDATA[<br/><font color='#0000FF'>这种方式直接将拦截器方法配置在报表配置文件中</font>]]>
+			</footer>
+		 </report>
+		 <report id="report2" parenttitle="开发拦截器类方式" extends="saveinterceptorreportpage1.report1"
+				interceptor="com.wabacusdemo.Interceptor_saveinterceptorreport">
+		 	<footer>
+			  <![CDATA[<br/><font color='#0000FF'>这种拦截方式是通过开发一拦截器类实现</font>]]>
+			</footer>
+		 </report>
+		 <report id="report3" parenttitle="引用拦截器资源项方式" extends="saveinterceptorreportpage1.report1"
+				interceptor="${Interceptor_saveinterceptorreport}">
+			<footer>
+			  <![CDATA[<br/><font color='#0000FF'>这种拦截方式是通过引用资源文件中定义的拦截器资源项实现</font>]]>
+			</footer>		
+		 </report>
+	  </tabpanel>
+	  <footer>
+	  	<![CDATA[<br/><font color='#ff0000'>说明：</font><font color='#0000FF'>这两个拦截方法在保存本报表所有记录前和后调用，用户在增、删、改数据后请查看控制台上拦截器方法打印的保存数据</font>]]>
+	  </footer>
+	</page>
+	
+	<page id="saveinterceptorperrowpage1" js="/webresources/script/validate.js">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="部门信息列表" parenttitle="直接配置拦截器方式" extends="saveinterceptorreportpage1.report1">
+		 	<interceptor>
+				<imports>
+	  				<import>java.util.*</import>
+	  			</imports>
+				<saveaction-perrow>
+				<![CDATA[
+				  String message="";
+		        if(editbean instanceof EditableReportInsertDataBean)
+		        {//对本条记录做添加操作
+		            message="正在添加记录：";
+		        }else   if(editbean instanceof EditableReportUpdateDataBean)
+		        {//对本条记录做修改操作
+		            message="正在修改记录：";
+		        }else if(editbean instanceof EditableReportDeleteDataBean)
+		        {//对本条记录做删除操作
+		            message="正在删除记录：";
+		        }
+		        //因为没有通过<button/>配置调用后台服务的操作，因此不用先判断editbean instanceof  EditableReportSQLButtonDataBean
+		        if(message!=null)
+		        {
+		            System.out.print(message);
+		            if(mRowData!=null)//mRowData中存放了本条记录各列的值
+		            {
+		                Iterator itKeys=mRowData.keySet().iterator();
+		                while(itKeys.hasNext())
+		                {
+		                    String key=(String)itKeys.next();
+		                    String value=(String)mRowData.get(key);
+		                    System.out.print("["+key+"="+value+"]");
+		                }
+		                System.out.println();
+		            }
+		            if(mParamValues!=null)//存放了相对于本条记录的在<insert/>或<update/>或<delete/>中定义的变量值
+		            {
+		                System.out.print("各变量的值为：");
+		                Iterator itKeys=mParamValues.keySet().iterator();
+		                while(itKeys.hasNext())
+		                {
+		                    String key=(String)itKeys.next();
+		                    String value=(String)mParamValues.get(key);
+		                    System.out.print("["+key+"="+value+"]");
+		                }
+		                System.out.println();
+		            }
+		        }
+		        return super.doSavePerRow(rrequest,rbean,mRowData,mParamValues,editbean);
+				]]>
+				</saveaction-perrow>
+			</interceptor>
+		 </report>
+		 <report id="report2" parenttitle="开发拦截器类方式" extends="saveinterceptorreportpage1.report2"
+				interceptor="com.wabacusdemo.Interceptor_saveinterceptorperrowpage1"/>
+		 <report id="report3" parenttitle="引用拦截器资源项方式" extends="saveinterceptorreportpage1.report3"
+				interceptor="${Interceptor_saveinterceptorperrowpage1}"/>
+	  </tabpanel>
+	  <footer>
+	  <![CDATA[
+	  	<br/><font color='#ff0000'>说明：</font><font color='#0000FF'>这两个拦截方法在保存每条记录前和后调用，用户在增、删、改数据后请查看控制台上拦截器方法打印的保存数据</font>
+	  ]]>
+	  </footer>
+	</page>
+	
+	<page id="saveinterceptorpersqlpage1" js="/webresources/script/validate.js">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="部门信息列表" parenttitle="直接配置拦截器方式" extends="saveinterceptorreportpage1.report1">
+		 	<interceptor>
+				<imports>
+	  				<import>java.util.*</import>
+	  			</imports>
+				<saveaction-peraction>
+				<![CDATA[
+				  if(actionbean instanceof AbsEditSqlActionBean)
+		        {//当前执行的脚本是配置的SQL语句或存储过程
+		            System.out.print("正在执行sql语句："+((AbsEditSqlActionBean)actionbean).getSql()+"，保存的记录为：");
+		        }
+		        if(mRowData!=null)//mRowData中存放了本条记录各列的值
+		        {
+		            Iterator itKeys=mRowData.keySet().iterator();
+		            while(itKeys.hasNext())
+		            {
+		                String key=(String)itKeys.next();
+		                String value=(String)mRowData.get(key);
+		                System.out.print("["+key+"="+value+"]");
+		            }
+		            System.out.println();
+		        }
+		        if(mParamValues!=null)//存放了相对于本条记录的在<insert/>或<update/>或<delete/>中定义的变量值
+		        {
+		            System.out.print("各变量的值为：");
+		            Iterator itKeys=mParamValues.keySet().iterator();
+		            while(itKeys.hasNext())
+		            {
+		                String key=(String)itKeys.next();
+		                String value=(String)mParamValues.get(key);
+		                System.out.print("["+key+"="+value+"]");
+		            }
+		            System.out.println();
+		        }
+		        return super.doSavePerAction(rrequest,rbean,mRowData,mParamValues,actionbean,editbean);
+				]]>
+				</saveaction-peraction>
+			</interceptor>
+		 </report>
+		 <report id="report2" parenttitle="开发拦截器类方式" extends="saveinterceptorreportpage1.report2"
+				interceptor="com.wabacusdemo.Interceptor_saveinterceptorpersqlpage1"/>
+		 <report id="report3" parenttitle="引用拦截器资源项方式" extends="saveinterceptorreportpage1.report3"
+				interceptor="${Interceptor_saveinterceptorpersqlpage1}"/>
+	  </tabpanel>
+	  <footer>
+	  <![CDATA[
+	  	<br/><font color='#ff0000'>说明：</font><font color='#0000FF'>这两个拦截方法在保存每条记录时，执行每个保存数据的SQL语句的前和后调用，用户在增、删、改数据后请查看控制台上拦截器方法打印的保存数据</font>
+	  ]]>
+	  </footer>
+	</page>
+	
+	<page id="editableAccessmodeListPage1" js="/webresources/script/validate.js" css="/wabacusdemo/css/demoreport.css">
+		<report id="report1" extends="editablelistreportpage1.report1">
+			<buttons>
+				<button name="button1" label="默认访问模式（可编辑）" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableAccessmodeListPage1'
+				</button>
+				<button name="button2" label="只读访问模式" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableAccessmodeListPage1&amp;report1_ACCESSMODE=readonly'
+				</button>
+			</buttons>
+		</report>
+    </page>
+    <page id="editableAccessmodeDetailPage1" js="/webresources/script/validate.js" css="/wabacusdemo/css/demoreport.css">
+		<report id="report1" extends="editabledetailpage1.report1">
+			<buttons>
+				<button name="button1" label="默认访问模式（可编辑）" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableAccessmodeDetailPage1'
+				</button>
+				<button name="button2" label="只读访问模式" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableAccessmodeDetailPage1&amp;report1_ACCESSMODE=readonly'
+				</button>
+			</buttons>
+		</report>
+    </page>
+    <page id="editableAccessmodeDetailPage2" js="/webresources/script/validate.js" css="/wabacusdemo/css/demoreport.css">
+		<report id="report1" extends="editabledetailpage1.report2">
+			<buttons>
+				<button name="button1" label="默认访问模式（可编辑）" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableAccessmodeDetailPage2'
+				</button>
+				<button name="button2" label="只读访问模式" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableAccessmodeDetailPage2&amp;report1_ACCESSMODE=readonly'
+				</button>
+			</buttons>
+		</report>
+    </page>
+    
+    <page id="editableFormatListPage1" js="/webresources/script/validate.js" css="/wabacusdemo/css/demoreport.css">
+		<report id="report1" extends="editmultitablepage1.report1">
+			<display>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="name" label="姓名" clickorderby="true" width="15%"/>
+				<group label="基本信息">
+					<col column="sex" label="性别">
+						<inputbox type="radiobox">
+							<option value="0" label="女"/> 
+							<option value="1" label="男"/>
+						</inputbox>
+					</col>
+					<col column="age" label="年龄" clickorderby="true" width="100px" filter="true" filterwidth="120px">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+					</col>
+					<col column="birthday" label="出生日期" clickorderby="true" width="150px" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  language="en" jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+				</group>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="deptno" label="所属部门" displaytype="hidden"/>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px" updatecol="@{deptno}">
+					<inputbox type="selectbox">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+				<group label="籍贯">
+					<col column="province" label="省">
+						<inputbox type="selectbox">
+							<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+						</inputbox>
+					</col>
+					<col column="city" label="市">
+						<inputbox type="selectbox" depends="province">
+							<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+						</inputbox>
+					</col>
+					<col column="county" label="县">
+						<inputbox type="selectbox" depends="city">
+							<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+						</inputbox>
+					</col>
+				</group>
+			</display>
+			<format>
+			  <value>
+			    <![CDATA[
+			  	  String accessmode=rrequest.getCurrentAccessMode(rbean.getId()); 
+				  if(accessmode.equals("readonly"))
+				  {//如果是只读模式，则进行如下格式化
+				  	no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+				  }
+				  sex=sex==null?"1":sex.trim();
+				  if(sex.equals("0")) sex="女";
+				  else if(sex.equals("1")) sex="男";
+				]]>
+			  </value>
+			</format>
+			<buttons>
+				<button name="button1" label="默认访问模式（可编辑）" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableFormatListPage1'
+				</button>
+				<button name="button2" label="只读访问模式" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableFormatListPage1&amp;report1_ACCESSMODE=readonly'
+				</button>
+			</buttons>
+		</report>
+		<footer>${editableFormatListPage1.footer}</footer>
+    </page>
+    
+    <page id="editableFormatDetailPage1"
+    	  js="/webresources/script/validate.js" css="/wabacusdemo/css/demoreport.css">
+		<report id="report1" extends="editabledetailpage1.report1">
+			<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="guid" displaytype="hidden"/>
+				<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+				</col>
+				<col column="deptname" label="部门名"/>
+				<col column="manager" label="部门经理" br="true"/>
+				<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'" datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true">
+					<inputbox type="selectbox">
+						<option value="优秀" label="优秀"/> 
+						<option value="良好" label="良好" />
+						<option value="较好" label="较好" />
+						<option value="很差" label="很差" />
+					</inputbox>
+				</col>
+				<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+					<inputbox type="textareabox"/>
+				</col>
+			</display>
+			<format>
+			  <value>
+			    <![CDATA[
+			  	  String accessmode=rrequest.getCurrentAccessMode(rbean.getId()); 
+				  if(accessmode.equals("readonly"))
+				  {//如果是只读模式，则进行如下格式化
+				  	deptno="<a href=\"#\" onclick=\"alert('"+deptno+"')\">"+deptno+"</a>";
+				  }else
+				  {//默认访问模式
+				  	manager="<a href=\"#\" onclick=\"alert('"+manager+"')\">"+manager+"</a>";
+				  }
+				]]>
+			  </value>
+			</format>
+			<buttons>
+				<button name="button1" label="默认访问模式（可编辑）" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableFormatDetailPage1'
+				</button>
+				<button name="button2" label="只读访问模式" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableFormatDetailPage1&amp;report1_ACCESSMODE=readonly'
+				</button>
+			</buttons>
+		</report>
+		<footer>${editableFormatDetailPage1.footer}</footer>
+    </page>
+    
+    <page id="editableFormatDetailPage2" js="/webresources/script/validate.js" css="/wabacusdemo/css/demoreport.css">
+		<report id="report1" extends="editabledetailpage1.report2">
+			<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="guid" displaytype="hidden"/>
+				<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+				</col>
+				<col column="deptname" label="部门名"/>
+				<col column="manager" label="部门经理" br="true"/>
+				<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'" datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true">
+					<inputbox type="selectbox">
+						<option value="优秀" label="优秀"/> 
+						<option value="良好" label="良好" />
+						<option value="较好" label="较好" />
+						<option value="很差" label="很差" />
+					</inputbox>
+				</col>
+				<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+					<inputbox type="textareabox" styleproperty="rows='5'"/>
+				</col>
+			</display>
+			<format>
+			  <value>
+			    <![CDATA[
+			  	  String accessmode=rrequest.getCurrentAccessMode(rbean.getId()); 
+				  if(accessmode.equals("readonly"))
+				  {//如果是只读模式，则进行如下格式化
+				  	deptno="<a href=\"#\" onclick=\"alert('"+deptno+"')\">"+deptno+"</a>";
+				  }else if(accessmode.equals("add"))
+				  {//如果是添加记录模式，给部门编号赋上默认值111111
+				  		deptno="111111";
+				  }else if(accessmode.equals("update"))
+				  {//如果是修改记录模式，不做任何格式化
+				  		
+				  }
+				]]>
+			  </value>
+			</format>
+			<buttons>
+				<button name="button1" label="默认访问模式（可编辑）" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableFormatDetailPage2'
+				</button>
+				<button name="button2" label="只读访问模式" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=editableFormatDetailPage2&amp;report1_ACCESSMODE=readonly'
+				</button>
+			</buttons>
+		</report>
+		<footer>${editableFormatDetailPage2.footer}</footer>
+    </page>
+    <page id="editableInvokeServerAction_autopage1" js="/wabacusdemo/js/demo.js,/webresources/script/validate.js">
+    	<tabpanel id="tp1" margin="10px">
+    		<vpanel id="vp1" parenttitle="可编辑报表">
+				<report id="report1" extends="editablelistreportpage1.report1" rowselect="checkbox">
+					<buttons>
+						<button name="button1" position="title" label="传入选中行数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report1','com.wabacusdemo.TestServerCallBack1',{name:'SELECTEDROW',value:true},null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+						<button name="button2" position="title" label="传入非选中行数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report1','com.wabacusdemo.TestServerCallBack1',{name:'SELECTEDROW',value:false},null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+						<button name="button3" position="title" label="传入所有行数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report1','com.wabacusdemo.TestServerCallBack1',null,null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+					</buttons>
+				</report>
+				<report id="report2" extends="editabledetailpage1.report1" top="10px">
+					<buttons>
+						<button name="button1" position="title" label="自动传入报表数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report2','com.wabacusdemo.TestServerCallBack1',null,null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+					</buttons>
+				</report>
+				<report id="report3" extends="editabledetailpage1.report2" top="10px">
+					<buttons>
+						<button name="button1" position="title" label="自动传入报表数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report3','com.wabacusdemo.TestServerCallBack1',null,null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+					</buttons>
+				</report>
+			</vpanel>
+			<vpanel id="vp2" parenttitle="只读报表一">
+				<report id="report4" extends="editablelistreportpage1.report1" rowselect="checkbox">
+					<interceptor>
+			    		<preaction>
+			    			rrequest.setAttribute("report4_ACCESSMODE","readonly");
+			    		</preaction>
+			    	</interceptor>
+					<buttons>
+						<button name="button1" position="title" label="传入选中行数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report4','com.wabacusdemo.TestServerCallBack1',{name:'SELECTEDROW',value:true},null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+						<button name="button2" position="title" label="传入非选中行数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report4','com.wabacusdemo.TestServerCallBack1',{name:'SELECTEDROW',value:false},null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+						<button name="button3" position="title" label="传入所有行数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report4','com.wabacusdemo.TestServerCallBack1',null,null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+					</buttons>
+				</report>
+				<report id="report5" extends="editabledetailpage1.report1" top="10px">
+					<interceptor>
+			    		<preaction>
+			    			rrequest.setAttribute("report5_ACCESSMODE","readonly");
+			    		</preaction>
+			    	</interceptor>
+					<buttons>
+						<button name="button1" position="title" label="自动传入报表数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report5','com.wabacusdemo.TestServerCallBack1',null,null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+					</buttons>
+				</report>
+				<report id="report6" extends="editabledetailpage1.report2" top="10px">
+					<interceptor>
+			    		<preaction>
+			    			rrequest.setAttribute("report6_ACCESSMODE","readonly");
+			    		</preaction>
+			    	</interceptor>
+					<buttons>
+						<button name="button1" position="title" label="自动传入报表数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report6','com.wabacusdemo.TestServerCallBack1',null,null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+					</buttons>
+				</report>
+			</vpanel>
+			<vpanel id="vp3" parenttitle="只读报表二">
+				<report id="report7" extends="editablelistreportpage1.report1" rowselect="checkbox">
+					<sql>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+						</value>
+						<condition name="txtdeptno" label="部门编号">
+							<value>
+								<![CDATA[(deptno like  '%#data#%' )]]>
+							</value>
+							<inputbox>
+							  <typeprompt width="200" count="15">
+								<promptcol label="deptno" matchmode="anywhere"/>
+								<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+							  </typeprompt>
+							</inputbox>
+						</condition>
+				   </sql>
+					<buttons>
+						<button name="button1" position="title" label="传入选中行数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report7','com.wabacusdemo.TestServerCallBack1',{name:'SELECTEDROW',value:true},null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+						<button name="button2" position="title" label="传入非选中行数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report7','com.wabacusdemo.TestServerCallBack1',{name:'SELECTEDROW',value:false},null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+						<button name="button3" position="title" label="传入所有行数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report7','com.wabacusdemo.TestServerCallBack1',null,null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+					</buttons>
+				</report>
+				<report id="report8" extends="editabledetailpage1.report1" top="10px">
+					<sql>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+						</value>
+						<condition name="txtdeptno" label="部门编号">
+							<value>
+								<![CDATA[(deptno like '%#data#%' )]]>
+							</value>
+							<inputbox>
+								 <typeprompt count="15">
+								<promptcol label="deptno" matchmode="anywhere"/>
+								<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+							  </typeprompt>
+							</inputbox>
+						</condition>
+					</sql>
+					<buttons>
+						<button name="button1" position="title" label="自动传入报表数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report8','com.wabacusdemo.TestServerCallBack1',null,null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+					</buttons>
+				</report>
+				<report id="report9" extends="editabledetailpage1.report2" top="10px">
+					<sql>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+						</value>
+						<condition name="txtdeptno" label="部门编号">
+							<value>
+								<![CDATA[(deptno like '%#data#%' )]]>
+							</value>
+							<inputbox>
+								 <typeprompt count="15">
+								<promptcol label="deptno" matchmode="anywhere"/>
+								<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+							  </typeprompt>
+							</inputbox>
+						</condition>
+					</sql>
+					<buttons>
+						<button name="button1" position="title" label="自动传入报表数据的调用">
+							invokeServerActionForReportData('editableInvokeServerAction_autopage1','report9','com.wabacusdemo.TestServerCallBack1',null,null,true,testBeforeInokeCallBackMethod1,testInvokeCallbackMethod1);
+						</button>
+					</buttons>
+				</report>
+			</vpanel>
+		</tabpanel>
+		<footer>
+			<![CDATA[
+			<br><br><font color='red'>说明：</font>
+			<font color='blue'>两种只读报表分别通过不同的方式实现，“只读报表一”是通过在拦截器中将访问模式设置为readonly，“只读报表二”是通过不为可编辑报表类型配置更新标签＜update/＞、＜delete/＞和＜insert/＞，这样它就自动退化为只读报表，
+			这两种只读报表的实现方式都能在调用服务器端操作时自动从页面上取报表数据传到服务器端</font>
+			]]>
+		</footer>
+	</page>
+	<!-- 注意：更新下面的报表的性别时，上面报表数据没有更新，是因为当在下面的报表的初始化方法更新数据时，上面的报表已经在初始化方法中加载完数据了 -->
+	<page id="editableInvokeServerAction_autodbpage1" js="/webresources/script/validate.js,/wabacusdemo/js/demo.js">
+	  	<tabpanel id="tp1" titlestyle="2" margin="10px">
+	  		<vpanel id="vp1" parenttitle="可编辑报表">
+				<report id="report1" extends="popupsinglepage1.report1" rowselect="checkbox">
+					<buttons>
+						<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title" confirmessage="确认设置所有选中记录的性别？"
+							label="设置选中记录性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage11" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button2" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title" confirmessage="确认设置所有非选中记录的性别？"
+							label="设置非选中记录性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage11" conditions="{name:'SELECTEDROW',value:false}" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button3" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title" confirmessage="确认设置所有记录的性别？"
+							label="设置所有记录性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage11" conditions="" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+					</buttons>
+					<footer/>
+				</report>
+				<report id="report2" extends="popupsinglepage1.report2">
+					<buttons>
+						<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage11" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button2" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘女’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage11" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=0) where no=@{no__old};
+							]]>
+						</button>
+					</buttons>
+					<footer/>
+				</report>
+				<report id="report3" extends="popupsinglepage1.report3">
+					<buttons>
+						<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage11" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button2" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘女’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage11" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=0) where no=@{no__old};
+							]]>
+						</button>
+					</buttons>
+					<footer/>
+				</report>
+			</vpanel>
+			<vpanel id="vp2" parenttitle="只读报表一">
+				<report id="report4" extends="popupsinglepage1.report1" rowselect="checkbox">
+					<interceptor>
+			    		<preaction>
+			    			rrequest.setAttribute("report4_ACCESSMODE","readonly");
+			    		</preaction>
+			    	</interceptor>
+					<buttons>
+						<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置选中记录性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage12" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button2" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置非选中记录性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage12" conditions="{name:'SELECTEDROW',value:false}" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button3" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置所有记录性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage12" conditions="" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+					</buttons>
+					<footer/>
+				</report>
+				<report id="report5" extends="popupsinglepage1.report2">
+					<interceptor>
+			    		<preaction>
+			    			rrequest.setAttribute("report5_ACCESSMODE","readonly");
+			    		</preaction>
+			    	</interceptor>
+					<buttons>
+						<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage12" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button2" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘女’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage12" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=0) where no=@{no__old};
+							]]>
+						</button>
+					</buttons>
+					<footer/>
+				</report>
+				<report id="report6" extends="popupsinglepage1.report3">
+					<interceptor>
+			    		<preaction>
+			    			rrequest.setAttribute("report6_ACCESSMODE","readonly");
+			    		</preaction>
+			    	</interceptor>
+					<buttons>
+						<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage12" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button2" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘女’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage12" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=0) where no=@{no__old};
+							]]>
+						</button>
+					</buttons>
+					<footer/>
+				</report>
+			</vpanel>
+			<vpanel id="vp3" parenttitle="只读报表二">
+				<report id="report7" extends="popupsinglepage1.report1" rowselect="checkbox">
+					<sql>
+						<value>
+							<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,interest FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+						</value>
+						<condition name="txtgonghao" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+					</sql>
+					<buttons>
+						<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置选中记录性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage13" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button2" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置非选中记录性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage13" conditions="{name:'SELECTEDROW',value:false}" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button3" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置所有记录性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage13" conditions="" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+					</buttons>
+					<footer/>
+				</report>
+				<report id="report8" extends="popupsinglepage1.report2">
+					<sql>
+						<value>
+							<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,interest,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where   {#condition#}]]>
+						</value>
+						<condition name="txtgonghao" label="工号">
+							<value>
+								<![CDATA[(A.no like '%#data#%')]]>
+							</value>
+						</condition>
+					</sql>
+					<buttons>
+						<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage13" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button2" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘女’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage13" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=0) where no=@{no__old};
+							]]>
+						</button>
+					</buttons>
+					<footer/>
+				</report>
+				<report id="report9" extends="popupsinglepage1.report3">
+					<sql>
+					  <select>
+						<value>
+							<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,interest,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where   {#condition#}]]>
+						</value>
+						<condition name="txtgonghao" hidden="true">
+							<value>
+								<![CDATA[(A.no like '%#data#%')]]>
+							</value>
+						</condition>
+					  </select>
+					</sql>
+					<buttons>
+						<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘男’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage13" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=1) where no=@{no__old};
+							]]>
+						</button>
+						<button name="button2" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title"
+							label="设置性别为‘女’" beforecallbackmethod="testBeforeInokeCallBackMethod1" aftercallbackmethod="testInvokeCallbackMethod_autodbpage13" successprompt="设置成功" failedprompt="设置失败">
+							<![CDATA[
+								update tbl_baseinfo(sex=0) where no=@{no__old};
+							]]>
+						</button>
+					</buttons>
+					<footer/>
+				</report>
+			</vpanel>
+			<vpanel id="vp4" parenttitle="脚本使用自定义数据">
+				<report id="report10" extends="popupsinglepage1.report1" rowselect="checkbox">
+					<buttons>
+						<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="title" label="设置选中记录性别为女"
+							successprompt="设置成功" failedprompt="设置失败" beforecallbackmethod="addCustomizeDataToButton">
+							<params>
+								<param name="now" value="now{}" datatype="timestamp"/>
+								<param name="uuid" value="uuid{}"/>
+							</params>
+							<value>
+							<![CDATA[
+								update tbl_baseinfo(sex=0) where no=@{no__old};
+								insert tbl_log(uuid=#{uuid},createdate=#{now},content=!{logcontent},updatetype=!{updatetype});
+							]]>
+							</value>
+						</button>
+					</buttons>
+					<footer/>
+				</report>
+				<report id="report11" title="查看更新日志" dataexport="richexcel" top="10px">
+					<display>
+						<col column="uuid" displaytype="hidden"/>
+						<col column="createdate" label="更新时间" clickorderby="true" width="180px"/>
+						<col column="updatetype" label="更新类型" width="150px"/>
+						<col column="content" label="内容" clickorderby="true"/>
+					</display>
+					<sql>
+						<value>
+							<![CDATA[SELECT * FROM tbl_log order by createdate desc]]>
+						</value>
+					</sql>
+				</report>
+			</vpanel>
+	  	</tabpanel>
+	</page>
+	<page id="editable2formatpage1" js="/webresources/script/validate.js">
+		<report id="report1" title="部门信息列表" extends="editablelistreportpage1.report1">
+			<display>
+				<col column="guid" displaytype="hidden"/>
+				<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+				</col>
+				<col column="deptname" label="部门名" formatemplate="&lt;a href='#' onclick=alert('部门编号：@{deptno}；部门名：@{deptname}')&gt;@{deptname}&lt;/a&gt;" clickorderby="true"/>
+				<col column="manager" label="部门经理" formatemplate="[&lt;a href='#' onclick=alert('部门编号：@{deptno}；部门经理：@{manager}')&gt;部门经理：@{manager}&lt;/a&gt;]"/>
+				<col column="builtdate" label="创建日期" clickorderby="true" datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="performance" label="表现" clickorderby="true" filter="true">
+					<inputbox type="selectbox">
+						<option value="优秀" label="优秀"/> 
+						<option value="良好" label="良好" />
+						<option value="较好" label="较好" />
+						<option value="很差" label="很差" />
+					</inputbox>
+				</col>
+			</display>
+		</report>
+		<report id="report2" top="10px" title="request{dept_name}详细资料" extends="editabledetailpage1.report1">
+			<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="guid" displaytype="hidden"/>
+				<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+				</col>
+				<col column="deptname" label="部门名" formatemplate="&lt;a href='#' onclick=alert('guid值：@{guid__old}；@{deptname}')&gt;@{deptname}&lt;/a&gt;"/>
+				<col column="manager" label="部门经理" formatemplate="[&lt;a href='#' onclick=alert('部门编号：@{deptno}；部门经理：@{manager}')&gt;部门经理：@{manager}&lt;/a&gt;]" br="true"/>
+				<col column="builtdate" label="创建日期"  datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true">
+					<inputbox type="selectbox">
+						<option value="优秀" label="优秀"/> 
+						<option value="良好" label="良好" />
+						<option value="较好" label="较好" />
+						<option value="很差" label="很差" />
+					</inputbox>
+				</col>
+				<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+					<inputbox type="textareabox"/>
+				</col>
+			</display>
+		</report>
+		<footer>
+		<![CDATA[
+			<br><br><font color='red'>说明：</font><font color='blue'>“部门名”和“部门经理”两列的格式化显示效果在编辑后仍然有效，它们的区别是：当“部门名”没有录入值时格式化模板内容不显示，而“部门经理”列模板内容在列值为空时仍然显示</font>
+		]]>
+		</footer>
+	</page>
+	<page id="confirmpromptpage1" js="/webresources/script/validate.js">
+	  	<report id="report1" type="editablelist2" extends="datepickerpage1.report1">
+			<interceptor>
+				<saveaction-perrow>
+					<![CDATA[
+						String val=rrequest.getStringAttribute("key"+mRowData.get("no"),"");
+						if(val.equals("true"))
+						{//已经在“确认”提示窗口中点击了“是”，则保存
+							return super.doSavePerRow(rrequest,rbean,mRowData,mParamValues,editbean);
+						}else if(val.equals("false"))
+						{//已经在“确认”提示窗口中点击了“否”，则不保存
+							return WX_RETURNVAL_SKIP;
+						}else
+						{//开始保存，则在客户端弹出一个确认操作提示窗口
+							rrequest.getWResponse().getMessageCollector().confirm("key"+mRowData.get("no"),"是否保存/删除"+mRowData.get("no")+"记录？");
+							return WX_RETURNVAL_TERMINATE;
+						}
+					]]>
+					</saveaction-perrow>
+				</interceptor>
+			<footer><![CDATA[
+			<br><br><font color='red'>说明：</font><font color='blue'>这里增、删、改每条报表记录都会在服务器端提示是否要完成这个操作</font>
+			]]></footer>
+		</report>
+	</page>
+</applications>

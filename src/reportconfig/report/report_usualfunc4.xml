@@ -1,0 +1,1682 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+    <page id="selectboxconditionpage1">
+		  <report id="report1" title="员工信息列表" dataexport="richexcel">
+			<interceptor>
+				<preaction>
+				  <![CDATA[
+				  	rrequest.getRequest().getSession().setAttribute("paramCity", "宜春");//将测试数据放入session中
+				  ]]>
+				</preaction>
+			</interceptor>
+			<display>
+				<col column="{sequence:0}" label="序号1"/>
+				<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="姓名">
+					<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true"/>
+					<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+				</group>
+				<col column="sex" label="性别" clickorderby="true"/>
+				<col column="age" label="年龄" clickorderby="true"/>
+				<col column="birthday" label="出生日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份" filter="condition{txtprovince}"/>
+					<col column="city"  label="城市" filter="condition{txtcity}"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option source="@{select distinct province from tbl_area where {#condition#}}" 
+								label="province" value="province">
+							<condition name="paramProvince">
+							  <value>
+								province like '%#data#%'
+							  </value>
+							</condition>
+						</option>
+					</inputbox>
+				</condition>
+				<condition name="txtcity" label="市">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%' and {#condition#}}" label="city" value="city">
+							<condition name="con1" source="session{paramCity}">
+							  <value>
+								city like '%#data#%'
+							  </value>
+							</condition>
+						</option>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+	</page>
+    
+	<page id="selectboxrelatepage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10" titlewidth="150px">
+		 <report id="report1" title="员工信息列表" parenttitle="一级关联" dataexport="richexcel">
+			<display>
+				<col column="{sequence:0}" label="序号1"/>
+				<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="姓名">
+					<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true"/>
+					<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+				</group>
+				<col column="sex" label="性别" clickorderby="true"/>
+				<col column="age" label="年龄" clickorderby="true"/>
+				<col column="birthday" label="出生日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份" filter="condition{txtprovince}"/>
+					<col column="city"  label="城市" filter="condition{txtcity}"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" title="工号" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcity" label="市">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+		<report id="report2" parenttitle="多级关联" extends="selectboxrelatepage1.report1">
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcity" label="市">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcounty" label="县城">
+					<value>
+						<![CDATA[(county like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtcity;txtprovince=false">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct county from tbl_area where city like '%#txtcity#%' and province like '%#txtprovince#%'}" label="county" value="county"/>
+					</inputbox>
+				</condition>
+			</sql>
+		 </report>
+		 <report id="report3" parenttitle="依赖其它输入框" extends="selectboxrelatepage1.report1">
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+				</condition>
+				<condition name="txtcity" label="市">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcounty" label="县城">
+					<value>
+						<![CDATA[(county like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtcity;txtprovince=false">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct county from tbl_area where city like '%#txtcity#%' and province like '%#txtprovince#%'}" label="county" value="county"/>
+					</inputbox>
+				</condition>
+			</sql>
+			<footer>
+				<![CDATA[
+					<br><font color="red">说明：</font><font color="blue">这里的“市”和“县城”两个下拉框都依赖于“省”这个文本框</font>
+				]]>
+				</footer>
+		 </report>
+	  </tabpanel>
+	</page>
+	
+	<page id="resultsetpage1">
+		<report id="report1" title="员工信息列表" pagesize="20" dataexport="richexcel" 
+				scrollstyle="image" scrollheight="300px" width="800px">
+			<interceptor>
+				<beforeloaddata>
+				  <![CDATA[
+					System.out.println("====执行的sql===："+sql);//将会在服务器控制台打印出来
+					return sql;//一定要返回sql，当然也可以直接返回记录集ResultSet或结果集List，后面会介绍差别
+				  ]]>
+				</beforeloaddata>
+			</interceptor>	
+			<display>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+				<col column="name" label="姓名" clickorderby="true"/>
+				<group label="基本信息">
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+					<col column="birthday" label="出生日期" clickorderby="true"/>
+				</group>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(no like  '%#data#%' )]]>
+					</value>
+				</condition>
+				<condition name="txtdeptno" label="所属部门">
+					<value>
+						<![CDATA[A.deptno like '%#data#%']]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+				   		<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</condition>
+				<condition name="txtsex" label="性别">
+					<value>
+						<![CDATA[(sex =#data#)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option value="" label="性别"/>
+						<option value="1" label="男"/> 
+						<option value="0" label="女" />
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+			    <![CDATA[
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+				]]>
+			  </value>
+			</format>
+		</report>
+	</page>
+	
+	<page id="resultsetpage2">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="控制SQL语句" extends="resultsetpage1.report1">
+			<interceptor>
+				<imports>
+					<import>com.wabacus.system.component.application.report.abstractreport.configbean.AbsListReportFilterBean</import>
+				</imports>
+				<beforeloaddata>
+				  <![CDATA[
+					if(typeObj instanceof ReportDataSetValueBean||typeObj instanceof AbsListReportFilterBean)
+					{//当前是在执行加载报表数据或列过滤选项数据，则将其中sql中的%mycondition%改为相应的条件
+						sql=sql.replaceAll("%mycondition%","age>30");//只显示年龄大于30岁的员工
+					}
+					return sql;//一定要返回sql，当然也可以直接返回记录集ResultSet或结果集List，后面会介绍差别
+				  ]]>
+				</beforeloaddata>
+			</interceptor>	
+			<sql>
+				<value>
+					<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} and %mycondition% order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(no like  '%#data#%' )]]>
+					</value>
+				</condition>
+				<condition name="txtdeptno" label="所属部门">
+					<value>
+						<![CDATA[A.deptno like '%#data#%']]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+				   		<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</condition>
+				<condition name="txtsex" label="性别">
+					<value>
+						<![CDATA[(sex =#data#)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option value="" label="性别"/>
+						<option value="1" label="男"/> 
+						<option value="0" label="女" />
+					</inputbox>
+				</condition>
+			</sql>
+		</report>
+		<report id="report2" title="控制结果集" pagesize="20" dataexport="richexcel" 
+				scrollstyle="image" scrollheight="300px" width="1000px"
+				pojoclass="com.wabacusdemo.Resultsetpage2_Report2_POJO"
+				interceptor="com.wabacusdemo.Interceptor_resultsetpage2Report2">
+			<display>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+				<col column="name" label="姓名" clickorderby="true"/>
+				<group label="基本信息">
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+					<col column="birthday" label="出生日期" clickorderby="true"/>
+				</group>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+			</display>
+			<sql type="statement">
+				<value>
+					<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} and %mycondition% order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(no like  '%#data#%' )]]>
+					</value>
+				</condition>
+				<condition name="txtdeptno" label="所属部门">
+					<value>
+						<![CDATA[A.deptno like '%#data#%']]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+				   		<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</condition>
+				<condition name="txtsex" label="性别">
+					<value>
+						<![CDATA[(sex =#data#)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option value="" label="性别"/>
+						<option value="1" label="男"/> 
+						<option value="0" label="女" />
+					</inputbox>
+				</condition>
+			</sql>		
+		 </report>
+	  </tabpanel>
+	</page>
+	
+	<page id="resultsetpage3">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="控制SQL语句" extends="resultsetpage1.report1">
+			<interceptor>
+				<imports>
+					<import>com.wabacus.system.inputbox.option.*</import><!-- 后面需要使用里面的OptionBean类 -->
+				</imports>
+				<beforeloaddata>
+				  <![CDATA[
+					if(typeObj instanceof SelectboxOptionBean)
+					{//当前是在执行加载下拉选项数据的操作，则将其中sql中的%mycondition%改为相应的条件
+						sql=sql.replaceAll("%mycondition%","deptname like '%售%'");//只显示部门名称有“售”的部门
+					}
+					return sql;//一定要返回sql，当然也可以直接返回记录集ResultSet或结果集List，后面会介绍差别
+				  ]]>
+				</beforeloaddata>
+			</interceptor>	
+			<sql>
+				<value>
+					<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#}  order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(no like  '%#data#%' )]]>
+					</value>
+				</condition>
+				<condition name="txtdeptno" label="所属部门">
+					<value>
+						<![CDATA[A.deptno like '%#data#%']]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+				   		<option source="@{select deptno,deptname from tbl_department where %mycondition%}" label="deptname" value="deptno"/>
+					</inputbox>
+				</condition>
+				<condition name="txtsex" label="性别">
+					<value>
+						<![CDATA[(sex =#data#)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option value="" label="性别"/>
+						<option value="1" label="男"/> 
+						<option value="0" label="女" />
+					</inputbox>
+				</condition>
+			</sql>
+		 </report>
+		 <report id="report2" title="控制结果集" extends="resultsetpage3.report1"
+				interceptor="com.wabacusdemo.Interceptor_resultsetpage3Report2"/>
+	  </tabpanel>
+	</page>
+	<page id="resultsetpage4">
+		<tabpanel id="tp1" margin="10px" titlestyle="2">
+			<report id="report1" title="员工信息列表" parenttitle="实现方式一" interceptor="com.wabacusdemo.Interceptor_resultsetpage4report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true" displaytype="always"/>
+					</group>
+					<group label="地区">
+						<col property="province" column="{non-fromdb}" label="省份"/>
+						<col property="city" column="{non-fromdb}" label="城市"/>
+						<col property="county" column="{non-fromdb}" label="县城"/>
+					</group>
+				</display>
+				<sql>
+					<value>
+						<![CDATA[SELECT no,name,sex,age,birthday FROM tbl_baseinfo where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(no like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%' )]]>
+						</value>
+					</condition>
+				</sql>
+				<format>
+				  <value>
+						sex=sex==null?"1":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else sex="男";
+						birthday=birthday==null?"":birthday.trim();
+						int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						if(idx>0) birthday=birthday.substring(0,idx);
+				  </value>
+				</format>
+				<footer><![CDATA[<br><font color='blue'>这种方式仍使用框架为报表自动生成的POJO存放，然后通过框架提供的接口方法读写报表数据</font>]]></footer>
+			</report>
+			<report id="report2" parenttitle="实现方式二" extends="resultsetpage4.report1" 
+				pojoclass="com.wabacusdemo.POJO_resultsetpage4report2" interceptor="com.wabacusdemo.Interceptor_resultsetpage4report2">
+				<footer><![CDATA[<br><font color='blue'>这种方式是开发人员自己开发一个POJO类用于存放报表数据，然后采用普通存取方式读写报表数据</font>]]></footer>
+			</report>
+		</tabpanel>
+		
+	</page>
+	<page id="colselectedpage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10" titlewidth="150px">
+		 <report id="report1" parenttitle="普通列选择功能" dataexport="richexcel" extends="filterpage1.report1">
+			<display>
+				<col column="{sequence:1}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" width="100px" displaytype="always"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="个人信息">
+					<group label="姓名">
+						<col column="name" label="中文名" width="100px" filter="true" filterwidth="120px" clickorderby="true"/>
+						<col column="ename" label="英文名" width="100px" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" width="60px" clickorderby="true" displaytype="optional"/>
+					<col column="age" label="年龄" width="60px" clickorderby="true"/>
+				</group>
+				<col column="birthday" label="出生日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份"/>
+					<col column="city"  label="城市"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+			<footer>
+				<![CDATA[
+					<br><font color='red'>说明：</font><font color='blue'>这里演示的列选择功能只对本次访问有效，再次打开此报表时会恢复默认显示的列</font>
+				]]>
+			</footer>
+		</report>
+		<report id="report2" parenttitle="保存列选择效果" extends="colselectedpage1.report1" personalizeclass="default"><!-- 使用在wabacus.cfg.xml中default-reportpersonalizeclass配置项配置的全局默认持久化类 -->
+			<footer>
+				<![CDATA[
+					<br><font color='red'>说明：</font><font color='blue'>这里演示的是将用户选择显示的列保存在session中，因此选择显示列后，再打开此报表仍然会保留只显示所选择列的效果，实际使用时开发人员可以将它们保存在数据库或其它任意地方</font>
+				]]>
+			</footer>
+		</report>
+		<report id="report3" parenttitle="关闭列选择功能" dataexport="richexcel" extends="filterpage1.report1">
+			<display colselect="false">
+				<col column="{sequence:1}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" width="100px" displaytype="always"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="个人信息">
+					<group label="姓名">
+						<col column="name" label="中文名" width="100px" filter="true" filterwidth="120px" clickorderby="true"/>
+						<col column="ename" label="英文名" width="100px" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" width="60px" clickorderby="true" displaytype="optional"/>
+					<col column="age" label="年龄" width="60px" clickorderby="true"/>
+				</group>
+				<col column="birthday" label="出生日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份"/>
+					<col column="city"  label="城市"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+		 </report>
+	  </tabpanel>
+	</page>
+	
+	<page id="colselectedpage2">
+	  <tabpanel id="tab1" titlestyle="2" margin="10" titlewidth="150px">
+		 <report id="report1" parenttitle="普通列选择效果" dataexport="richexcel|word" extends="detailpage1.report1">
+			<display valuetdwidth="100px" labeltdwidth="80px" labelalign="right" valuealign="left" colselect="true">
+				<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<col column="name" label="中文名" displaytype="always"/>
+				<col column="ename" label="英文名" displaytype="optional" br="true"/>
+				<col column="sex" label="性别"/>
+				<col column="age" label="年龄"/>
+				<col column="marriage" label="婚否" br="true"/>
+				<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}"/>
+				<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='3'" br="true"/>
+				<col column="province"  label="籍贯" valuestyleproperty="colspan='5'" displaytype="optional" br="true"/>
+				<col column="city" displaytype="hidden"/>
+				<col column="county" displaytype="hidden"/>
+				<col label="评价" column="{non-value}" labelstyleproperty="colspan='6' bgcolor='#f0f0f0' align='left'" br="true"/>
+				<col column="description" datatype="clob" valuestyleproperty="colspan='6' align='center'"/>
+			</display>
+			<footer>
+				<![CDATA[
+					<br><font color='red'>说明：</font><font color='blue'>这里演示的列选择功能只对本次访问有效，再次打开此报表时会恢复默认显示的列</font>
+				]]>
+			</footer>
+		</report>
+		<report id="report2" parenttitle="保存列选择效果" extends="colselectedpage2.report1" personalizeclass="default"><!-- 使用在wabacus.cfg.xml中default-reportpersonalizeclass配置项配置的全局默认持久化类 -->
+			<footer>
+				<![CDATA[
+					<br><font color='red'>说明：</font><font color='blue'>这里演示的是将用户选择显示的列保存在session中，因此选择显示列后，再打开此页面仍然会保留只显示所选择列的效果，实际使用时开发人员可以将它们保存在数据库或其它任意地方</font>
+				]]>
+			</footer>
+		</report>
+		<report id="report3" parenttitle="关闭列选择功能" dataexport="richexcel" extends="detailpage1.report1">
+			<display valuetdwidth="100px" labeltdwidth="80px" labelalign="right" valuealign="left">
+				<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<col column="name" label="中文名"/>
+				<col column="ename" label="英文名" br="true"/>
+				<col column="sex" label="性别"/>
+				<col column="age" label="年龄"/>
+				<col column="marriage" label="婚否" br="true"/>
+				<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}" valuestyleproperty="colspan='2'"/>
+				<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='2'" br="true"/>
+				<col column="province"  label="籍贯" valuestyleproperty="colspan='5'" br="true"/>
+				<col column="city" displaytype="hidden"/>
+				<col column="county" displaytype="hidden"/>
+				<col label="评价" column="{non-value}" labelstyleproperty="colspan='6' bgcolor='#f0f0f0' align='left'" br="true"/>
+				<col column="description" datatype="clob" valuestyleproperty="colspan='6' align='center'"/>
+			</display>
+		 </report>
+	  </tabpanel>
+	</page>
+	
+	<page id="navigatebuttonpage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report2" title="自定义按钮文字" extends="listpage1.report1" 
+				  navigate="${navigatebuttonpage1.report2.navigate}"/>
+		 <report id="report1" title="自定义按钮图片" extends="listpage1.report1" 
+				  navigate="${navigatebuttonpage1.report1.navigate}"/>
+		 <report id="report3" title="默认翻页按钮" extends="listpage1.report1" 
+				  navigate="${navigatebuttonpage1.report3.navigate}"/>
+	  </tabpanel>
+	</page>
+	<page id="navigatesequencepage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="控制页码显示" extends="listpage1.report1" 
+				  pagesize="5" navigate="${navigatesequencepage1.report1.navigate}"/>
+		 <report id="report2" title="指定页码个数" extends="listpage1.report1" 
+				  pagesize="5" navigate="${navigatesequencepage1.report2.navigate}"/>
+		 <report id="report3" title="可变页码个数" extends="listpage1.report1" 
+				  pagesize="5" navigate="${navigatesequencepage1.report3.navigate}"/>
+		 <report id="report4" title="指定页码最小长度" extends="listpage1.report1" 
+				  pagesize="5" navigate="${navigatesequencepage1.report4.navigate}"/>
+	  </tabpanel>
+	</page>
+	<page id="navigategotopage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="文本框跳转" extends="listpage1.report1" 
+				  navigate="${navigategotopage1.report1.navigate}"/>
+		 <report id="report2" title="下拉框跳转" extends="listpage1.report1" 
+				  navigate="${navigategotopage1.report2.navigate}"/>
+		 <report id="report3" title="动态指定显示页码" parenttitle="动态指定显示页码" extends="listpage1.report1">
+		 	<interceptor>
+		 		<preaction>
+		 			<![CDATA[
+		 			String report3Pageno=rrequest.getStringAttribute("report3_PAGENO","");//取到当前报表所翻到的页数
+		 			if(report3Pageno.equals(""))
+		 			{//当前报表没有翻页操作，说明是第一次进入报表，则给它动态设置默认访问页码
+		 				rrequest.setAttribute("report3_DYNPAGENO","99999");//设置一个非常大的值，超出页数，则会自动显示到最后一页（如果设置为1、则显示第一页、设置为2，则显示第二页，依次类推...）
+		 			}
+		 			]]>
+		 		</preaction>
+		 	</interceptor>
+		 	<footer>
+		 		<![CDATA[
+		 		<font color="red">说明：</font><font color="blue">本报表通过在拦截器中设置默认显示最后一页，也可以直接在URL中带上参数&report3_DYNPAGENO=默认页码 进行指定</font>
+		 		]]>
+		 	</footer>
+		 </report>
+	  </tabpanel>
+	</page>
+	<page id="navigatepagesizepage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		<report id="report3" title="切换页大小" extends="listpage1.report1" 
+				  pagesize="5|10|15|-1" navigate="${navigatepagesizepage1.report3.navigate}"/>
+		<report id="report1" title="只分页显示" extends="listpage1.report1" 
+				  pagesize="15"/>
+		<report id="report2" title="只不分页显示" extends="listpage1.report1" 
+				  pagesize="-1"/>
+		<report id="report4" title="动态指定页大小" parenttitle="动态指定页大小" extends="listpage1.report1">
+			<interceptor>
+		 		<preaction>
+		 			<![CDATA[
+		 			rrequest.setAttribute("report4_PAGESIZE","15");//动态设置页大小为15，即每页显示15条记录，如果指定为－1，则表示动态设置为不分页显示
+		 			]]>
+		 		</preaction>
+		 	</interceptor>
+		 	<footer>
+		 		<![CDATA[
+		 		<font color="red">说明：</font><font color="blue">本报表通过在拦截器中设置页大小，也可以直接在URL中带上参数&report4_PAGESIZE=页大小 进行指定。</font>
+		 		]]>
+		 	</footer>
+		</report>	  
+	  </tabpanel>
+	</page>
+	
+	<page id="detailnavigatepage1">
+		<tabpanel id="tp1" margin="10px">
+			<report id="report1" parenttitle="默认分页导航栏" extends="detailpage1.report1" pagesize="1">
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B 
+									on A.no=B.no where  {#condition#} order by A.no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%' )]]>
+						</value>
+						<inputbox>
+							<typeprompt width="200" count="15">
+								<promptcol label="no" title="工号" matchmode="anywhere"/>
+								<promptcol label="name" title="姓名"/>
+								<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+							</typeprompt>
+						</inputbox>
+					</condition>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name =  '#data#' )]]>
+						</value>
+						<inputbox>
+							<typeprompt width="-1" count="15">
+								<promptcol label="name"  matchmode="anywhere"/>
+								<datasource><option source="@{select name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+							</typeprompt>
+						</inputbox>
+					</condition>
+				</sql>
+			</report>
+			<report id="report2" parenttitle="控制分页导航栏" extends="detailpage1.report1" pagesize="1" navigate="${detailnavigatepage1.report2.navigate}">
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B 
+									on A.no=B.no where  {#condition#} order by A.no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%' )]]>
+						</value>
+						<inputbox>
+							<typeprompt width="200" count="15">
+								<promptcol label="no" title="工号" matchmode="anywhere"/>
+								<promptcol label="name" title="姓名"/>
+								<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+							</typeprompt>
+						</inputbox>
+					</condition>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name =  '#data#' )]]>
+						</value>
+						<inputbox>
+							<typeprompt width="-1" count="15">
+								<promptcol label="name"  matchmode="anywhere"/>
+								<datasource><option source="@{select name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+							</typeprompt>
+						</inputbox>
+					</condition>
+				</sql>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="conditionrelatepage1">
+		<tabpanel id="tp1" margin="10px">
+			<vpanel id="vp1" parenttitle="员工详细资料列表">
+				<report id="report1" title="报表一" extends="listpage1.report1">
+					<sql>
+						<value>
+							<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(no like  '%#data#%' )]]>
+							</value>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+						<condition name="txtsex" label="性别">
+							<value>
+								<![CDATA[(sex =#data#)]]>
+							</value>
+							<inputbox type="selectbox">
+								<option value="" label="性别"/>
+								<option value="1" label="男"/> 
+								<option value="0" label="女" />
+							</inputbox>
+						</condition>
+					</sql>
+				</report>
+				<report id="report2" title="报表二" extends="detailpage1.report1" top="20px">
+					<display valuetdwidth="100px" labeltdwidth="80px" labelalign="right" valuealign="left">
+						<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+						<col column="name" label="中文名"/>
+						<col column="ename" label="英文名" br="true"/>
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄"/>
+						<col column="marriage" label="婚否" br="true"/>
+						<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}" valuestyleproperty="colspan='2'"/>
+						<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='2'" br="true"/>
+						<col column="province"  label="籍贯" valuestyleproperty="colspan='5'" br="true"/>
+						<col column="city" displaytype="hidden"/>
+						<col column="county" displaytype="hidden"/>
+						<col label="评价" column="{non-value}" labelstyleproperty="colspan='6' bgcolor='#f0f0f0' align='left'" br="true"/>
+						<col column="description" datatype="clob" valuestyleproperty="colspan='6' align='center'"/>
+					</display>
+					<footer>${conditionrelatepage1.footer}</footer>
+					<sql>
+						<value>
+							<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#}]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(A.no like  '%#data#%' )]]>
+							</value>
+						</condition>
+						<condition name="txtname1" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+					</sql>
+				</report>
+			</vpanel>
+			<report id="report3" title="报表三" parenttitle="员工基本资料" extends="rowgrouppage1.report1">
+				<sql>
+					<value>
+						<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(no like  '%#data#%' )]]>
+						</value>
+						<inputbox>
+					 	 <typeprompt count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  	</typeprompt>
+						</inputbox>
+					</condition>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtsex2" label="性别">
+						<value>
+							<![CDATA[(sex =#data#)]]>
+						</value>
+						<inputbox type="selectbox">
+							<option value="" label="性别"/>
+							<option value="1" label="男"/> 
+							<option value="0" label="女" />
+						</inputbox>
+					</condition>
+				</sql>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="navigaterelatepage1">
+		<report id="report1" extends="listpage1.report1" navigate_reportid="report2">
+			<sql>
+				<value>
+					<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			</sql>
+		</report>
+		<report id="report2" title="员工详细资料列表" extends="rowgrouppage1.report2" pagesize="10" top="20px">
+			<display>
+				<group label="地区">
+					<col column="province"  label="省份" filter="true" filterwidth="120px" rowgroup="true"/>
+					<col column="city"  label="城市" filter="true" filterwidth="120px" rowgroup="true"/>
+					<col column="county"  label="县城" rowgroup="true"/>
+				</group>
+				<col column="{sequence:0}" label="序号1"/>
+				<col column="no" label="工号" clickorderby="true" filter="condition{txtno}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="个人资料">
+					<group label="姓名">
+						<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true"/>
+						<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" clickorderby="true"/>
+					<col column="age" label="年龄" clickorderby="true"/>
+				</group>
+				<col column="joinindate" label="入职日期" clickorderby="true"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			</sql>
+		</report>
+	</page>
+	
+	<page id="containerbuttonsdisplaypage1">
+		<tabpanel id="tab1" margin="10px">
+			<report id="report1" parenttitle="员工信息列表" extends="listpage1.report1"/>
+			<report id="report2" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+			<buttons buttonspacing="5">
+				<button name="button1" position="top" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+					alert('测试图片按钮');
+				</button>
+				<button name="button2" position="top" label="普通按钮">
+					alert('测试普通按钮');
+				</button>
+				<button name="button3" position="top" label="button{&lt;a href='#'&gt;完全自定义按钮&lt;/a&gt;}">
+					alert('测试完全自定义按钮');
+				</button>
+				<button name="button4" position="top" extends="${wabacus.button2.default}" label="框架按钮">
+					alert('测试框架内置的按钮样式');
+				</button>
+			</buttons>
+		</tabpanel>
+	</page>
+	
+	<page id="containerbuttonspositionpage1">
+		<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="120px" border="0">
+			<vpanel id="vp1" parenttitle="显示在顶部">
+				<framepanel id="fp1" title="居左对齐" margin="10px">
+					<tabpanel id="tab11" margin="10px">
+						<report id="report1" parenttitle="员工信息列表" extends="listpage1.report1"/>
+						<report id="report2" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+						<buttons buttonspacing="5" align="left">
+							<button name="button1" position="top" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+								alert('测试图片按钮');
+							</button>
+							<button name="button2" position="top" label="普通按钮">
+								alert('测试普通按钮');
+							</button>
+							<button name="button3" position="top" extends="${wabacus.button2.default}" label="框架按钮">
+								alert('测试框架内置的按钮样式');
+							</button>
+						</buttons>
+					</tabpanel>
+				</framepanel>
+				<framepanel id="fp2" title="居中对齐" margin="10px" top="10px">
+					<tabpanel id="tab12" margin="10px">
+						<report id="report3" parenttitle="员工信息列表" extends="listpage1.report1"/>
+						<report id="report4" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+						<buttons buttonspacing="5" align="center">
+							<button name="button1" position="top" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+								alert('测试图片按钮');
+							</button>
+							<button name="button2" position="top" label="普通按钮">
+								alert('测试普通按钮');
+							</button>
+							<button name="button3" position="top" extends="${wabacus.button2.default}" label="框架按钮">
+								alert('测试框架内置的按钮样式');
+							</button>
+						</buttons>
+					</tabpanel>
+				</framepanel>
+				<framepanel id="fp3" title="居右对齐" margin="10px" top="10px">
+					<tabpanel id="tab13" margin="10px">
+						<report id="report5" parenttitle="员工信息列表" extends="listpage1.report1"/>
+						<report id="report6" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+						<buttons buttonspacing="5" align="right">
+							<button name="button1" position="top" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+								alert('测试图片按钮');
+							</button>
+							<button name="button2" position="top" label="普通按钮">
+								alert('测试普通按钮');
+							</button>
+							<button name="button3" position="top" extends="${wabacus.button2.default}" label="框架按钮">
+								alert('测试框架内置的按钮样式');
+							</button>
+						</buttons>
+					</tabpanel>
+				</framepanel>
+			</vpanel>
+			<vpanel id="vp2" parenttitle="显示在底部">
+				<framepanel id="fp4" title="居左对齐" margin="10px">
+					<tabpanel id="tab21" margin="10px">
+						<report id="report7" parenttitle="员工信息列表" extends="listpage1.report1"/>
+						<report id="report8" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+						<buttons buttonspacing="5" align="left">
+							<button name="button1" position="bottom" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+								alert('测试图片按钮');
+							</button>
+							<button name="button2" position="bottom" label="普通按钮">
+								alert('测试普通按钮');
+							</button>
+							<button name="button3" position="bottom" extends="${wabacus.button2.default}" label="框架按钮">
+								alert('测试框架内置的按钮样式');
+							</button>
+						</buttons>
+					</tabpanel>
+				</framepanel>
+				<framepanel id="fp5" title="居中对齐" margin="10px" top="10px">
+					<tabpanel id="tab22" margin="10px">
+						<report id="report9" parenttitle="员工信息列表" extends="listpage1.report1"/>
+						<report id="report10" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+						<buttons buttonspacing="5" align="center">
+							<button name="button1" position="bottom" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+								alert('测试图片按钮');
+							</button>
+							<button name="button2" position="bottom" label="普通按钮">
+								alert('测试普通按钮');
+							</button>
+							<button name="button3" position="bottom" extends="${wabacus.button2.default}" label="框架按钮">
+								alert('测试框架内置的按钮样式');
+							</button>
+						</buttons>
+					</tabpanel>
+				</framepanel>
+				<framepanel id="fp6" title="居右对齐" margin="10px" top="10px">
+					<tabpanel id="tab23" margin="10px">
+						<report id="report11" parenttitle="员工信息列表" extends="listpage1.report1"/>
+						<report id="report12" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+						<buttons buttonspacing="5" align="right">
+							<button name="button1" position="bottom" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+								alert('测试图片按钮');
+							</button>
+							<button name="button2" position="bottom" label="普通按钮">
+								alert('测试普通按钮');
+							</button>
+							<button name="button3" position="bottom" extends="${wabacus.button2.default}" label="框架按钮">
+								alert('测试框架内置的按钮样式');
+							</button>
+						</buttons>
+					</tabpanel>
+				</framepanel>
+			</vpanel>
+			<tabpanel id="tab3" margin="10px" parenttitle="显示在右键菜单">
+				<report id="report13" parenttitle="员工信息列表" extends="listpage1.report1"/>
+				<report id="report14" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+				<buttons buttonspacing="5">
+					<button name="button1" position="contextmenu" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}" menulabel="图片按钮">
+						alert('测试图片按钮');
+					</button>
+					<button name="button2" position="contextmenu" label="普通按钮">
+						alert('测试普通按钮');
+					</button>
+					<button name="button3" position="contextmenu" extends="${wabacus.button2.default}" label="框架按钮">
+						alert('测试框架内置的按钮样式');
+					</button>
+				</buttons>
+			</tabpanel>
+			<tabpanel id="tab4" margin="10px" parenttitle="综合">
+				<report id="report15" parenttitle="员工信息列表" extends="listpage1.report1"/>
+				<report id="report16" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+				<buttons buttonspacing="5">
+					<button name="button1" position="top|bottom|contextmenu" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}" menulabel="图片按钮">
+						alert('测试图片按钮');
+					</button>
+					<button name="button2" position="top|contextmenu" label="普通按钮">
+						alert('测试普通按钮');
+					</button>
+					<button name="button3" position="bottom|contextmenu" extends="${wabacus.button2.default}" label="框架按钮">
+						alert('测试框架内置的按钮样式');
+					</button>
+				</buttons>
+			</tabpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="containerbuttonsreportpage1">
+		<tabpanel id="tab1" margin="10px">
+			<report id="report1" parenttitle="员工信息列表" dataexport="richexcel|plainexcel|word" extends="listpage1.report1">
+				<buttons>
+					<button name="button1" position="title" label="按钮一">
+						alert('报表按钮一');
+					</button>
+					<button name="button2" position="title" label="按钮二">
+						alert('报表按钮二');
+					</button>
+					<button name="button3" position="title" label="按钮三">
+						alert('报表按钮三');
+					</button>
+				</buttons>
+			</report>
+			<report id="report2" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+			<buttons buttonspacing="5">
+				<button name="button1" position="top" refer="report1.type{richexcel}"/>
+				<button name="button2" position="top" refer="report1.type{word}" referedbutton="display"/>
+				<button name="button3" position="top" refer="report1.button1"/>
+				<button name="button4" position="top" refer="report1.button2" referedbutton="display"/>
+			</buttons>
+		</tabpanel>
+	</page>
+	
+	<page id="reportbuttonsdisplaypage1">
+		<report id="report1" title="员工信息列表" dataexport="word|richexcel">
+			<display>
+				<group label="个人资料" >
+					<group label="姓名">
+						<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true" />
+						<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" clickorderby="true"/>
+					<col column="age" label="年龄" clickorderby="true"/>
+				</group>
+				<col column="joinindate" label="入职日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份" filter="condition{txtprovince}"/>
+					<col column="city"  label="城市" filter="condition{txtcity}"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcity" label="市">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			   <imports>
+				<import>com.wabacus.util.*</import>
+				<import>com.wabacus</import>
+			  </imports>
+			  <value>
+			   <![CDATA[
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					joinindate=joinindate==null?"":joinindate.trim();
+					int idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) joinindate=joinindate.substring(0,idx);
+				  ]]>
+			  </value>
+			</format>
+			<buttons buttonspacing="5">
+				<button name="button1" position="title" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+					alert('测试图片按钮');
+				</button>
+				<button name="button2" position="title" label="普通按钮">
+					alert('测试普通按钮');
+				</button>
+				<button name="button3" position="title" label="button{&lt;a href='#'&gt;完全自定义按钮&lt;/a&gt;}">
+					alert('测试完全自定义按钮');
+				</button>
+				<button name="button4" extends="${wabacus.button2.default}" position="title" label="框架按钮">
+					alert('测试框架内置的按钮样式');
+				</button>
+			</buttons>
+		</report>
+	</page>
+	
+	<page id="reportbuttonspositionpage1" margin_bottom="10px">
+		<tabpanel id="tp1" margin="10px" titlestyle="2" titlewidth="138px">
+			<report id="report1" parenttitle="显示在搜索栏" extends="reportbuttonsdisplaypage1.report1">
+				<footer><![CDATA[<font color="blue">配置的所有功能按钮都显示在搜索栏中</font>]]></footer>
+				<buttons buttonspacing="5">
+					<button name="button1" position="searchbox" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+						alert('测试图片按钮');
+					</button>
+					<button name="button2" position="searchbox" label="普通按钮">
+						alert('测试普通按钮');
+					</button>
+					<button name="button3" position="searchbox" label="普通按钮2">
+						alert('测试普通按钮2');
+					</button>
+					<button name="button4" extends="${wabacus.button2.default}" position="searchbox" label="框架按钮">
+						alert('测试框架内置的按钮样式');
+					</button>
+				</buttons>
+			</report>
+			<tabpanel id="tp2" margin="10px" parenttitle="显示在标题栏" titlestyle="2" titlewidth="138px">
+				<report id="report21" parenttitle="居左对齐" extends="reportbuttonsdisplaypage1.report1">
+					<buttons buttonspacing="5" align="left">
+						<button name="button1" position="title" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+							alert('测试图片按钮');
+						</button>
+						<button name="button2" position="title" label="普通按钮">
+							alert('测试普通按钮');
+						</button>
+						<button name="button3" position="title" label="普通按钮2">
+							alert('测试普通按钮2');
+						</button>
+						<button name="button4" extends="${wabacus.button2.default}" position="title" label="框架按钮">
+							alert('测试框架内置的按钮样式');
+						</button>
+					</buttons>
+				</report>
+				<report id="report22" parenttitle="居中对齐" extends="reportbuttonsdisplaypage1.report1">
+					<buttons buttonspacing="5" align="center">
+						<button name="button1" position="title" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+							alert('测试图片按钮');
+						</button>
+						<button name="button2" position="title" label="普通按钮">
+							alert('测试普通按钮');
+						</button>
+						<button name="button3" position="title" label="普通按钮2">
+							alert('测试普通按钮2');
+						</button>
+						<button name="button4" extends="${wabacus.button2.default}" position="title" label="框架按钮">
+							alert('测试框架内置的按钮样式');
+						</button>
+					</buttons>
+				</report>
+				<report id="report23" parenttitle="居右对齐" extends="reportbuttonsdisplaypage1.report1">
+					<buttons buttonspacing="5" align="right">
+						<button name="button1" position="title" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+							alert('测试图片按钮');
+						</button>
+						<button name="button2" position="title" label="普通按钮">
+							alert('测试普通按钮');
+						</button>
+						<button name="button3" position="title" label="普通按钮2">
+							alert('测试普通按钮2');
+						</button>
+						<button name="button4" extends="${wabacus.button2.default}" position="title" label="框架按钮">
+							alert('测试框架内置的按钮样式');
+						</button>
+					</buttons>
+				</report>
+				<report id="report24" parenttitle="显示在标题左侧" extends="reportbuttonsdisplaypage1.report1">
+					<buttons buttonspacing="5" align="left" titleposition="left">
+						<button name="button1" position="title" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+							alert('测试图片按钮');
+						</button>
+						<button name="button2" position="title" label="普通按钮">
+							alert('测试普通按钮');
+						</button>
+						<button name="button3" position="title" label="普通按钮2">
+							alert('测试普通按钮2');
+						</button>
+						<button name="button4" extends="${wabacus.button2.default}" position="title" label="框架按钮">
+							alert('测试框架内置的按钮样式');
+						</button>
+					</buttons>
+				</report>
+				<footer><![CDATA[<font color="blue">配置的所有功能按钮都显示在标题栏中</font>]]></footer>
+			</tabpanel>
+			<report id="report3" parenttitle="显示在右键菜单" extends="reportbuttonsdisplaypage1.report1">
+				<footer><![CDATA[<font color="blue">配置的所有功能按钮都显示在右键菜单中</font>]]></footer>
+				<buttons buttonspacing="5">
+					<button name="button1" position="contextmenu" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}" menulabel="添加">
+						alert('测试图片按钮');
+					</button>
+					<button name="button2" position="contextmenu" label="普通按钮" menugroup="11">
+						alert('测试普通按钮');
+					</button>
+					<button name="button3" position="contextmenu" label="普通按钮2" menugroup="11">
+						alert('测试普通按钮2');
+					</button>
+					<button name="button4" extends="${wabacus.button2.default}" position="contextmenu" label="框架按钮">
+						alert('测试框架内置的按钮样式');
+					</button>
+				</buttons>
+			</report>
+			<report id="report4" parenttitle="综合" extends="reportbuttonsdisplaypage1.report1">
+				<footer><![CDATA[<font color="blue">配置的功能按钮显示在一个或多个位置上</font>]]></footer>
+				<buttons buttonspacing="5">
+					<button name="button1" position="title|searchbox|contextmenu" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}" menulabel="添加">
+						alert('测试图片按钮');
+					</button>
+					<button name="button2" position="title|contextmenu" label="普通按钮" menugroup="11">
+						alert('测试普通按钮');
+					</button>
+					<button name="button3" position="title|contextmenu" label="普通按钮2" menugroup="11">
+						alert('测试普通按钮2');
+					</button>
+					<button name="button4" extends="${wabacus.button2.default}" position="title|searchbox" label="框架按钮">
+						alert('测试框架内置的按钮样式');
+					</button>
+				</buttons>
+			</report>
+		</tabpanel>
+		<footer><![CDATA[<font color="blue">如果要显示在其它位置，则需要用静态模板或动态模板通过＜wx:button/＞自定义标签进行显示</font>]]></footer>
+	</page>
+	
+	<page id="reportbuttonseventpage1" js="/wabacusdemo/js/demo.js">
+		<tabpanel id="tp1" margin="10px" titlestyle="2" titlewidth="150px">
+			<report id="report1" parenttitle="静态配置按钮事件" extends="reportbuttonsdisplaypage1.report1">
+				<buttons>
+					<button name="button1"  position="searchbox" label="测试静态配置按钮事件">
+						alert('测试静态配置按钮事件');
+					</button>
+				</buttons>
+			</report>
+			<report id="report2" parenttitle="动态生成按钮事件" extends="reportbuttonsdisplaypage1.report1">
+				<buttons>
+					<button name="button1" position="searchbox|title" label="测试动态拼凑事件">
+						<imports>
+							<import>com.wabacus.system.*</import><!-- 用到了这个包下面的CacheDataBean类 -->
+						</imports>
+						<dynevent>
+						<![CDATA[
+							CacheDataBean cdb=rrequest.getCdb("report2");
+							StringBuffer sbuffer=new StringBuffer();
+							sbuffer.append("alert('总记录数："+cdb.getRecordcount()+";;;");
+							sbuffer.append("总页数："+cdb.getPagecount()+"')");
+							return sbuffer.toString();//返回拼凑好的事件
+						]]>
+						</dynevent>
+					</button>
+				</buttons>
+			</report>
+			<report id="report3" parenttitle="提供确认操作提示" extends="reportbuttonsdisplaypage1.report1">
+				<buttons>
+					<button name="button1"  position="title" label="确认提示按钮" confirmessage="是否调用按钮事件？" cancelmethod="myCancelButtonEvent">
+						alert('点击了\'确定\'按钮，执行按钮事件');
+					</button>
+				</buttons>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="reportbuttonsrecordpage1">
+		<report id="report1" extends="reportbuttonsdisplaypage1.report1">
+			<display>
+				<col column="no" label="工号" valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="姓名">
+					<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true" />
+					<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+				</group>
+				<col column="sex" label="性别" clickorderby="true"/>
+				<col column="age" label="年龄" clickorderby="true"/>
+				<col column="joinindate" label="入职日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份" filter="condition{txtprovince}"/>
+					<col column="city"  label="城市" filter="condition{txtcity}"/>
+					<col column="county"  label="县城"/>
+				</group>
+				<col property="btn" column="{non-fromdb}" label="按钮"/>
+			</display>
+			<format>
+			   <imports>
+					<import>com.wabacus.util.*</import>
+					<import>com.wabacus</import>
+			  	</imports>
+			  <value>
+			   <![CDATA[
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					joinindate=joinindate==null?"":joinindate.trim();
+					int idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) joinindate=joinindate.substring(0,idx);
+					if(rrequest.getShowtype() == Consts.DISPLAY_ON_PAGE)
+					{//如果是显示在html页面上，则显示输入框
+					 	btn="<input type=\"button\" value=\"点击\" onclick=\"alert('工号："+no+"；姓名："+name+"')\">"; 
+					}
+				  ]]>
+			  </value>
+			</format>
+			<buttons/>
+		</report>
+	</page>
+	
+	<page id="viewtblimport1page1">
+		<report id="report1" title="测试数据导入" dataexport="word|plainexcel" pagesize="20">
+			<display>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+				<col column="name" label="姓名" clickorderby="true"/>
+				<col column="age" label="年龄" datatype="int" clickorderby="true" filter="true" filterwidth="120px"/>
+				<col column="birthday" label="出生日期" datatype="date"/>
+				<col column="salary" label="工资" datatype="float"/>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT * FROM tbl_testimport1 where   {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_testimport1 where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			</sql>
+		</report>
+	</page>
+	
+	<page id="viewtblimport1page2">
+		<report id="report1" title="测试数据导入" pagesize="20">
+			<display>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'"/>
+				<col column="name" label="姓名" clickorderby="true"/>
+				<col column="age" label="年龄" datatype="int" clickorderby="true"/>
+				<col column="birthday" label="出生日期" datatype="date"/>
+				<col column="salary" label="工资" datatype="float"/>
+				<col column="description" label="描述" datatype="clob"/>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.*,B.description FROM tbl_testimport1 A left join tbl_testimport2 B on A.no=B.no where   {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_testimport1 where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			</sql>
+		</report>
+	</page>
+	<page id="excelimport1page1">
+		<report id="report1" title="测试数据导入" extends="viewtblimport1page2.report1">
+			<buttons>
+				<button name="btn1" label="同步导入" extends="${dataimport.button.default}">
+					<dataimport ref="${dataimport.multifiles};${dataimport.multifiles2}" popupparams="{width:300,height:200}"/>
+				</button>
+				<button name="btn2" label="异步导入" extends="${dataimport.button.default}">
+					<dataimport ref="${dataimport.multifiles};${dataimport.multifiles2}" popupparams="{width:300,height:200}" asyn="true"/>
+				</button>
+				<button name="btn3" label="自定义导入按钮" position="title" class="com.wabacus.system.buttons.DataImportButton">
+					<dataimport ref="${dataimport.multifiles};${dataimport.multifiles2}" popupparams="{width:300,height:200}"/>
+				</button>
+			</buttons>
+		</report>
+		<buttons align="center">
+			<button name="btn1" label="页面导入按钮" position="bottom" class="com.wabacus.system.buttons.DataImportButton">
+					<dataimport ref="${dataimport.multifiles};${dataimport.multifiles2}" popupparams="{width:300,height:200}"/>
+				</button>
+		</buttons>
+	</page>
+	
+	<page id="invokeservermethod_componentpage1" js="/wabacusdemo/js/demo.js" margin_top="10px">
+		<report id="report1" extends="listpage1.report1">
+			<buttons>
+				<button name="button1" position="title" label="调用服务器方法">
+					invokeServerActionForComponent('invokeservermethod_componentpage1','report1','com.wabacusdemo.TestServerCallBack1',{a1:'b1',a2:'b2'},true,testInvokeCallbackMethod1)
+				</button>
+			</buttons>
+		</report>
+		<report id="report2" extends="detailpage1.report1" top="10px">
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#}]]>
+				</value>
+				<condition name="txtno2" label="工号">
+					<value>
+						<![CDATA[(A.no =  '#data#' )]]>
+					</value>
+					<inputbox>
+						<typeprompt width="200" count="15">
+							<promptcol label="no" title="工号" matchmode="anywhere"/>
+							<promptcol label="name" title="姓名"/>
+							<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						</typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtname2" label="姓名">
+					<value>
+						<![CDATA[(name =  '#data#' )]]>
+					</value>
+					<inputbox>
+						<typeprompt width="-1" count="15">
+							<promptcol label="name"  matchmode="anywhere"/>
+							<datasource><option source="@{select name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						</typeprompt>
+					</inputbox>
+				</condition>
+			</sql>
+			<buttons>
+				<button name="button1" position="title" label="调用服务器方法">
+					invokeServerActionForComponent('invokeservermethod_componentpage1','report2','com.wabacusdemo.TestServerCallBack1',{c1:'d1',c2:'d2'},true,testInvokeCallbackMethod1)
+				</button>
+			</buttons>
+		</report>
+		<buttons align="center">
+			<button name="button1" position="top" label="针对页面调用服务器方法">
+				invokeServerActionForComponent('invokeservermethod_componentpage1',null,'com.wabacusdemo.TestServerCallBack1',{e1:'f1',e2:'f2'},true,testInvokeCallbackMethod1)
+			</button>
+		</buttons>
+	</page>
+	
+	<page id="invokeservermethod_sqlpage1" js="/wabacusdemo/js/demo.js" margin_top="10px">
+		<report id="report1" extends="clickorderbypage1.report1" refreshid="invokeservermethod_sqlpage1">
+			<interceptor>
+				<imports>
+					<import>java.util.*</import>
+				</imports>
+				<preaction>
+				<![CDATA[
+					List lstInvokeParams=rrequest.getLstInvokeServerActionParams("report1");
+					if(lstInvokeParams!=null&&lstInvokeParams.size()>0)
+					{//如果当前是在做针对此报表的服务器端调用，且传入了动态参数
+						Map mParams=(Map)lstInvokeParams.get(0);//因为这里调用服务器端操作时只传入一个对象，而不是传入多个对象的数组
+						String name=(String)mParams.get("param_name");//从传入的动态参数中取到姓名
+						if(name!=null&&!name.equals(""))
+						{
+							mParams.put("logcontent","当前在设置员工“"+name+"”的婚姻状态");//新增一个名为logcontent的参数，用于下面记录日志时使用
+							rrequest.getRequest().setAttribute("req_logcontent","当前在设置员工“"+name+"”的婚姻状态");//这里存入一份到request中，因为下面在记录日志时也使用了从这里取数据的功能
+						}
+					}
+				]]>
+				</preaction>
+			</interceptor>
+			<header/>
+			<display>
+				<col column="{sequence:1}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" width="100px"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="姓名">
+					<col column="name" label="中文名" clickorderby="true" filter="true" filterwidth="120px"/>
+					<col column="ename" label="英文名" clickorderby="true" filter="true" filterwidth="150px"/>
+				</group>
+				<group label="地区">
+					<col column="province"  label="省份" filter="condition{txtprovince}"/>
+					<col column="city"  label="城市" filter="condition{txtcity}"/>
+					<col column="county"  label="县城"/>
+				</group>
+				<col column="marriage" label="婚否"/>
+				<col property="operate1" column="{non-fromdb}" label="设置婚姻状态" width="180px"/>
+				<col property="operate2" column="{non-fromdb}" label="删除记录"/>
+			</display>
+			<buttons>
+				<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="other" autoreportdata="false"
+					successprompt="设置成功" failedprompt="设置失败">
+					<params>
+						<param name="now" value="now{}" datatype="timestamp"/>
+						<param name="uuid" value="uuid{}"/>
+					</params>
+					<value>
+					<![CDATA[
+						update tbl_detailinfo(marriage=1) where no=@{param_no};
+						insert tbl_log(uuid=#{uuid},createdate=#{now},content=@{logcontent},updatetype='设置为已婚状态');
+					]]>
+					</value>
+				</button>
+				<button name="button2" class="com.wabacus.system.buttons.ServerSQLActionButton" position="other" autoreportdata="false"
+					successprompt="设置成功" failedprompt="设置失败">
+					<params>
+						<param name="now" value="now{}" datatype="timestamp"/>
+						<param name="uuid" value="uuid{}"/>
+					</params>
+					<value>call sp_testInvokeServerSP(#{uuid},#{now},@{param_no},request{req_logcontent})</value>
+				</button>
+				<button name="button3" class="com.wabacus.system.buttons.ServerSQLActionButton" position="other" autoreportdata="false"
+					successprompt="删除成功" failedprompt="删除失败">
+					<params>
+						<param name="now" value="now{}" datatype="timestamp"/>
+						<param name="uuid" value="uuid{}"/>
+					</params>
+					<value>class{com.wabacusdemo.UpdateData_invokeservermethod}</value>
+				</button>
+			</buttons>
+			<format>
+			  <value>
+			  <![CDATA[
+					marriage=marriage==null?"":marriage.trim();
+					String btnMarriagedCls="cls-button2";
+					String btnMarriagedEvent="invokeComponentSqlActionButton('invokeservermethod_sqlpage1','report1','button1',{param_no:'"+no+"',param_name:'"+name+"'},true,testInvokeCallbackMethod1)";
+					String btnUnMarriagedCls="cls-button2";
+					String btnUnMarriagedEvent="invokeComponentSqlActionButton('invokeservermethod_sqlpage1','report1','button2',{param_no:'"+no+"',param_name:'"+name+"'},true,testInvokeCallbackMethod1)";
+					if(marriage.equals("1"))
+					{//当前员工是已婚状态
+					 	marriage="已婚";
+					 	btnMarriagedCls="cls-button2-disabled";
+					 	btnMarriagedEvent="";
+					}else if(marriage.equals("0"))
+					{//当前员工是未婚状态 
+						marriage="未婚";
+						btnUnMarriagedCls="cls-button2-disabled";
+					 	btnUnMarriagedEvent="";
+					}
+					operate1="<input type=\"button\" class=\""+btnMarriagedCls+"\" value=\"设置已婚\" onclick=\""+btnMarriagedEvent+"\">&nbsp;&nbsp;";
+					operate1=operate1+"<input type=\"button\" class=\""+btnUnMarriagedCls+"\" value=\"设置未婚\" onclick=\""+btnUnMarriagedEvent+"\">";
+					operate2="<input type=\"button\" class=\"cls-button\" value=\"删除\" onclick=\"invokeComponentSqlActionButton('invokeservermethod_sqlpage1','report1','button3',{param_no:'"+no+"',param_name:'"+name+"'},true,testInvokeCallbackMethod1)\">";
+				]]>
+			  </value>
+			</format>
+			<footer><![CDATA[<font color='red'>说明：</font><font color='blue'>“设置已婚”按钮调用SQL语句；“设置未婚”按钮调用存储过程；“删除”按钮调用JAVA类</font>]]></footer>
+		</report>
+		<report id="report2" title="查看更新日志" dataexport="richexcel" top="10px">
+			<display>
+				<col column="uuid" displaytype="hidden"/>
+				<col column="createdate" label="更新时间" clickorderby="true" width="180px"/>
+				<col column="updatetype" label="更新类型" width="150px"/>
+				<col column="content" label="内容" clickorderby="true"/>
+				<col property="operate" column="{non-fromdb}" label="删除记录" width="120px"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT * FROM tbl_log order by createdate desc]]>
+				</value>
+			</sql>
+			<buttons>
+				<button name="button1" class="com.wabacus.system.buttons.ServerSQLActionButton" position="other" autoreportdata="false"
+						successprompt="删除成功" failedprompt="删除失败">
+					<![CDATA[
+						delete from tbl_log where uuid=@{param_uuid};
+					]]>
+				</button>
+			</buttons>
+			<format>
+			  <value>
+			  <![CDATA[
+					operate="<input type=\"button\" class=\"cls-button\" value=\"删除\" onclick=\"invokeComponentSqlActionButton('invokeservermethod_sqlpage1','report2','button1',{param_uuid:'"+uuid+"'},true,null)\">";
+				]]>
+			  </value>
+			</format>
+		</report>
+	</page>
+	<page id="invokeservermethod_alonepage1" js="/wabacusdemo/js/demo.js" margin_top="10px">
+		<report id="report2" title="测试表" dataexport="richexcel" top="10px">
+			<display>
+				<col column="uuid" displaytype="hidden"/>
+				<col column="createdate" label="更新时间" clickorderby="true" width="180px"/>
+				<col column="updatetype" label="更新类型" width="150px"/>
+				<col column="content" label="内容" clickorderby="true"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT * FROM tbl_log order by createdate desc]]>
+				</value>
+			</sql>
+		</report>
+		<buttons align="center">
+			<button name="button1" position="bottom" label="插入一条记录">
+				invokeServerAction('com.wabacusdemo.TestServerCallBack1',{text:'被插入记录的测试内容',actiontype:'测试插入一条记录'},testInvokeCallbackMethod2,null);
+			</button>
+			<button name="button2" position="bottom" label="插入二条记录">
+				invokeServerAction('com.wabacusdemo.TestServerCallBack1',[{text:'被插入记录的测试内容1',actiontype:'测试同时插入两条记录'},{text:'被插入记录的测试内容2',actiontype:'测试同时插入两条记录'}],testInvokeCallbackMethod2,null);
+			</button>
+			<button name="button3" position="bottom" label="清空表记录">
+				invokeServerAction('com.wabacusdemo.TestServerCallBack1',{actiontype:'clear'},testInvokeCallbackMethod2,null);
+			</button>
+		</buttons>
+	</page>
+	
+</applications>

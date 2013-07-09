@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+					
+	<page id="sppage1" js="/webresources/script/validate.js">
+		<tabpanel id="tp1" titlewidth="180px" margin="10">
+			<tabpanel id="tp2" titlestyle="2" titlewidth="150px" parenttitle="使用SQL语句更新数据" margin="10">
+				<report id="report10" parenttitle="Wabacus专有格式的更新SQL语句" extends="editablelistreportpage1.report1"/>
+				<report id="report11" parenttitle="标准格式的更新SQL语句" extends="editablelistreportpage1.report1">
+					<sql>
+					  <select>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+						</value>
+						<condition name="txtdeptno" label="部门编号">
+							<value>
+								<![CDATA[(deptno like  '%#data#%' )]]>
+							</value>
+						</condition>
+					  </select>
+					  <insert>
+					  	  <params>
+					  	 	 <param name="uuid" value="uuid{}"/>
+					  	  </params>
+					  	  <value>
+				  		 		insert into tbl_department(guid,deptno,deptname,manager,builtdate,performance) values(#{uuid},@{deptno},@{deptname},@{manager},@{builtdate},@{performance});
+				  		  </value>
+					  </insert>
+					  <update>
+					     update tbl_department set deptno=@{deptno},deptname=@{deptname},manager=@{manager},builtdate=@{builtdate},performance=@{performance} where guid=@{guid};
+					     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+					  </update>
+					  <delete>
+					  	 delete from tbl_department where deptno=@{deptno__old};
+					  </delete>
+					</sql>
+				</report>
+			</tabpanel>
+			<report id="report2" title="部门信息列表" parenttitle="使用存储过程更新数据" type="editablelist2" dataexport="richexcel|plainexcel|word">
+				<interceptor>
+					<imports>
+						<import>java.util.*</import>
+					</imports>
+					<preaction>
+						rrequest.getRequest().getSession().setAttribute("sessionvalue","测试部门名");
+					</preaction>
+					<saveaction-perrow><!-- 在此拦截方法中打印保存数据的存储过程返回值 -->
+					<![CDATA[
+						if(editbean instanceof EditableReportInsertDataBean)
+						{//当前是在添加数据
+							String rntValueBySp=(String)mParamValues.get("param1");
+							System.out.println("添加记录时存储过程的返回值为"+rntValueBySp);
+						}else if(editbean instanceof EditableReportUpdateDataBean)
+						{//当前是在修改数据
+							String rntValueBySp=rrequest.getStringAttribute("rtnValue","");
+							System.out.println("修改记录时存储过程的返回值为"+rntValueBySp);
+						}
+						//删除数据的时候（WX_DELETE），没有保存存储过程返回值，所以这里不打印
+						 return super.doSavePerRow(rrequest,rbean,mRowData,mParamValues,editbean);
+					]]>
+					</saveaction-perrow>
+				</interceptor>
+				<display>
+					<col column="guid" displaytype="hidden"/>
+					<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'">
+						<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+					</col>
+					<col column="deptname" label="部门名" clickorderby="true"/>
+					<col column="manager" label="部门经理"/>
+					<col column="builtdate" label="创建日期" clickorderby="true" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+					<col column="performance" label="表现" clickorderby="true" filter="true">
+						<inputbox type="selectbox">
+							<option value="优秀" label="优秀"/> 
+							<option value="良好" label="良好" />
+							<option value="较好" label="较好" />
+							<option value="很差" label="很差" />
+						</inputbox>
+					</col>
+					<col column="description" label="简介" datatype="clob" width="300px">
+						<inputbox type="textareabox"/>
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+					</value>
+					<condition name="txtdeptno" label="部门编号">
+						<value>
+							<![CDATA[(deptno like  '%#data#%' )]]>
+						</value>
+					</condition>
+				  </select>
+				  <insert>
+				  	  <params>
+				  	 	 <param name="param1" value=""/><!-- 稍后用来保存存储过程返回值 -->
+				  	 	 <param name="param2" value="session{sessionvalue}"/>
+				  	  </params>
+				  	  <value>
+			  		 		#{param1}=call sp_testInsertData(uuid{},@{deptno},#{param2},@{manager},@{builtdate},@{performance},@{description});
+			  		  </value>
+				  </insert>
+				  <update>
+				     rrequest{rtnValue}=call sp_testUpdateData(@{deptno},@{deptno__old},@{manager},@{builtdate},@{performance},@{description});
+				     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+				  </update>
+				  <delete>
+				  	 call sp_testDeleteData(@{deptno});
+				  </delete>
+				</sql>
+			</report>
+			<report id="report3" parenttitle="使用JAVA类更新数据" extends="sppage1.report10">
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+					</value>
+					<condition name="txtdeptno" label="部门编号">
+						<value>
+							<![CDATA[(deptno like  '%#data#%' )]]>
+						</value>
+					</condition>
+				  </select>
+				  <insert>
+				  	 <params>
+				  	 	 <param name="updatetype" value="insert"/><!-- 定义一个变量标识当前操作类型方便传到JAVA类中，这样可以增、删、改共用一个JAVA类 -->
+				  	 </params>
+				  	 <value>class{com.wabacusdemo.UpdateData_spage1Report3(@{deptno},@{deptname},@{manager},@{performance})}</value>
+				  </insert>
+				  <update>
+				    <params>
+				  	 	 <param name="updatetype" value="update"/><!-- 定义一个变量标识当前操作类型方便传到JAVA类中，这样可以增、删、改共用一个JAVA类 -->
+				  	 </params>
+				  	 <value>class{com.wabacusdemo.UpdateData_spage1Report3(@{deptno},@{deptname},@{manager},@{performance})}</value>
+				  </update>
+				  <delete>
+				  	 <params>
+				  	 	 <param name="updatetype" value="delete"/><!-- 定义一个变量标识当前操作类型方便传到JAVA类中，这样可以增、删、改共用一个JAVA类 -->
+				  	 </params>
+				  	 <value>class{com.wabacusdemo.UpdateData_spage1Report3}</value>
+				  </delete>
+				</sql>
+			</report>
+			<report id="report4" parenttitle="综合三种脚本类型" extends="sppage1.report2" interceptor="">
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+					</value>
+					<condition name="txtdeptno" label="部门编号">
+						<value>
+							<![CDATA[(deptno like  '%#data#%' )]]>
+						</value>
+					</condition>
+				  </select>
+				  <insert>
+				  	  <params>
+				  	  	 <param name="param1" value=""/><!-- 稍后用来保存存储过程返回值 -->
+				  	 	 <param name="updatetype" value="insert"/><!-- 定义一个变量标识当前操作类型方便传到JAVA类中，这样可以增、删、改共用一个JAVA类 -->
+				  	  </params>
+				  	  <value>
+			  		 		#{param1}=call sp_testInsertData(uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{performance},@{description});
+			  		 		class{com.wabacusdemo.UpdateData_spage1Report4}
+			  		  </value>
+				  </insert>
+				  <update>
+				  		<params>
+				  	 	 	<param name="updatetype" value="update"/><!-- 定义一个变量标识当前操作类型方便传到JAVA类中，这样可以增、删、改共用一个JAVA类 -->
+				  	 	</params>
+				  	 	<value>
+					     rrequest{rtnValue}=call sp_testUpdateData(@{deptno},@{deptno__old},@{manager},@{builtdate},@{performance},@{description});
+					     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+					     class{com.wabacusdemo.UpdateData_spage1Report4}
+				     </value>
+				  </update>
+				  <delete>
+				  	 <params>
+				  	 	 <param name="updatetype" value="delete"/><!-- 定义一个变量标识当前操作类型方便传到JAVA类中，这样可以增、删、改共用一个JAVA类 -->
+				  	 </params>
+				  	 <value>
+				  	 	call sp_testDeleteData(@{deptno});
+				  	 	update tbl_baseinfo set deptno='' where deptno=@{deptno__old};
+				  	 	class{com.wabacusdemo.UpdateData_spage1Report4}
+				  	 </value>
+				  </delete>
+				</sql>
+			</report>
+		</tabpanel>
+	</page>
+	<page id="autocompletedatapage1" js="/webresources/script/validate.js">
+		<tabpanel id="tp1" titlestyle="2" margin="10px" titlewidth="120px">
+			<report id="report1" title="部门信息列表" parenttitle="用SQL语句查询填充数据" extends="editablelistreportpage1.report1">
+				<display>
+					<col column="guid" displaytype="hidden"/>
+					<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'">
+						<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)">
+							<autocomplete columns="deptname;manager;performance" colvaluecondition="deptno like '%#deptno#%'" 
+								dataset="SELECT * FROM tbl_department where  {#condition#} order by deptno"/>
+						</inputbox>
+					</col>
+					<col column="deptname" label="部门名" clickorderby="true">
+						<inputbox>
+							<autocomplete columns="deptno" colvaluecondition="deptname like '%#deptname#%'" 
+								dataset="SELECT * FROM tbl_department where  {#condition#} order by deptno"/>
+						</inputbox>
+					</col>
+					<col column="manager" label="部门经理"/>
+					<col column="builtdate" label="创建日期" clickorderby="true" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+					<col column="performance" label="表现" clickorderby="true" filter="true">
+						<inputbox type="selectbox">
+							<option value="优秀" label="优秀"/> 
+							<option value="良好" label="良好" />
+							<option value="较好" label="较好" />
+							<option value="很差" label="很差" />
+						</inputbox>
+					</col>
+				</display>
+				<footer>
+				<![CDATA[
+					<br><font color="red">说明：</font><font color="blue">添加或修改时在“部门编号”中输入字符后会自动通过SQL语句从数据库取出其它列信息进行填充，在“部门名”中输入字符后会自动从数据库中取相应的部门编号进行填充</font>
+				]]>
+				</footer>
+			</report>
+			<report id="report2" title="部门信息列表" parenttitle="用JAVA类查询填充数据" extends="editablelistreportpage1.report1">
+				<display>
+					<col column="guid" displaytype="hidden"/>
+					<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@'">
+						<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)">
+							<autocomplete columns="deptname;manager;performance" colvaluecondition="deptno;" 
+								dataset="class{com.wabacusdemo.AutoCompleteDataSet_autocompletedatapage1Report2}"/>
+						</inputbox>
+					</col>
+					<col column="deptname" label="部门名" clickorderby="true">
+						<inputbox>
+							<autocomplete columns="deptno" colvaluecondition="deptname like '%#deptname#%'" 
+								dataset="SELECT * FROM tbl_department where  {#condition#} order by deptno"/>
+						</inputbox>
+					</col>
+					<col column="manager" label="部门经理"/>
+					<col column="builtdate" label="创建日期" clickorderby="true" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+					<col column="performance" label="表现" clickorderby="true" filter="true">
+						<inputbox type="selectbox">
+							<option value="优秀" label="优秀"/> 
+							<option value="良好" label="良好" />
+							<option value="较好" label="较好" />
+							<option value="很差" label="很差" />
+						</inputbox>
+					</col>
+				</display>
+				<footer>
+				<![CDATA[
+					<br><font color="red">说明：</font><font color="blue">添加或修改时在“部门编号”中输入字符后会自动通过JAVA类获取其它列信息进行填充</font>
+				]]>
+				</footer>
+			</report>
+			<report id="report3" title="员工信息列表" parenttitle="利用拦截器修改填充数据" extends="editmultitablepage1.report1" 
+					interceptor="com.wabacusdemo.Interceptor_autocompletedatapage1Report2">
+				<display>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})">
+							<autocomplete columns="name;sex;age;birthday;salary;deptname;deptno;province;city;county" colvaluecondition="A.no like '%#no#%'" 
+								dataset="SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where  {#condition#}"/>
+						</inputbox>
+					</col>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别">
+							<inputbox type="radiobox">
+								<option value="0" label="女"/> 
+								<option value="1" label="男"/>
+							</inputbox>
+						</col>
+						<col column="age" label="年龄" clickorderby="true" width="100px" filter="true" filterwidth="120px">
+							<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+						</col>
+						<col column="birthday" label="出生日期" clickorderby="true" width="150px" datatype="date{yyyy-MM-dd}">
+							<inputbox type="datepicker"  language="en" jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+						</col>
+					</group>
+					<col column="salary" label="工资" datatype="float">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+					</col>
+					<col column="deptno" label="所属部门" displaytype="hidden"/>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px" updatecol="@{deptno}">
+						<inputbox type="selectbox">
+							<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+						</inputbox>
+					</col>
+					<group label="籍贯">
+						<col column="province" label="省">
+							<inputbox type="selectbox">
+								<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+							</inputbox>
+						</col>
+						<col column="city" label="市">
+							<inputbox type="selectbox" depends="province">
+								<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+							</inputbox>
+						</col>
+						<col column="county" label="县">
+							<inputbox type="selectbox" depends="city">
+								<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+							</inputbox>
+						</col>
+					</group>
+				</display>
+				<footer>
+				<![CDATA[
+					<br><font color="red">说明：</font><font color="blue">添加或修改时在“工号”列中输入字符后会自动从数据库取出其它列信息进行填充，这里演示了在加载数据后动作中增加数据</font>
+				]]>
+				</footer>
+			</report>
+		</tabpanel>
+	</page>
+</applications>

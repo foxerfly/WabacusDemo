@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	<!--数据展示篇中的模板演示-->
+   <page id="statictemplatepage1">
+		<report id="report1" title="员工信息列表" extends="listpage1.report1" template="${report.template.test}">
+			<buttons>
+				<button name="button1" position="title" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+					alert('测试图片按钮');
+				</button>
+			</buttons>
+		</report>
+		<report id="report2" title="request{employeename}详细资料" extends="detailpage1.report1" top="15px"
+				  template="relative{/wabacusdemo/htmltemplate/reporttemplatepage1report2_report.html}">
+		</report>
+	</page>
+	<page id="statictemplatepage2">
+		<report id="report1" title="员工信息列表" extends="listpage1.report1">
+			<header>${headertemplatepage1.report1.header}</header>
+			<display>
+				<col column="{sequence:1}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+				<col column="name" label="姓名" clickorderby="true" width="15%"/>
+				<group label="基本信息">
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄" clickorderby="true" width="100px" filter="true" filterwidth="120px"/>
+					<col column="birthday" label="出生日期" clickorderby="true" width="150px"/>
+				</group>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+			</display>
+			<buttons>
+				<button name="button1" position="title" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+					alert('测试图片按钮');
+				</button>
+			</buttons>
+			<footer>${headertemplatepage1.report1.footer}</footer>
+		</report>
+	</page>
+	<page id="statictemplatepage3">
+		<report id="report1" title="员工信息列表" extends="listpage1.report1" 
+				  navigate="${navigatetemplatepage1.report1.navigate}">
+			<buttons>
+				<button name="button1" position="title" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+					alert('测试图片按钮');
+				</button>
+			</buttons>
+		</report>
+	</page>
+	
+	<page id="dynamictemplatepage1">
+		<report id="report1" title="员工信息列表" dataexport="richexcel"
+				  template="/wabacusdemo/jsp/tagpages/dynamictemplatepage1.jsp">
+			<display>
+				<col column="no" label="工号" valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="个人资料" >
+					<group label="姓名">
+						<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true" />
+						<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" clickorderby="true"/>
+					<col column="age" label="年龄" clickorderby="true"/>
+				</group>
+				<col column="joinindate" label="入职日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份" filter="condition{txtprovince}"/>
+					<col column="city"  label="城市" filter="condition{txtcity}"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcity" label="市">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			   <imports>
+				<import>com.wabacus.util.*</import>
+			  </imports>
+			  <value>
+			   <![CDATA[
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					joinindate=joinindate==null?"":joinindate.trim();
+					int idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) joinindate=joinindate.substring(0,idx);
+				  ]]>
+			  </value>
+			</format>
+			<buttons buttonspacing="3">
+				<button name="button1" position="title|searchbox" label="image{/WabacusDemo/wabacusdemo/images/add_button.gif}">
+					alert('图片按钮');
+				</button>
+				<button name="button2" position="searchbox" label="按钮一">
+					alert('普通按钮一');
+				</button>
+				<button name="button3" position="title|searchbox" label="按钮二">
+					alert('普通按钮二');
+				</button>
+			</buttons>
+		</report>
+		<report id="report2" title="request{dept_name}详细资料" type="detail" dataexport="richexcel"
+				  template="/wabacusdemo/jsp/tagpages/dynamictemplatepage1.jsp">
+			<display valuetdwidth="200px" labeltdwidth="171px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'"/>
+				<col column="deptname" label="部门名"/>
+				<col column="manager" label="部门经理" br="true"/>
+				<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'"/>
+				<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true"/>
+				<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+				</value>
+				<condition name="txtdeptno" label="部门编号">
+					<value>
+						<![CDATA[(deptno like '%#data#%' )]]>
+					</value>
+					<inputbox>
+						<typeprompt count="15">
+							<promptcol label="deptno" matchmode="anywhere"/>
+							<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+				  		</typeprompt>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+				<value>
+					rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+					builtdate=builtdate==null?"":builtdate.trim();
+				 	int idx=builtdate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+			 		if(idx>0) builtdate=builtdate.substring(0,idx);
+				</value>
+			</format>
+		</report>
+	</page>
+	<page id="dynamictemplatepage2">
+		<report id="report1" extends="dynamictemplatepage1.report1" template="/wabacusdemo/jsp/tagpages/dynamictemplatepage2_report1.jsp"/>
+		<report id="report2" extends="dynamictemplatepage1.report2" template="/wabacusdemo/jsp/tagpages/dynamictemplatepage2_report2.jsp"/>
+	</page>
+	<page id="dynamictemplatepage3">
+		<report id="report1" extends="dynamictemplatepage1.report1" template="/wabacusdemo/jsp/tagpages/dynamictemplatepage3_report1.jsp"/>
+		<report id="report2" extends="dynamictemplatepage1.report2" template="/wabacusdemo/jsp/tagpages/dynamictemplatepage3_report2.jsp"/>
+	</page>
+	<page id="dynamictemplatepage4">
+		<report id="report1" refreshid="dynamictemplatepage4" extends="dynamictemplatepage1.report1" template="/wabacusdemo/jsp/tagpages/dynamictemplatepage4.jsp"/>
+		<report id="report2" refreshid="dynamictemplatepage4" extends="dynamictemplatepage1.report2" template="none"/>
+	</page>
+	
+	<!-- 数据编辑篇模板演示 -->
+	<page id="editablestatictemplatepage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="editablelistreportpage1.report1"
+				  template="relative{/wabacusdemo/htmltemplate/editabletemplatepage1report1_report.html}"/>
+		<report id="report2" extends="editabledetailpage1.report1" template="${editabletemplatepage1.report2.template}" top="15px"/>
+		<report id="report3" extends="editabledetailpage1.report2" template="relative{/wabacusdemo/htmltemplate/editabletemplatepage1report3_report.html}" top="15px"/>
+	</page>
+	<page id="editabledynamictemplatepage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="editablelistreportpage1.report1" template="/wabacusdemo/jsp/tagpages/editabledynamictemplatepage1_report1.jsp"/>
+		<report id="report2" title="request{dept_name}详细资料1" extends="editabledetailpage1.report1" template="/wabacusdemo/jsp/tagpages/editabledynamictemplatepage1_report2.jsp"/>
+		<report id="report3" title="request{dept_name}详细资料2" extends="editabledetailpage1.report2" template="/wabacusdemo/jsp/tagpages/editabledynamictemplatepage1_report3.jsp"/>
+	</page>
+	
+	<!-- 表单模板演示 -->
+	<page id="formstatictemplatepage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="listformpage1.report1"
+				  template="relative{/wabacusdemo/htmltemplate/editabletemplatepage1report1_report.html}"/>
+		<report id="report2" extends="detailformpage1.report1" top="15px"
+				  template="relative{/wabacusdemo/htmltemplate/formtemplatepage1report2_report.html}"/>
+	</page>
+	
+	<page id="formdynamictemplatepage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="listformpage1.report1" template="/wabacusdemo/jsp/tagpages/formdynamictemplatepage1_report1.jsp"/>
+		<report id="report2" extends="detailformpage1.report1" template="/wabacusdemo/jsp/tagpages/formdynamictemplatepage1_report2.jsp"/>
+	</page>
+</applications>

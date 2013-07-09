@@ -1,0 +1,1477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+    <local-resources>
+    	<resources>
+    		<resource key="navigate.count.info">
+    			<![CDATA[
+  					当前第#currentpage#页 共#totalpage#页	
+  				]]>
+    		</resource>
+    	</resources>
+    </local-resources>
+	<!--local-cssfiles>
+      <css-file>/webresources/css/report_ch.css</css-file>
+    </local-cssfiles-->
+	<page id="formpartcoldetail1" js="/webresources/script/validate.js">
+		<tabpanel id="tp1" titlestyle="2" titlewidth="120px" margin="10px">
+			<report id="report1" parenttitle="普通表单" title="request{employeename}员工详细资料" type="form" dataexport="richexcel">
+				<display valuetdwidth="200px" labeltdwidth="150px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+					<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+					</col>
+					<col column="name" label="中文名"/>
+					<col column="ename" label="英文名" br="true"/>
+					<col column="sex" label="性别">
+						<inputbox type="radiobox">
+							<option value="0" label="女"/> 
+							<option value="1" label="男"/>
+						</inputbox>
+					</col>
+					<col column="age" label="年龄">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+					</col>
+					<col column="marriage" label="婚否" br="true">
+						<inputbox type="selectbox">
+							<option value="0" label="未婚"/> 
+							<option value="1" label="已婚"/>
+						</inputbox>
+					</col>
+					<col column="salary" label="工资" datatype="float">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+					</col>
+					<col column="deptno" displaytype="hidden"/>
+					<col column="deptname" label="所属部门" updatecol="@{deptno}" valuestyleproperty="colspan='3'" br="true">
+						<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+						</inputbox>
+					</col>
+					<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+					<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}">
+						<inputbox type="datepicker" dateformat="MM/dd/yyyy"/>
+					</col>
+					<col column="interest" label="兴趣爱好"  br="true">
+						<inputbox type="selectbox" multiply="true" separator="," styleproperty="size='5'">
+							<option label="篮球" value="篮球"/>
+							<option label="足球" value="足球"/>
+							<option label="排球" value="排球"/>
+							<option label="游泳" value="游泳"/>
+							<option label="看书" value="看书"/>
+							<option label="唱歌" value="唱歌"/>
+							<option label="旅游" value="旅游"/>
+							<option label="跑步" value="跑步"/>
+							<option label="健身" value="健身"/>
+							<option label="爬山" value="爬山"/>
+						</inputbox> 
+					</col>
+					<col column="province" label="省">
+						<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option label="请选择" value=""/>
+							<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+						</inputbox>
+					</col>
+					<col column="city" label="市">
+						<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+						</inputbox>
+					</col>
+					<col column="county" label="县" br="true">
+						<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+						</inputbox>
+					</col>
+					<col column="description" label="评价" datatype="clob" valuestyleproperty="colspan='5'">
+						<inputbox type="textareabox" styleproperty="rows='5'"/>
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,interest,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where  {#condition#}]]>
+					</value>
+					<condition name="txtgonghao" label="工号">
+						<value>
+							<![CDATA[(A.no = '#data#' )]]>
+						</value>
+						<inputbox>
+						 	<typeprompt width="-1" count="15">
+								<promptcol label="no" matchmode="anywhere"/>
+								<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						 </inputbox>
+					</condition>
+				  </select>
+				  <insert condition="txtgonghao=@{no}">
+				     insert into tbl_baseinfo(uuid=uuid{},@{no},@{name},@{sex},@{age},@{birthday},@{deptno});
+				     insert into tbl_detailinfo(@{no},@{salary},@{marriage},@{interest},@{province},@{city},@{county},@{description});
+				  </insert>
+				  <update>
+				     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday}) where no=@{no__old};
+				     update tbl_detailinfo(@{no},@{ename},@{joinindate},@{interest},@{province},@{city},@{county},@{description}) where no=@{no__old};
+				  </update>
+				  <delete>
+				     delete from tbl_baseinfo where no=@{no__old};
+				     delete from tbl_detailinfo where no=@{no__old};
+				  </delete>
+				</sql>
+				<format>
+				  <imports>
+						<import>com.wabacus.util.*</import>
+				  </imports>
+				  <value>
+				  		rrequest.getRequest().setAttribute("employeename",name);//存放request，以便显示标题时能取到
+						marriage=marriage==null?"":marriage.trim();
+						if(marriage.equals("1")) marriage="已婚";
+						else if(marriage.equals("0")) marriage="未婚";
+				  		if(rrequest.getShowtype() != Consts.DISPLAY_ON_PAGE)
+				  		{
+				  			sex=sex==null?"":sex.trim();
+							if(sex.equals("0")) sex="女";
+							else if(sex.equals("1")) sex="男";
+				  		}
+				  </value>
+				</format>
+				<footer>${formpartcoldetail1.footer}</footer>
+			</report>
+			<report id="report2" parenttitle="列表表单" title="员工信息列表" type="listform" width="1200px" dataexport="richexcel" >
+				<display>
+					<col column="no" label="工号" clickorderby="true" width="60px" valuestyleproperty="style='mso-number-format:\@;'">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+					</col>
+					<col column="name" label="姓名" clickorderby="true"/>
+					<group label="基本信息" labelstyleproperty="width='260px'">
+						<col column="sex" label="性别">
+							<inputbox type="radiobox">
+								<option value="0" label="女"/> 
+								<option value="1" label="男"/>
+							</inputbox>
+						</col>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px">
+							<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+						</col>
+						<col column="birthday" label="出生日期" clickorderby="true"  datatype="date{yyyy-MM-dd}">
+							<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+						</col>
+					</group>
+					<col column="salary" label="工资" datatype="float">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+					</col>
+					<col column="deptno" label="所属部门" displaytype="hidden"/>
+					<col column="deptname" label="所属部门" updatecol="@{deptno}" width="100px">
+						<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+						</inputbox>
+					</col>
+					<group label="籍贯">
+						<col column="province" label="省">
+							<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+								<option label="请选择" value=""/>
+								<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+							</inputbox>
+						</col>
+						<col column="city" label="市">
+							<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+								<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+							</inputbox>
+						</col>
+						<col column="county" label="县">
+							<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+								<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+							</inputbox>
+						</col>
+					</group>
+					<col column="interest" label="兴趣爱好" width="200px">
+						<inputbox type="popupbox"  width="600" height="400">
+							<![CDATA[/wabacusdemo/jsp/testpopupbox.jsp?name=@{name}&no=@{no}]]>
+						</inputbox> 
+					</col>
+				</display>
+				<sql>
+				  <select>
+					<value>
+						<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,interest FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%' )]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="-1" count="15">
+								<promptcol label="no" matchmode="anywhere"/>
+								<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+				  </select>
+				  <insert>
+			  		 insert into tbl_baseinfo(uuid=uuid{},@{no},@{age},@{birthday},@{deptno});
+			  		 insert into tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest});
+				  </insert>
+				  <update>
+				     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday}) where no=@{no__old};
+				     update tbl_detailinfo(@{no},@{salary},@{interest}) where no=@{no__old};
+				  </update>
+				  <delete>
+				  	 delete from tbl_baseinfo where no=@{no__old};
+				  	 delete from tbl_detailinfo where no=@{no__old}
+				  </delete>
+				</sql>
+				<footer>${formpartcollistpage1.footer}</footer>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="formpartfuncdetail_addpage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="detailformpage1.report1" dataexport="none">
+			<sql>
+			  <insert>
+			     insert into tbl_baseinfo(uuid=uuid{},@{no},@{name},@{sex},@{age},@{birthday},@{deptno});
+			     insert into tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{interest},@{province},@{city},@{county},@{description});
+			  </insert>
+			</sql>
+		</report>
+	</page>
+	<page id="formpartfuncdetail_addmodifypage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="detailformpage1.report1" dataexport="none">
+			<sql>
+				<select>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,interest,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where  {#condition#}]]>
+					</value>
+					<condition name="txtgonghao" hidden="true">
+						<value>
+							<![CDATA[(A.no = '#data#' )]]>
+						</value>
+					</condition>
+					<condition name="txtguid" hidden="true">
+						<value>
+							<![CDATA[(A.uuid = '#data#' )]]>
+						</value>
+					</condition>
+			  	</select>
+			  	<insert condition="txtgonghao=@{no};txtguid=#{guid}">
+			  		<params>
+			  			<param name="guid" value="uuid{}"/>
+			  		</params>
+			     	insert into tbl_baseinfo(uuid=#{guid},@{no},@{name},@{sex},@{age},@{birthday},@{deptno});
+			     	insert into tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{interest},@{province},@{city},@{county},@{description});
+			  	</insert>
+			  	<update>
+			     	update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     	update tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{interest},@{province},@{city},@{county},@{description}) where no=@{no__old};
+			  	</update>
+			</sql>
+		</report>
+	</page>
+	<page id="formpartfuncdetail_modifypage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="detailformpage1.report1">
+			<sql>
+				<select>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,interest,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where  {#condition#}]]>
+					</value>
+					<condition name="txtgonghao" label="工号">
+						<value>
+							<![CDATA[(A.no = '#data#' )]]>
+						</value>
+						<inputbox>
+							<typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+						</inputbox>
+					</condition>
+			  	</select>
+			  	<update>
+			     	update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     	update tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{interest},@{province},@{city},@{county},@{description}) where no=@{no__old};
+			  	</update>
+			</sql>
+		</report>
+	</page>
+	<page id="formpartfuncdetail_modifydeletepage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="detailformpage1.report1">
+			<sql>
+				<select>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,interest,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where  {#condition#}]]>
+					</value>
+					<condition name="txtgonghao" label="工号">
+						<value>
+							<![CDATA[(A.no = '#data#' )]]>
+						</value>
+						<inputbox>
+							<typeprompt width="-1" count="15">
+								<promptcol label="no" matchmode="anywhere"/>
+								<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+			  	</select>
+			  	<update>
+			     	update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     	update tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{interest},@{province},@{city},@{county},@{description}) where no=@{no__old};
+			  	</update>
+			  	<delete>
+			     	delete from tbl_baseinfo where no=@{no__old};
+			     	delete from tbl_detailinfo where no=@{no__old};
+			  	</delete>
+			</sql>
+		</report>
+	</page>
+	<page id="formpartfunclist_addmodifypage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="listformpage1.report1">
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,interest FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			  <insert>
+		  		 insert into tbl_baseinfo(uuid=uuid{},@{no},@{name},@{sex},@{age},@{birthday},@{deptno});
+		  		 insert into tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest});
+			  </insert>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest}) where no=@{no__old};
+			  </update>
+			</sql>
+		</report>
+	</page>
+	<page id="formpartfunclist_modifypage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="listformpage1.report1">
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,interest FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest}) where no=@{no__old};
+			  </update>
+			</sql>
+		</report>
+	</page>
+	<page id="formpartfunclist_modifydeletepage1" js="/webresources/script/validate.js">
+		<report id="report1" extends="listformpage1.report1">
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,interest FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest}) where no=@{no__old};
+			  </update>
+			  <delete>
+			  	 delete from tbl_baseinfo where no=@{no__old};
+			  	 delete from tbl_detailinfo where no=@{no__old}
+			  </delete>
+			</sql>
+		</report>
+	</page>
+	<page id="formmasterslavepage1" js="/webresources/script/validate.js">
+		<report id="report1" title="部门信息列表" pagesize="8" dataexport="richexcel">
+			<display>
+				<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+				<col column="deptname" label="部门名" clickorderby="true" width="15%"/>
+				<col column="manager" label="部门经理"/>
+				<col column="builtdate" label="创建日期" clickorderby="true" width="100px"/>
+				<col column="performance" label="表现" clickorderby="true" width="150px" filter="condition{txtperformance}"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+				</value>
+				<condition name="txtdeptno" label="部门编号">
+					<value>
+						<![CDATA[(deptno like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					   <typeprompt width="200" count="15">
+							<promptcol label="deptno" matchmode="anywhere"/>
+							<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+					  	</typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtperformance" label="表现">
+					<value>
+						<![CDATA[(performance like '%#data#%')]]>
+					</value>
+					<inputbox type="selectbox">
+						<option value="" label="全部"/>
+						<option value="优秀" label="优秀"/> 
+						<option value="良好" label="良好" />
+						<option value="较好" label="较好" />
+						<option value="很差" label="很差" />
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+			  		builtdate=builtdate==null?"":builtdate.trim();
+					int idx=builtdate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) builtdate=builtdate.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+		<report id="report2" title="request{dept_name}详细资料" type="form" 
+				depends="report1" dependsparams="txtdeptno2=@{deptno}">
+			<display valuetdwidth="200px" labeltdwidth="150px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="guid" displaytype="hidden"/>
+				<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+				</col>
+				<col column="deptname" label="部门名"/>
+				<col column="manager" label="部门经理" br="true"/>
+				<col column="builtdate" label="创建日期" datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true">
+					<inputbox type="selectbox">
+						<option value="优秀" label="优秀"/> 
+						<option value="良好" label="良好" />
+						<option value="较好" label="较好" />
+						<option value="很差" label="很差" />
+					</inputbox>
+				</col>
+				<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+					<inputbox type="textareabox" styleproperty="rows='5'"/>
+				</col>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+				</value>
+				<condition name="txtdeptno2" hidden="true">
+					<value>
+						<![CDATA[(deptno like '%#data#%' )]]>
+					</value>
+					<inputbox>
+					   <typeprompt count="15">
+							<promptcol label="deptno" matchmode="anywhere"/>
+							<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+					  	</typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			  <insert condition="txtdeptno2=@{deptno}" refreshparentonsave="report1|true">
+		  		 insert into tbl_department(guid=uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{performance},@{description});
+			  </insert>
+			  <update refreshparentonsave="report1">
+			     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{performance},@{description}) where guid=@{guid};
+			     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+			  </update>
+			</sql>
+			<format>
+				<value>
+					rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+				</value>
+			</format>
+		</report>
+		<report id="report3" title="request{dept_name}员工信息列表" width="100%" extends="listformpage1.report1" depends="report1" dependsparams="txtdeptno2=@{deptno}">
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,interest FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  	<typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  	</typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtdeptno2" hidden="true">
+					<value>
+						<![CDATA[(A.deptno like  '%#data#%' )]]>
+					</value>
+				</condition>
+			  </select>
+			  <insert>
+			  	<params>
+			  		<param name="master_deptno" value="url{txtdeptno2}"/>
+			  	</params>
+			  	<value>
+		  		 	insert into tbl_baseinfo(uuid=uuid{},@{no},@{name},@{sex},@{age},@{birthday},deptno=#{master_deptno});
+		  		 	insert into tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest});
+		  		</value>
+			  </insert>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest}) where no=@{no__old};
+			  </update>
+			  <delete>
+			  	 delete from tbl_baseinfo where no=@{no__old};
+			  	 delete from tbl_detailinfo where no=@{no__old}
+			  </delete>
+			</sql>
+			<format>
+				<value>
+					rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+				</value>
+			</format>
+		 </report>
+	 </page>
+	 <page id="formmasterslavepage2" js="/webresources/script/validate.js">
+	 	<tabpanel id="tp2" margin="10px" titlewidth="150px">
+	 		<report id="report21" parenttitle="request{dept_name}详细资料" title="基本资料" type="form"  pagesize="1">
+				<display valuetdwidth="200px" labeltdwidth="150px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+					<col column="guid" displaytype="hidden"/>
+					<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+						<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+					</col>
+					<col column="deptname" label="部门名"/>
+					<col column="manager" label="部门经理" br="true"/>
+					<col column="builtdate" label="创建日期" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+					<col column="performance" label="表现" valuestyleproperty="colspan='3'" br="true">
+						<inputbox type="selectbox">
+							<option value="优秀" label="优秀"/> 
+							<option value="良好" label="良好" />
+							<option value="较好" label="较好" />
+							<option value="很差" label="很差" />
+						</inputbox>
+					</col>
+				</display>
+				<sql savebinding="report22;report23">
+				  	<select>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+						</value>
+						<condition name="txtdeptno21">
+							<value>
+								<![CDATA[(deptno like '%#data#%' )]]>
+							</value>
+							<inputbox>
+							   <typeprompt count="15">
+									<promptcol label="deptno" matchmode="anywhere"/>
+									<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+							  	</typeprompt>
+							</inputbox>
+						</condition>
+				  	</select>
+				  	<insert condition="txtdeptno21=@{deptno}">
+		  		 		insert into tbl_department(guid=uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{performance});
+			  		</insert>
+				  	<update>
+				     	update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{performance}) where guid=@{guid};
+				     	update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+				  	</update>
+				  	<delete>
+				  		delete from tbl_department where deptno=@{deptno__old};
+				  	</delete>
+				</sql>
+				<format>
+					<value>
+						rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+					</value>
+				</format>
+			</report>
+			<report id="report22" parenttitle="request{dept_name}部门简介" type="form" depends="report21" dependsparams="txtdeptnoDepends=@{deptno};dept_name=@{deptname}">
+				<interceptor>
+					<imports>
+				     			<import>java.util.*</import>
+			    			</imports>
+					<preaction>
+						//将本报表的“添加”、“取消”、“重置”三个按钮隐藏，全部用主报表report21的相应按钮功能
+						rrequest.authorize("report22","button","type{add}","display","false");
+						rrequest.authorize("report22","button","type{cancel}","display","false");
+						rrequest.authorize("report22","button","type{reset}","display","false");
+					</preaction>
+					<saveaction>
+					  <![CDATA[
+	 					List lstInsertData=rrequest.getLstInsertedData("report21");//取到report21报表添加记录的数据集合
+	 					if(lstInsertData!=null&&lstInsertData.size()>0)
+	 					{//有添加记录
+	 						Map mInsertData=(Map)lstInsertData.get(0);//因为report21为可编辑细览报表，因此只有一个元素
+	 						String deptno=(String)mInsertData.get("deptno");//取到添加的deptno列的值
+	 						List lstInsertExternalVals=rrequest.getLstInsertedParamValues("report22");//取到report22报表为<insert/>配置的<external-values/>数据
+	 						Map mExternalData=(Map)lstInsertExternalVals.get(0);//因为report22也是一个可编辑数据细览报表，因此只有一个元素
+	 						mExternalData.put("masterdeptno",deptno);//将主报表report21添加的deptno传入本报表report22的变量中以便能使用到
+	 					}
+						return super.doSave(rrequest,rbean,editbean);
+					  ]]>
+	  				</saveaction>
+				</interceptor>
+				<display labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+					<col label="&lt;b&gt;简介&lt;/b&gt;" column="{non-value}" labelstyleproperty="bgcolor='#f0f0f0' align='center'" br="true"></col>
+					<col column="description" datatype="clob">
+						<inputbox type="richtextbox"  inputboxparams="width:'100%',height:'300px'"/>
+					</col>
+				</display>
+				<sql>
+				  	<select>
+						<value>
+							<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+						</value>
+						<condition name="txtdeptnoDepends" hidden="true">
+							<value>
+								<![CDATA[(deptno like '%#data#%' )]]>
+							</value>
+						</condition>
+				  	</select>
+				  	<insert>
+				  		<params>
+				  			<param name="masterdeptno" value=""/><!-- 定义这个变量，以便添加时能从主报表中取到新增的deptno -->
+				  		</params>
+				  		<value>
+				  			update tbl_department(@{description}) where deptno=#{masterdeptno};
+				  		</value>
+			  		</insert>
+				  	<update>
+				  		<params>
+				  			<param name="masterdeptno" value="url{txtdeptnoDepends}"/>
+				  		</params>
+				  		<value>
+							update tbl_department(@{description}) where deptno=#{masterdeptno};						  		
+				  		</value>
+				  	</update>
+				</sql>
+			</report>
+			<buttons><!-- 将主报表report21上的功能按钮显示到tabpanel容器上，因为它们对整个页面有效，而不光是这个报表 -->
+				<button name="button1" position="top" refer="report21.type{add}"/>
+				<button name="button2" position="top" refer="report21.type{delete}"/>
+				<button name="button3" position="top" refer="report21.type{save}"/>
+				<button name="button4" position="top" refer="report21.type{reset}"/>
+				<button name="button5" position="top" refer="report21.type{cancel}"/>
+			</buttons>
+	 	</tabpanel>
+	 	<report id="report23" title="request{dept_name}员工信息列表" type="listform" dataexport="richexcel|plainexcel|word"  top="10px" 
+	 				depends="report21" dependsparams="txtdeptnoDepends=@{deptno}">
+	 		<interceptor>
+				<imports>
+			     			<import>java.util.*</import>
+		    			</imports>
+				<saveaction>
+				  <![CDATA[
+ 					List lstInsertData=rrequest.getLstInsertedData("report21");//取到report21报表添加记录的数据集合
+ 					if(lstInsertData!=null&&lstInsertData.size()>0)
+ 					{//主报表是在做添加操作
+ 						Map mInsertData=(Map)lstInsertData.get(0);//因为report21为可编辑细览报表，因此只有一个元素
+ 						String deptno=(String)mInsertData.get("deptno");//取到添加的deptno列的值，因为此时不能从url中取到
+ 						List lstInsertExternalVals=rrequest.getLstInsertedParamValues("report23");//取到report23报表为<insert/>配置的<params/>数据
+ 						//report23是一个数据自动列表报表，可能会同时添加多条记录，因此要循环每条记录的变量值
+ 						for(int i=0;i<lstInsertExternalVals.size();i++)
+ 						{
+ 							Map mExternalData=(Map)lstInsertExternalVals.get(i);//因为report22也是一个可编辑数据细览报表，因此只有一个元素
+ 							mExternalData.put("master_deptno",deptno);//将主报表report21添加的deptno传入报表report23的本条添加记录的变量中以便能使用到
+ 						}
+ 					}
+					return super.doSave(rrequest,rbean,editbean);;
+				  ]]>
+  				</saveaction>
+			</interceptor>
+			<display minrownum="1">
+				<col column="no" label="工号" clickorderby="true" width="130px" valuestyleproperty="style='mso-number-format:\@;'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})" styleproperty="style='width:90%;'"/>
+				</col>
+				<col column="name" label="中文名" clickorderby="true">
+					<inputbox styleproperty="style='width:90%;'"/>
+				</col>
+				<group label="基本信息" labelstyleproperty="width='260px'">
+					<col column="sex" label="性别">
+						<inputbox type="radiobox">
+							<option value="0" label="女"/> 
+							<option value="1" label="男"/>
+						</inputbox>
+					</col>
+					<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)" styleproperty="style='width:90%;'"/>
+					</col>
+					<col column="birthday" label="出生日期" clickorderby="true"  datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)" styleproperty="style='width:90%;'"/>
+					</col>
+				</group>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})" styleproperty="style='width:90%;'"/>
+				</col>
+				<col column="deptname" label="所属部门" displaytype="hidden"/>
+				<group label="籍贯">
+					<col column="province" label="省">
+						<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option label="请选择" value=""/>
+							<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+						</inputbox>
+					</col>
+					<col column="city" label="市">
+						<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+						</inputbox>
+					</col>
+					<col column="county" label="县">
+						<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+						</inputbox>
+					</col>
+				</group>
+				<col column="interest" label="兴趣爱好" width="200px">
+					<inputbox type="popupbox"  width="600" height="400" styleproperty="style='width:95%;'">
+						<![CDATA[/wabacusdemo/jsp/testpopupbox.jsp?name=@{name}&no=@{no}]]>
+					</inputbox> 
+				</col>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,interest FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtdeptnoDepends" hidden="true">
+					<value>
+						<![CDATA[(A.deptno like  '%#data#%' )]]>
+					</value>
+				</condition>
+			  </select>
+			  <insert>
+			  	<params>
+			  		<param name="master_deptno" value="url{txtdeptnoDepends}"/>
+			  	</params>
+			  	<value>
+		  		 	insert into tbl_baseinfo(uuid=uuid{},@{no},@{name},@{sex},@{age},@{birthday},deptno=#{master_deptno});
+		  		 	insert into tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest});
+		  		</value>
+			  </insert>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county},@{interest}) where no=@{no__old};
+			  </update>
+			  <delete>
+			  	 delete from tbl_baseinfo where no=@{no__old};
+			  	 delete from tbl_detailinfo where no=@{no__old}
+			  </delete>
+			</sql>
+			<format>
+				<value>
+					rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+				</value>
+			</format>
+		 </report>
+	</page>
+	
+	<page id="formclientsavecallbackpage1" js="/webresources/script/validate.js,/wabacusdemo/js/testcallback.js">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="员工详细资料" type="form"  dataexport="richexcel">
+		 	<header>${formcallbackdetailpage1.header}</header>
+			<display valuetdwidth="200px" labeltdwidth="150px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="name" label="中文名"/>
+				<col column="ename" label="英文名" br="true"/>
+				<col column="sex" label="性别">
+					<inputbox type="radiobox">
+						<option value="0" label="女"/> 
+						<option value="1" label="男"/>
+					</inputbox>
+				</col>
+				<col column="age" label="年龄">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+				</col>
+				<col column="marriage" label="婚否" br="true">
+					<inputbox type="selectbox">
+						<option value="0" label="未婚"/> 
+						<option value="1" label="已婚"/>
+					</inputbox>
+				</col>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="deptno" label="所属部门" displaytype="hidden"/>
+				<col column="deptname" label="所属部门" updatecol="@{deptno}" valuestyleproperty="colspan='3'" br="true">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+				<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}" valuestyleproperty="colspan='2'">
+					<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='2'" br="true">
+					<inputbox type="datepicker" dateformat="MM/dd/yyyy"/>
+				</col>
+				<col column="province" label="省">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</col>
+				<col column="city" label="市">
+					<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+					</inputbox>
+				</col>
+				<col column="county" label="县" br="true">
+					<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+					</inputbox>
+				</col>
+				<col column="photo" label="照片" valuestyleproperty="colspan='5' align='center'" br="true">
+					<inputbox type="file" maxsize="10240" allowedtypes="jpg;gif;png"  displaytype="image" deletetype="1"
+					          savepath="relative{\wabacusdemo\uploadfile\}" 
+					          rooturl="/wabacusdemo/uploadfile/"/>
+				</col>
+			</display>
+			<sql beforesave="testBeforeSaveCallBack" aftersave="testAfterSaveCallback">
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate,photo,province,city,county,B.description FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno where  {#condition#}]]>
+				</value>
+				<condition name="txtgonghao" label="工号或姓名">
+					<value>
+						<![CDATA[(A.no like '%#data#%' or A.name like '%#data#%')]]>
+					</value>
+					<inputbox>
+					  	<typeprompt count="15">
+							<promptcol label="no" title="工号" matchmode="anywhere"/>
+							<promptcol label="name" title="姓名" matchmode="anywhere"/>
+							<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  	</typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			  <insert condition="txtgonghao=@{no}">
+			     insert into tbl_baseinfo(uuid=uuid{},@{no},@{name},@{sex},@{age},@{birthday},@{deptno});
+			     insert into tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{photo},@{province},@{city},@{county});
+			  </insert>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{ename},@{salary},@{marriage},@{joinindate},@{photo},@{province},@{city},@{county}) where no=@{no__old};
+			  </update>
+			  <delete>
+			     delete from tbl_baseinfo where no=@{no__old};
+			     delete from tbl_detailinfo where no=@{no__old};
+			  </delete>
+			</sql>
+		 </report>
+	  </tabpanel>
+	</page>
+	
+	<page id="formcustomizeinputboxpage1" js="/webresources/script/validate.js">
+		<report id="report1" title="request{dept_name}详细资料" type="form" dataexport="richexcel"
+				  template="/wabacusdemo/jsp/tagpages/customizeinputbox.jsp">
+			<display valuetdwidth="200px" labeltdwidth="150px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="guid" displaytype="hidden"/>
+				<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+				</col>
+				<col column="deptname" label="部门名"/>
+				<col column="manager" label="部门经理" br="true"/>
+				<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'" datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker2"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true"/>
+				<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+					<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+				</col>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT * FROM tbl_department where  {#condition#}]]>
+				</value>
+				<condition name="txtdeptno" label="部门编号">
+					<value>
+						<![CDATA[(deptno like '%#data#%' )]]>
+					</value>
+					<inputbox>
+					   <typeprompt count="15">
+							<promptcol label="deptno" matchmode="anywhere"/>
+							<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+					  	</typeprompt>
+					</inputbox>
+				</condition>
+			  </select>
+			  <insert condition="txtdeptno=@{deptno}">
+		  		 insert into tbl_department(guid=uuid{},@{deptno},@{deptname},@{manager},@{builtdate},@{performance},@{description});
+			  </insert>
+			  <update>
+			     update tbl_department(@{deptno},@{deptname},@{manager},@{builtdate},@{performance},@{description}) where guid=@{guid};
+			     update tbl_baseinfo(@{deptno}) where deptno=@{deptno__old};
+			  </update>
+			</sql>
+			<format>
+				<value>
+					rrequest.getRequest().setAttribute("dept_name",deptname);//存放request，以便显示标题时能取到
+				</value>
+			</format>
+		</report>
+	</page>
+	
+	<page id="detailformAccessmodepage1" js="/webresources/script/validate.js" css="/wabacusdemo/css/demoreport.css">
+		<report id="report1" extends="detailformpage1.report1">
+			<format>
+			  <value>
+			    <![CDATA[
+			  	  String accessmode=rrequest.getCurrentAccessMode(rbean.getId()); 
+				  if(accessmode.equals("readonly"))
+				  {//如果是只读模式，则进行如下格式化
+				  	sex=sex==null?"1":sex.trim();
+				  	if(sex.equals("0")) sex="女";
+				  	else if(sex.equals("1")) sex="男";
+				  	marriage=marriage==null?"0":marriage.trim();
+				  	if(marriage.equals("0")) marriage="未婚";
+				  	else marriage="已婚";
+				  }
+				]]>
+			  </value>
+			</format>
+			<buttons>
+				<button name="button1" label="默认访问模式" position="title">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=detailformAccessmodepage1'
+				</button>
+				<button name="button2" label="只读访问模式" position="title">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=detailformAccessmodepage1&amp;report1_ACCESSMODE=readonly'
+				</button>
+			</buttons>
+		</report>
+    </page>
+	<page id="listformAccessmodepage1" js="/webresources/script/validate.js" css="/wabacusdemo/css/demoreport.css">
+		<report id="report1" extends="listformpage1.report1">
+			<format>
+			  <value>
+			    <![CDATA[
+			  	  String accessmode=rrequest.getCurrentAccessMode(rbean.getId()); 
+				  if(accessmode.equals("readonly"))
+				  {//如果是只读模式，则进行如下格式化
+				  	sex=sex==null?"1":sex.trim();
+				  	if(sex.equals("0")) sex="女";
+				  	else if(sex.equals("1")) sex="男";
+				  }
+				]]>
+			  </value>
+			</format>
+			<buttons>
+				<button name="button1" label="默认访问模式" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=listformAccessmodepage1'
+				</button>
+				<button name="button2" label="只读访问模式" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=listformAccessmodepage1&amp;report1_ACCESSMODE=readonly'
+				</button>
+			</buttons>
+		</report>
+    </page>
+    
+    <page id="detailformFormatPage1" js="/webresources/script/validate.js" css="/wabacusdemo/css/demoreport.css">
+		<report id="report1" extends="detailformpage1.report1">
+			<format>
+			  <value>
+			    <![CDATA[
+			  	  String accessmode=rrequest.getCurrentAccessMode(rbean.getId()); 
+				  if(accessmode.equals("readonly"))
+				  {//如果是只读模式，则进行如下格式化
+				  	sex=sex==null?"1":sex.trim();
+				  	if(sex.equals("0")) sex="女";
+				  	else if(sex.equals("1")) sex="男";
+				  	marriage=marriage==null?"0":marriage.trim();
+				  	if(marriage.equals("0")) marriage="未婚";
+				  	else marriage="已婚";
+				  	no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+				  }else if(accessmode.equals("add"))
+				  {//如果是添加记录模式，给工号和姓名赋上默认值
+				  		no="111111";
+				  		name="无名";
+				  }else if(accessmode.equals("update"))
+				  {//如果是修改记录模式，即默认访问模式，则不做任何格式化
+				  		
+				  }
+				]]>
+			  </value>
+			</format>
+			<buttons>
+				<button name="button1" label="默认访问模式" position="title">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=detailformFormatPage1'
+				</button>
+				<button name="button2" label="只读访问模式" position="title">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=detailformFormatPage1&amp;report1_ACCESSMODE=readonly'
+				</button>
+			</buttons>
+		</report>
+    </page>
+    <page id="listformFormatPage1" js="/webresources/script/validate.js" css="/wabacusdemo/css/demoreport.css">
+		<report id="report1" extends="listformpage1.report1">
+			<format>
+			  <value>
+			    <![CDATA[
+			  	  String accessmode=rrequest.getCurrentAccessMode(rbean.getId()); 
+				  if(accessmode.equals("readonly"))
+				  {//如果是只读模式，则进行如下格式化
+				  	no="<a href=\"#\" onclick=\"alert('"+no+"')\">"+no+"</a>";
+				  	sex=sex==null?"1":sex.trim();
+				  	if(sex.equals("0")) sex="女";
+				  	else if(sex.equals("1")) sex="男";
+				  }
+				]]>
+			  </value>
+			</format>
+			<buttons>
+				<button name="button1" label="默认访问模式" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=listformFormatPage1'
+				</button>
+				<button name="button2" label="只读访问模式" position="title|searchbox">
+					window.location.href='/WabacusDemo/ShowReport.wx?PAGEID=listformFormatPage1&amp;report1_ACCESSMODE=readonly'
+				</button>
+			</buttons>
+		</report>
+    </page>
+    
+    <!--page id="commonrowgrouplistformpage1" js="/webresources/script/validate.js,/wabacusdemo/js/testcallback.js">
+		<report id="report1" title="员工信息列表" type="listform" pagesize="20" dataexport="richexcel">
+			<display>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px" 
+					 width="10%" updatecol="@{deptno}" rowgroup="true">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+				<col column="sex" label="性别" rowgroup="true" width="10%">
+					<inputbox type="radiobox">
+						<option value="0" label="女"/> 
+						<option value="1" label="男"/>
+					</inputbox>
+				</col>
+				<col column="deptno" label="所属部门" displaytype="hidden"/>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='10%'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<group label="基本信息">
+					<col column="name" label="姓名" clickorderby="true"/>
+					<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+					</col>
+					<col column="birthday" label="出生日期" clickorderby="true" width="150px" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+				</group>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<group label="籍贯">
+					<col column="province" label="省">
+						<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+						</inputbox>
+					</col>
+					<col column="city" label="市">
+						<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+						</inputbox>
+					</col>
+					<col column="county" label="县">
+						<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+						</inputbox>
+					</col>
+				</group>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtname" label="姓名">
+					<value>
+						<![CDATA[(name like  '%#data#%' )]]>
+					</value>
+				</condition>
+			  </select>
+			  <insert>
+		  		 insert into tbl_baseinfo(uuid=uuid{},@{no},@{name},@{sex},@{age},@{birthday},@{deptno});
+		  		 insert into tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county});
+			  </insert>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county}) where no=@{no__old};
+			  </update>
+			  <delete>
+			  	 delete from tbl_baseinfo where no=@{no__old};
+			  	 delete from tbl_detailinfo where no=@{no__old}
+			  </delete>
+			</sql>
+		</report>
+	</page>
+	<page id="otherrowgrouplistformpage1" js="/webresources/script/validate.js,/wabacusdemo/js/testcallback.js">
+		<report id="report1" title="员工信息列表" extends="commonrowgrouplistformpage1.report1">
+			<display>
+				<group label="籍贯">
+					<col column="province" label="省" rowgroup="true">
+						<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+						</inputbox>
+					</col>
+					<col column="city" label="市" rowgroup="true">
+						<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+						</inputbox>
+					</col>
+					<col column="county" label="县" rowgroup="true">
+						<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+						</inputbox>
+					</col>
+				</group>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='10%'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="name" label="姓名" clickorderby="true"/>
+				<group label="基本信息">
+					<col column="sex" label="性别">
+						<inputbox type="radiobox">
+							<option value="0" label="女"/> 
+							<option value="1" label="男"/>
+						</inputbox>
+					</col>
+					<col column="age" label="年龄" clickorderby="true" width="100px" filter="true" filterwidth="120px">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+					</col>
+					<col column="birthday" label="出生日期" clickorderby="true" width="150px" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+				</group>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="deptno" label="所属部门" displaytype="hidden"/>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px" updatecol="@{deptno}">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+			</display>
+		</report>
+	</page>
+	
+	<page id="commontreerowgroupformpage1" js="/webresources/script/validate.js,/wabacusdemo/js/testcallback.js">
+		<report id="report1" title="员工信息列表" type="listform" pagesize="20" dataexport="richexcel">
+			<display>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px" width="15%"
+					 updatecol="@{deptno}" treerowgroup="true">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+				<col column="sex" label="性别" treerowgroup="true">
+					<inputbox type="radiobox">
+						<option value="0" label="女"/> 
+						<option value="1" label="男"/>
+					</inputbox>
+				</col>
+				<col column="deptno" label="所属部门" displaytype="hidden"/>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='10%'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="name" label="姓名" clickorderby="true" width="15%"/>
+				<group label="基本信息">
+					<col column="age" label="年龄" clickorderby="true" width="100px" filter="true" filterwidth="120px">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+					</col>
+					<col column="birthday" label="出生日期" clickorderby="true" width="150px" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+				</group>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<group label="籍贯">
+					<col column="province" label="省">
+						<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+						</inputbox>
+					</col>
+					<col column="city" label="市">
+						<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+						</inputbox>
+					</col>
+					<col column="county" label="县">
+						<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+						</inputbox>
+					</col>
+				</group>
+			</display>
+			<sql>
+			  <select>
+				<value>
+					<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where {#condition#} order by no desc]]>
+				</value>
+				<condition name="txtno" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtname" label="姓名">
+					<value>
+						<![CDATA[(name like  '%#data#%' )]]>
+					</value>
+				</condition>
+			  </select>
+			  <update>
+			     update tbl_baseinfo(@{no},@{name},@{sex},@{age},@{birthday},@{deptno}) where no=@{no__old};
+			     update tbl_detailinfo(@{no},@{salary},@{province},@{city},@{county}) where no=@{no__old};
+			  </update>
+			  <delete>
+			  	 delete from tbl_baseinfo where no=@{no__old};
+			  	 delete from tbl_detailinfo where no=@{no__old}
+			  </delete>
+			</sql>
+		</report>
+	</page>
+	
+	<page id="othertreerowgroupformpage1" js="/webresources/script/validate.js">
+		<report id="report1" title="员工信息列表" extends="commontreerowgroupformpage1.report1" contextmenu="false">
+			<display>
+				<col column="province" label="地区" treerowgroup="true" width="15%">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</col>
+				<col column="city" label="市" treerowgroup="true">
+					<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+					</inputbox>
+				</col>
+				<col column="county" label="县" treerowgroup="true">
+					<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+					</inputbox>
+				</col>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='10%'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="name" label="姓名" clickorderby="true" width="15%"/>
+				<group label="基本信息">
+					<col column="sex" label="性别">
+						<inputbox type="radiobox">
+							<option value="0" label="女"/> 
+							<option value="1" label="男"/>
+						</inputbox>
+					</col>
+					<col column="age" label="年龄" clickorderby="true" width="100px" filter="true" filterwidth="120px">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+					</col>
+					<col column="birthday" label="出生日期" clickorderby="true" width="150px" datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+				</group>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="deptno" label="所属部门" displaytype="hidden"/>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px" updatecol="@{deptno}">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+			</display>
+		</report>
+	</page-->
+	
+	<page id="formtypepromptpage1" js="/webresources/script/validate.js">
+	  <tabpanel id="tp1" margin="10px">
+		 <report id="report1" extends="listformpage1.report1" parenttitle="列表表单">
+			<display>
+				<col column="no" label="工号" clickorderby="true" width="130px" valuestyleproperty="style='mso-number-format:\@;'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})">
+						<typeprompt count="15">
+							<promptcol label="no" title="工号" matchmode="anywhere"/>
+							<promptcol label="name" title="中文名"/>
+							<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					   </typeprompt>
+					</inputbox>
+				</col>
+				<col column="name" label="中文名" clickorderby="true">
+					<inputbox>
+						<typeprompt count="15">
+							<promptcol label="name" matchmode="anywhere"/>
+							<datasource><option source="@{select name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					   </typeprompt>
+					</inputbox>
+				</col>
+				<group label="基本信息" labelstyleproperty="width='260px'">
+					<col column="sex" label="性别">
+						<inputbox type="radiobox">
+							<option value="0" label="女"/> 
+							<option value="1" label="男"/>
+						</inputbox>
+					</col>
+					<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px">
+						<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+					</col>
+					<col column="birthday" label="出生日期" clickorderby="true"  datatype="date{yyyy-MM-dd}">
+						<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+					</col>
+				</group>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="deptno" label="所属部门" displaytype="hidden"/>
+				<col column="deptname" label="所属部门" updatecol="@{deptno}" width="100px">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+				<group label="籍贯">
+					<col column="province" label="省">
+						<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option label="请选择" value=""/>
+							<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+						</inputbox>
+					</col>
+					<col column="city" label="市">
+						<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+						</inputbox>
+					</col>
+					<col column="county" label="县">
+						<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+							<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+						</inputbox>
+					</col>
+				</group>
+				<col column="interest" label="兴趣爱好" width="200px">
+					<inputbox type="popupbox"  width="600" height="400">
+						<![CDATA[/wabacusdemo/jsp/testpopupbox.jsp?name=@{name}&no=@{no}]]>
+					</inputbox> 
+				</col>
+			</display>
+			<footer><![CDATA[<font color='red'>本表单的“工号”和“姓名”两列均提供输入联想功能</font>]]></footer>
+		 </report>
+		 <report id="report2" extends="detailformpage1.report1" parenttitle="普通表单">
+			<display valuetdwidth="200px" labeltdwidth="150px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+				<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})">
+						<typeprompt count="15">
+							<promptcol label="no" title="工号" matchmode="anywhere"/>
+							<promptcol label="name" title="中文名"/>
+							<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					   </typeprompt>
+					</inputbox>
+				</col>
+				<col column="name" label="中文名">
+					<inputbox>
+						<typeprompt count="15">
+							<promptcol label="name" matchmode="anywhere"/>
+							<datasource><option source="@{select name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					   </typeprompt>
+					</inputbox>
+				</col>
+				<col column="ename" label="英文名" br="true"/>
+				<col column="sex" label="性别">
+					<inputbox type="radiobox">
+						<option value="0" label="女"/> 
+						<option value="1" label="男"/>
+					</inputbox>
+				</col>
+				<col column="age" label="年龄">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+				</col>
+				<col column="marriage" label="婚否" br="true">
+					<inputbox type="selectbox">
+						<option value="0" label="未婚"/> 
+						<option value="1" label="已婚"/>
+					</inputbox>
+				</col>
+				<col column="salary" label="工资" datatype="float">
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+				</col>
+				<col column="deptno" displaytype="hidden"/>
+				<col column="deptname" label="所属部门" updatecol="@{deptno}" valuestyleproperty="colspan='3'" br="true">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+					</inputbox>
+				</col>
+				<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}">
+					<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+				</col>
+				<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}">
+					<inputbox type="datepicker" dateformat="MM/dd/yyyy"/>
+				</col>
+				<col column="interest" label="兴趣爱好"  br="true">
+					<inputbox type="popupbox"  width="600" height="400">
+						<![CDATA[/wabacusdemo/jsp/testpopupbox.jsp?name=@{name}&no=@{no}]]>
+					</inputbox> 
+				</col>
+				<col column="province" label="省">
+					<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option label="请选择" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</col>
+				<col column="city" label="市">
+					<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+					</inputbox>
+				</col>
+				<col column="county" label="县" br="true">
+					<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+						<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+					</inputbox>
+				</col>
+				<col column="description" label="评价" datatype="clob" valuestyleproperty="colspan='5'">
+					<inputbox type="textareabox" styleproperty="rows='5'"/>
+				</col>
+			</display>
+			<footer><![CDATA[<font color='red'>本表单的“工号”和“姓名”两列均提供输入联想功能</font>]]></footer>
+		  </report>
+	  </tabpanel>
+	</page>
+</applications>

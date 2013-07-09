@@ -1,0 +1,1628 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	<!-- 数据展示篇报表类型 -->
+	<page id="containerpermissionpage11">
+		<interceptor>
+	  	 	<preaction>
+	  	 		rrequest.authorize("vp1",null,null,"display","false");//将整个“hp1”容器设置为不显示
+	  	 	</preaction>
+	  	</interceptor>
+	  	<vpanel id="vp1" border="1" margin="10px" title="测试容器" titlealign="center">
+			<report id="report1" extends="listpage1.report1"/>
+			<report id="report2" extends="detailpage1.report1"/>
+	  	</vpanel>
+	</page>
+	<page id="containerpermissionpage12">
+		<interceptor>
+	  	 	<preaction>
+	  	 		rrequest.authorize("vp1",null,null,"readonly","true");//将整个“hp1”容器设置为只读
+	  	 	</preaction>
+	  	</interceptor>
+	  	<vpanel id="vp1" border="1" margin="10px" title="测试容器" titlealign="center">
+			<report id="report1" extends="listpage1.report1"/>
+			<report id="report2" extends="detailpage1.report1">
+				<display valuetdwidth="100px" labeltdwidth="80px" labelalign="right" valuealign="left">
+					<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<col column="name" label="中文名"/>
+					<col column="ename" label="英文名" br="true"/>
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄"/>
+					<col column="marriage" label="婚否" br="true"/>
+					<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}" valuestyleproperty="colspan='2'"/>
+					<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='2'" br="true"/>
+					<col column="province"  label="籍贯" valuestyleproperty="colspan='5'" br="true"/>
+					<col column="city" displaytype="hidden"/>
+					<col column="county" displaytype="hidden"/>
+					<col label="评价" column="{non-value}" labelstyleproperty="colspan='6' bgcolor='#f0f0f0' align='left'" br="true"/>
+					<col column="description" datatype="clob" valuestyleproperty="colspan='6' align='center'"/>
+				</display>
+			</report>
+	  	</vpanel>
+	  	<footer>${containerpermissionpage12.footer}</footer>
+	</page>
+	
+	<page id="containerpermissionpage13">
+		<interceptor>
+	  	 	<preaction>
+	  	 		rrequest.authorize("vp1",null,null,"disabled","true");//将整个“hp1”容器设置为禁用
+	  	 	</preaction>
+	  	</interceptor>
+	  	<vpanel id="vp1" border="1" margin="10px" title="测试容器" titlealign="center">
+			<report id="report1" extends="listpage1.report1"/>
+			<report id="report2" extends="detailpage1.report1">
+				<display valuetdwidth="100px" labeltdwidth="80px" labelalign="right" valuealign="left">
+					<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<col column="name" label="中文名"/>
+					<col column="ename" label="英文名" br="true"/>
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄"/>
+					<col column="marriage" label="婚否" br="true"/>
+					<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}" valuestyleproperty="colspan='2'"/>
+					<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='2'" br="true"/>
+					<col column="province"  label="籍贯" valuestyleproperty="colspan='5'" br="true"/>
+					<col column="city" displaytype="hidden"/>
+					<col column="county" displaytype="hidden"/>
+					<col label="评价" column="{non-value}" labelstyleproperty="colspan='6' bgcolor='#f0f0f0' align='left'" br="true"/>
+					<col column="description" datatype="clob" valuestyleproperty="colspan='6' align='center'"/>
+				</display>
+			</report>
+	  	</vpanel>
+	  	<footer>${containerpermissionpage13.footer}</footer>
+	</page>
+	
+	<page id="containerpermissionpage21">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("vp1",Consts.TITLE_PART,null,"display","false");//将ID为“hp1”的容器标题的display权限设置为false
+	  	 	</preaction>
+	  	</interceptor>
+	  	<vpanel id="vp1" border="1" margin="10px" title="测试容器" titlealign="center">
+			<report id="report1" extends="listpage1.report1"/>
+			<report id="report2" extends="detailpage1.report1">
+				<display valuetdwidth="100px" labeltdwidth="80px" labelalign="right" valuealign="left">
+					<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<col column="name" label="中文名"/>
+					<col column="ename" label="英文名" br="true"/>
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄"/>
+					<col column="marriage" label="婚否" br="true"/>
+					<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}" valuestyleproperty="colspan='2'"/>
+					<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='2'" br="true"/>
+					<col column="province"  label="籍贯" valuestyleproperty="colspan='5'" br="true"/>
+					<col column="city" displaytype="hidden"/>
+					<col column="county" displaytype="hidden"/>
+					<col label="评价" column="{non-value}" labelstyleproperty="colspan='6' bgcolor='#f0f0f0' align='left'" br="true"/>
+					<col column="description" datatype="clob" valuestyleproperty="colspan='6' align='center'"/>
+				</display>
+			</report>
+			<footer>${containerpermissionpage21.footer}</footer>
+	  	</vpanel>
+	</page>
+	<page id="containerpermissionpage31">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("vp1",Consts.DATA_PART,null,"display","false");//将ID为“hp1”的容器内容的display权限设置为false
+	  	 	</preaction>
+	  	</interceptor>
+	  	<vpanel id="vp1" border="1" margin="10px" title="测试容器" titlealign="center">
+			<report id="report1" extends="listpage1.report1"/>
+			<report id="report2" extends="detailpage1.report1"/>
+	  	</vpanel>
+	</page>
+	
+	<page id="containerpermissionpage32">
+		<interceptor>
+			<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("vp1",Consts.DATA_PART,null,"readonly","true");//将ID为“hp1”的容器内容设置为只读
+	  	 	</preaction>
+	  	</interceptor>
+	  	<vpanel id="vp1" border="1" margin="10px" title="测试容器" titlealign="center">
+			<report id="report1" extends="listpage1.report1"/>
+			<report id="report2" extends="detailpage1.report1">
+				<display valuetdwidth="100px" labeltdwidth="80px" labelalign="right" valuealign="left">
+					<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<col column="name" label="中文名"/>
+					<col column="ename" label="英文名" br="true"/>
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄"/>
+					<col column="marriage" label="婚否" br="true"/>
+					<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}" valuestyleproperty="colspan='2'"/>
+					<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='2'" br="true"/>
+					<col column="province"  label="籍贯" valuestyleproperty="colspan='5'" br="true"/>
+					<col column="city" displaytype="hidden"/>
+					<col column="county" displaytype="hidden"/>
+					<col label="评价" column="{non-value}" labelstyleproperty="colspan='6' bgcolor='#f0f0f0' align='left'" br="true"/>
+					<col column="description" datatype="clob" valuestyleproperty="colspan='6' align='center'"/>
+				</display>
+			</report>
+	  	</vpanel>
+	  	<footer>${containerpermissionpage12.footer}</footer>
+	</page>
+	
+	<page id="containerpermissionpage33">
+		<interceptor>
+			<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("vp1",Consts.DATA_PART,null,"disabled","true");//将ID为“hp1”的容器内容设置为禁用
+	  	 	</preaction>
+	  	</interceptor>
+	  	<vpanel id="vp1" border="1" margin="10px" title="测试容器" titlealign="center">
+			<report id="report1" extends="listpage1.report1"/>
+			<report id="report2" extends="detailpage1.report1">
+				<display valuetdwidth="100px" labeltdwidth="80px" labelalign="right" valuealign="left">
+					<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<col column="name" label="中文名"/>
+					<col column="ename" label="英文名" br="true"/>
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄"/>
+					<col column="marriage" label="婚否" br="true"/>
+					<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}" valuestyleproperty="colspan='2'"/>
+					<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='2'" br="true"/>
+					<col column="province"  label="籍贯" valuestyleproperty="colspan='5'" br="true"/>
+					<col column="city" displaytype="hidden"/>
+					<col column="county" displaytype="hidden"/>
+					<col label="评价" column="{non-value}" labelstyleproperty="colspan='6' bgcolor='#f0f0f0' align='left'" br="true"/>
+					<col column="description" datatype="clob" valuestyleproperty="colspan='6' align='center'"/>
+				</display>
+			</report>
+	  	</vpanel>
+	  	<footer>${containerpermissionpage13.footer}</footer>
+	</page>
+	
+	<page id="containerpermissionpage41">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("tab1",Consts.DATA_PART,"0","display","false");//将ID为“tab1”的容器的第一个tab标签页的display权限设置为false
+	  	 		rrequest.authorize("tab1",Consts.DATA_PART,"1","display","false");//将ID为“tab1”的容器第二个tab标签页的display权限设置为false
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2">
+			<report id="report1" extends="listpage1.report1"/>
+			<report id="report2" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+			<report id="report3" title="部门信息列表" dataexport="richexcel">
+			<display>
+				<col column="performance" label="表现" clickorderby="true" width="150px" treerowgroup="true" filter="condition{txtperformance}"/>
+				<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+				<col column="deptname" label="部门名" clickorderby="true" width="15%"/>
+				<col column="manager" label="部门经理"/>
+				<col column="builtdate" label="创建日期" clickorderby="true" width="100px"/>
+			</display>
+			<footer>${containerpermissionpage41.footer}</footer>
+			<sql>
+				<value>
+					<![CDATA[SELECT * FROM tbl_department where  {#condition#} order by deptno]]>
+				</value>
+				<condition name="txtdeptno" label="部门编号">
+					<value>
+						<![CDATA[(deptno like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="200" count="15">
+						<promptcol label="deptno" matchmode="anywhere"/>
+						<datasource><option source="@{select deptno from tbl_department where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtperformance" label="表现">
+					<value>
+						<![CDATA[(performance like '%#data#%')]]>
+					</value>
+					<inputbox type="selectbox">
+						<option value="" label="全部"/>
+						<option value="优秀" label="优秀"/> 
+						<option value="良好" label="良好" />
+						<option value="较好" label="较好" />
+						<option value="很差" label="很差" />
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+			  		builtdate=builtdate==null?"":builtdate.trim();
+					int idx=builtdate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) builtdate=builtdate.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+	  	</tabpanel>
+	</page>
+	
+	<page id="containerpermissionpage42">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("tab1",Consts.DATA_PART,"1","disabled","true");//将ID为“tab1”的容器第二个tab标签页的disabled权限设置为true
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2">
+			<report id="report1" extends="listpage1.report1"/>
+			<report id="report2" parenttitle="员工详细资料" extends="detailpage1.report1"/>
+			<report id="report3" extends="containerpermissionpage41.report3" dataexport="richexcel">
+				<display>
+					<col column="performance" label="表现" clickorderby="true" width="150px" treerowgroup="true" filter="condition{txtperformance}"/>
+					<col column="deptno" label="部门编号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="deptname" label="部门名" clickorderby="true" width="15%"/>
+					<col column="manager" label="部门经理"/>
+					<col column="builtdate" label="创建日期" clickorderby="true" width="100px"/>
+				</display>
+				<footer>${containerpermissionpage42.footer}</footer>
+			</report>
+	  	</tabpanel>
+	</page>
+	<page id="reportpermissionpage1">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",null,null,"display","false");//将report1报表设置为不显示
+	  	 		rrequest.authorize("report2",null,null,"readonly","true");//将report2报表设置为只读
+	  	 		rrequest.authorize("report3",null,null,"disabled","true");//将report3报表设置为禁用
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+			<report id="report1" parenttitle="不显示" extends="listpage1.report1"/>
+			<report id="report2" parenttitle="只读" extends="listpage1.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>此报表所有输入框都是只读</font>]]></footer>
+			</report>
+			<report id="report3" parenttitle="禁用" extends="listpage1.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>此报表所有按钮都禁用</font>]]></footer>
+			</report>
+	  	</tabpanel>
+	</page>
+	
+	<page id="reportpermissionpage2">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"type{search}","display","false");//隐藏搜索按钮
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"type{richexcel}","display","false");//隐藏下载Excel按钮
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"type{word}","display","false");//隐藏下载Word按钮
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"button1","display","false");//隐藏用户配置的button1按钮
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"button2","display","false");//隐藏用户配置的button2按钮
+	  	 		
+	  	 		rrequest.authorize("report2",Consts.BUTTON_PART,"type{search}","disabled","true");//禁用搜索按钮
+	  	 		rrequest.authorize("report2",Consts.BUTTON_PART,"type{richexcel}","disabled","true");//禁用下载Excel按钮
+	  	 		rrequest.authorize("report2",Consts.BUTTON_PART,"type{word}","disabled","true");//禁用下载Word按钮
+	  	 		rrequest.authorize("report2",Consts.BUTTON_PART,"button1","disabled","true");//禁用用户配置的button1按钮
+	  	 		rrequest.authorize("report2",Consts.BUTTON_PART,"button2","disabled","true");//禁用用户配置的button2按钮
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+			<report id="report1" parenttitle="隐藏按钮" extends="listpage1.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>此报表所有按钮都隐藏掉，包括系统的“搜索”、“导出Excel”、“导出Word”按钮和用户自己配置的按钮都没显示出来</font>]]></footer>
+				<buttons>
+					<button name="button1" position="title|searchbox" label="按钮一">
+						alert('按钮一');
+					</button>
+					<button name="button2" position="title|searchbox" label="按钮二">
+						alert('按钮二');
+					</button>
+				</buttons>
+			</report>
+			<report id="report2" parenttitle="禁用按钮" extends="listpage1.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>此报表所有按钮都禁用，包括系统的“搜索”、“导出Excel”、“导出Word”按钮和用户自己配置的按钮都没有点击事件</font>]]></footer>
+				<buttons>
+					<button name="button1" position="title|searchbox" label="按钮一">
+						alert('按钮一');
+					</button>
+					<button name="button2" position="title|searchbox" label="按钮二">
+						alert('按钮二');
+					</button>
+				</buttons>
+			</report>
+	  	</tabpanel>
+	</page>
+	<page id="reportpermissionpage31">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.SEARCH_PART,null,"display","false");//隐藏搜索栏
+	  	 		rrequest.authorize("report2",Consts.SEARCH_PART,null,"readonly","true");//只读搜索栏
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+			<report id="report1" parenttitle="隐藏搜索栏" extends="listpage1.report1">
+				<sql>
+					<value>
+						<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(no like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtsex" label="性别">
+						<value>
+							<![CDATA[(sex =#data#)]]>
+						</value>
+						<inputbox type="selectbox">
+							<option value="" label="性别"/>
+							<option value="1" label="男"/> 
+							<option value="0" label="女" />
+						</inputbox>
+					</condition>
+				</sql>
+			</report>
+			<report id="report2" parenttitle="只读" extends="reportpermissionpage31.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>此报表所有查询条件输入框都不允许输入</font>]]></footer>
+			</report>
+	  	</tabpanel>
+	</page>
+	<page id="reportpermissionpage32">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.SEARCH_PART,"txtno","display","false");//隐藏工号查询条件输入框
+	  	 		rrequest.authorize("report1",Consts.SEARCH_PART,"txtsex","display","false");//隐藏性别查询条件输入框
+	  	 		
+	  	 		rrequest.authorize("report2",Consts.SEARCH_PART,"txtno","readonly","true");//将工号查询条件输入框设置为只读
+	  	 		rrequest.authorize("report2",Consts.SEARCH_PART,"txtsex","readonly","true");//将性别查询条件输入框设置为只读
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+			<report id="report1" parenttitle="隐藏" extends="listpage1.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>隐藏了此报表“工号”和“性别”两个查询条件输入框</font>]]></footer>
+				<sql>
+					<value>
+						<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(no like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtsex" label="性别">
+						<value>
+							<![CDATA[(sex =#data#)]]>
+						</value>
+						<inputbox type="selectbox">
+							<option value="" label="性别"/>
+							<option value="1" label="男"/> 
+							<option value="0" label="女" />
+						</inputbox>
+					</condition>
+				</sql>
+			</report>
+			<report id="report2" parenttitle="只读" extends="reportpermissionpage31.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>将此报表的“工号”和“性别”两个查询条件输入框设置为只读</font>]]></footer>
+			</report>
+	  	</tabpanel>
+	</page>
+	<page id="reportdatapermissionpage1">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,null,"display","false");//隐藏数据部分
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+	  		<report id="report1" parenttitle="显示数据部分" extends="listpage1.report1"/>
+			<report id="report2" parenttitle="隐藏数据部分" extends="listpage1.report1"/>
+	  	</tabpanel>
+	</page>
+	
+	<page id="reportdatapartpermissionlistpage1">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"name","display","false");//隐藏中文名
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"ename","display","false");//隐藏中文名
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"sex","display","false");//隐藏性别
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"age","display","false");//隐藏年龄
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+			<report id="report1" title="员工信息列表" parenttitle="显示所有数据列">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<group label="姓名">
+						<col column="name" label="中文名" clickorderby="true"/>
+						<col column="ename" label="英文名" clickorderby="true"/>
+					</group>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,salary,A.deptno,deptname,birthday,joinindate FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no left join tbl_department C on A.deptno=C.deptno 
+									where   {#condition#} order by A.no]]>
+					</value>
+					<condition name="txtgonghao" label="工号或姓名">
+						<value>
+							<![CDATA[(A.no like '%#data#%' or A.name like '%#data#%')]]>
+						</value>
+						<inputbox>
+						  <typeprompt count="15">
+							<promptcol label="no" title="工号" matchmode="anywhere"/>
+							<promptcol label="name" title="姓名" matchmode="anywhere"/>
+							<datasource><option source="@{select no,name from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+				</sql>
+				<format>
+				  <value>
+						sex=sex==null?"":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else if(sex.equals("1")) sex="男";
+						birthday=birthday==null?"":birthday.trim();
+						int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						if(idx>0) birthday=birthday.substring(0,idx);
+				  </value>
+				</format>
+			</report>
+			<report id="report2" parenttitle="隐藏部分数据列" extends="reportdatapartpermissionlistpage1.report1"/>
+	  	</tabpanel>
+	</page>
+	
+	<page id="reportdatapartpermissiondetailpage1">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"ename","display","false");//隐藏英文名
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"birthday","display","false");//隐藏出生日期
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"joinindate","display","false");//隐藏入职日期
+				rrequest.authorize("report2",Consts.DATA_PART,"descriptionlabel","display","false");//隐藏评价的label部分
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"description","display","false");//隐藏评价的数据部分
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px" width="850px">
+			<report id="report1" parenttitle="显示所有数据列" extends="detailpage1.report1" width="820px">
+				<display valuetdwidth="150px" labeltdwidth="120px" labelalign="right" valuealign="left">
+					<col column="no" label="工号"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<col column="name" label="中文名"/>
+					<col column="ename" label="英文名" br="true"/>
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄"/>
+					<col column="marriage" label="婚否" br="true"/>
+					<col column="birthday" label="出生日期" datatype="date{yyyy-MM-dd}"/>
+					<col column="joinindate" label="入职日期" datatype="date{MM/dd/yyyy}" valuestyleproperty="colspan='3'" br="true"/>
+					<col column="province"  label="籍贯" valuestyleproperty="colspan='5'" br="true"/>
+					<col column="city" displaytype="hidden"/>
+					<col column="county" displaytype="hidden"/>
+					<col property="descriptionlabel" column="{non-value}" label="评价" labelstyleproperty="colspan='6' bgcolor='#f0f0f0' align='left'" br="true"/>
+					<col column="description" datatype="clob" valuestyleproperty="colspan='6' align='center'"/>
+				</display>
+			</report>
+			<report id="report2" parenttitle="隐藏部分数据列" extends="reportdatapartpermissiondetailpage1.report1" />
+	  	</tabpanel>
+	</page>
+	
+	<page id="reportdatapartpermissionpage2">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"cityProp1","display","false");
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"cityProp3","display","false");
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"countyProp1","display","false");
+				rrequest.authorize("report2",Consts.DATA_PART,"countyProp2","display","false");
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"countyProp3","display","false");
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"sprop2","display","false");
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"sprop3","display","false");
+	  	 	</preaction>
+	  	</interceptor>
+	   <tabpanel id="tab1" titlestyle="2" margin="10" width="1300px">
+			 <report id="report1" title="员工信息列表" parenttitle="显示全部统计" dataexport="richexcel|plainexcel" pagesize="20">
+				<display colselect="false">
+					<col column="province"  label="省份" filter="condition{txtprovince}" treerowgroup="true"/>
+					<col column="city"  label="城市" filter="condition{txtcity}" treerowgroup="true"/>
+					<col column="county"  label="县城" treerowgroup="true"/>
+					<col column="{sequence:0}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<group label="个人资料">
+						<col column="sex" label="性别" clickorderby="true"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true"/>
+						<group label="姓名">
+							<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true"/>
+							<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+						</group>
+					</group>
+					<col column="salary" label="工资" clickorderby="true"/>
+				</display>
+				<subdisplay>
+					<statitems>
+						<statitem property="item1" value="count(*)" datatype="int"/>
+						<statitem property="item2" value="max(age)" datatype="int"/>
+						<statitem property="item3" value="avg(age)" datatype="float"/>
+						<statitem property="item4" value="sum(age)" datatype="int"/>
+						<statitem property="item5" value="min(age)" datatype="int"/>
+						<statitem property="item6" value="avg(salary)" datatype="float"/>
+						<statitem property="item7" value="sum(salary)" datatype="float"/>
+					</statitems>
+					<treerowgroup-subrow column="province"><!-- 针对“省”分组的统计 -->
+						<subcol property="provProp1" colspan="2" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="provProp2" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="provProp3" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+					</treerowgroup-subrow>
+					<treerowgroup-subrow column="city"><!-- 针对“市”分组的统计 -->
+						<subcol property="cityProp1" colspan="2" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="cityProp2" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="cityProp3" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+					</treerowgroup-subrow>
+					<treerowgroup-subrow column="county"><!-- 针对“县”分组的统计 -->
+						<subcol property="countyProp1" colspan="2" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="countyProp2" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="countyProp3" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+					</treerowgroup-subrow>
+					<!-- 针对整个报表的统计 -->
+					<subrow>
+						<subcol property="sprop1" colspan="3" valuestyleproperty="align='right' bgcolor='#CCFAFF'"/>
+						<subcol property="sprop2" colspan="3" valuestyleproperty="align='right' bgcolor='#CCFAFF'"/>
+						<subcol property="sprop3" colspan="3" valuestyleproperty="align='right' bgcolor='#CCFAFF'"/>
+					</subrow>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+						</imports>
+						<value>
+						<![CDATA[
+							if(type.equals("province"))
+							{//当前正在统计“省”分组数据
+								provProp1="记录数："+item1;
+								provProp2="最大年龄："+item2+"&nbsp;&nbsp;最小年龄："+item5+"&nbsp;&nbsp;年龄之和："+item4;
+								provProp2=provProp2+"&nbsp;&nbsp;平均年龄："+Tools.formatDouble(String.valueOf(item3),"#,###0.00");//对浮点数进行格式化显示
+								provProp3="平均工资："+Tools.formatDouble(String.valueOf(item6),"#,###0.00");
+							}else if(type.equals("city"))
+							{//当前正在统计“市”分组数据
+								cityProp1="记录数："+item1;
+								cityProp2="平均年龄："+Tools.formatDouble(String.valueOf(item3),"#,###0.00")+"&nbsp;&nbsp;最大年龄："+item2+"&nbsp;&nbsp;最小年龄："+item5+"&nbsp;&nbsp;年龄之和："+item4;
+								cityProp3="总工资："+Tools.formatDouble(String.valueOf(item7),"#,###0.00");
+							}else if(type.equals("county"))
+							{//当前正在统计“县”分组数据
+								countyProp1="记录数："+item1;
+								countyProp2="平均年龄："+Tools.formatDouble(String.valueOf(item3),"#,###0.00")+"&nbsp;&nbsp;最大年龄："+item2+"&nbsp;&nbsp;最小年龄："+item5+"&nbsp;&nbsp;年龄之和："+item4;
+								countyProp3="平均工资："+Tools.formatDouble(String.valueOf(item6),"#,###0.00")+"&nbsp;&nbsp;总工资："+Tools.formatDouble(String.valueOf(item7),"#,###0.00");
+							}else
+							{//当前正在统计针对整个报表的数据
+								sprop1="记录数："+item1;
+								sprop2="平均年龄："+Tools.formatDouble(String.valueOf(item3),"#,###0.00")+"&nbsp;&nbsp;最大年龄："+item2+"&nbsp;&nbsp;最小年龄："+item5+"&nbsp;&nbsp;年龄之和："+item4;
+								sprop3="平均工资："+Tools.formatDouble(String.valueOf(item6),"#,###0.00")+"&nbsp;&nbsp;总工资："+Tools.formatDouble(String.valueOf(item7),"#,###0.00");
+							}
+						]]>
+						</value>
+					</format>
+				</subdisplay> 
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,salary,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtgonghao" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%')]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+					<condition name="txtprovince" label="省">
+						<value>
+							<![CDATA[(province like %#data#%)]]>
+						</value>
+						<inputbox type="selectbox">
+							<option label="全部" value=""/>
+							<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+						</inputbox>
+					</condition>
+					<condition name="txtcity" label="市">
+						<value>
+							<![CDATA[(city like %#data#%)]]>
+						</value>
+						<inputbox type="selectbox" depends="txtprovince">
+							<option label="全部" value=""/>
+							<option label="无" value="" type="false"/>
+							<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+						</inputbox>
+					</condition>
+				</sql>
+				<format>
+				  <value>
+						sex=sex==null?"1":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else sex="男";
+						birthday=birthday==null?"":birthday.trim();
+						int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						if(idx>0) birthday=birthday.substring(0,idx);
+				  </value>
+				</format>
+			</report>
+			<report id="report2" title="员工信息列表" parenttitle="隐藏部分统计" extends="reportdatapartpermissionpage2.report1"/>
+		</tabpanel>
+	</page>
+	
+	<page id="reportdatapartpermissionpage3">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"jd.stat1","display","false");//隐藏第二个报表“最高”交叉统计列
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"jd.stat2","display","false");//隐藏第二个报表“平均”交叉统计列
+	  	 		rrequest.authorize("report3",Consts.DATA_PART,"jd","display","false");//隐藏第三个报表针对每列的统计
+	  	 		//将第四个报表的统计项全部隐藏，这样只显示普通列
+	  	 		rrequest.authorize("report4",Consts.DATA_PART,"jd.stat1","display","false");
+	  	 		rrequest.authorize("report4",Consts.DATA_PART,"jd.stat2","display","false");
+	  	 		rrequest.authorize("report4",Consts.DATA_PART,"jd.stat3","display","false");
+	  	 	</preaction>
+	  	</interceptor>
+		<tabpanel id="tab1" titlestyle="2" margin="10" width="1030px">
+			<report id="report1" title="员工工资统计表" parenttitle="显示全部交叉统计列" pagesize="-1" dataexport="richexcel|plainexcel" type="crosslist"
+					width="2500px" scrollwidth="1000px" scrollstyle="image">
+				<display>
+					<col column="no" label="工号" clickorderby="true" filter="condition{txtno}" valuestyleproperty="style='mso-number-format:\@'"/>
+					<col column="name" label="姓名" clickorderby="true"/>
+					<group column="year" staticondition="year=#data#" dataset="select * from tbl_salary where {#condition#}">
+						<datasetconditions>
+							<condition name="ref{txtyear}">
+								<value>year = '#data#'</value>
+							</condition>
+							<condition name="ref{txtjd}">
+								<value>(case when month in(1,2,3) then '1' when month in(4,5,6) then '2' when month in(7,8,9) then '3' when month in(10,11,12) then '4' else '' end)  = '#data#'</value>
+							</condition>
+						</datasetconditions>
+					   <col column="jd" staticondition="jd='#data#'"  verticalstatistic="true" verticallabel="汇总" verticallabelstyleproperty="bgcolor='#DCDCDC' align='center'"
+					           realvalue="case when month in(1,2,3) then '1' when month in(4,5,6) then '2' when month in(7,8,9) then '3' when month in(10,11,12) then '4' else '' end">
+							<statistic id="stat1" type="max" column="salary" label="最高"/>
+							<statistic id="stat2" type="avg" column="salary" label="平均" statitems="report"/>
+							<statistic id="stat3" type="sum" column="salary" label="合计|合计|总计" statitems="jd|year|report"/>
+						</col>
+						<format><!-- 格式化动态表头数据 -->
+							<imports>
+			  					<import>java.util.*</import>
+		  					</imports>
+							<value>
+								<![CDATA[
+									if(mDynamicColData!=null&&mDynamicColData.size()>0)
+									{//查询到了统计数据，对它进行格式化
+										Iterator itKeys=mDynamicColData.keySet().iterator();
+										while(itKeys.hasNext())
+										{
+											String key=(String)itKeys.next();
+											String value=(String)mDynamicColData.get(key);
+											if(key.indexOf("_year_")==0)
+											{//如果是年
+											 	if(value!=null&&!value.trim().equals(""))
+											 		mDynamicColData.put(key,value+"年");
+											}else if(key.indexOf("_jd_")==0)
+											{//如果是季度
+												if(value==null) value="";
+												if(value.equals("1")) value="第一季度";
+												else if(value.equals("2")) value="第二季度";
+												else if(value.equals("3")) value="第三季度";
+												else if(value.equals("4")) value="第四季度";
+											 	mDynamicColData.put(key,value);
+											}
+										}
+									}
+								]]>
+							</value>
+						</format>
+					</group>
+				</display>
+				<sql>
+					<value>
+						<![CDATA[select A.no,A.name,[#dynamic-columns#] from tbl_salary B,tbl_baseinfo A where A.no=B.no and {#condition#} group by A.no,A.name order by A.no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtyear" label="年份">
+						<inputbox type="selectbox">
+							<option label="年份" value=""/>
+							<option label="year" value="year" source="@{select distinct year from tbl_salary order by year}"/>
+						</inputbox>
+					</condition>
+					<condition name="txtjd" label="季度">
+						<inputbox type="selectbox">
+							<option label="季度" value=""/>
+							<option label="第一季度" value="1"/>
+							<option label="第二季度" value="2"/>
+							<option label="第三季度" value="3"/>
+							<option label="第四季度" value="4"/>
+						</inputbox>
+					</condition>
+				</sql>
+				<format>
+					<imports>
+	  					<import>java.util.*</import>
+	  					<import>com.wabacus.util.*</import>
+  					</imports>
+					<value>
+						<![CDATA[
+						if(mDynamicColData!=null&&mDynamicColData.size()>0)
+						{//查询到了统计数据，对它进行格式化
+							Iterator itKeys=mDynamicColData.keySet().iterator();
+							while(itKeys.hasNext())
+							{
+								String key=(String)itKeys.next();
+								String value=(String)mDynamicColData.get(key);
+								mDynamicColData.put(key,Tools.formatDouble(value,"##,###.##"));
+							}
+						}
+						]]>
+					</value>
+				</format>
+			</report>
+			<report id="report2" title="员工工资统计表" parenttitle="隐藏部分交叉统计列" extends="reportdatapartpermissionpage3.report1"/>
+			<report id="report3" title="员工工资统计表" parenttitle="隐藏针对每列的统计" scrollwidth="" width="" extends="reportdatapartpermissionpage3.report1"/>
+			<report id="report4" title="员工工资统计表" parenttitle="隐藏全部交叉统计列" scrollwidth="" width="" extends="reportdatapartpermissionpage3.report1"/>
+		</tabpanel>
+	</page>
+	
+	<page id="reportpermissionpage51">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.NAVIGATE_PART,null,"display","false");//隐藏此报表翻页导航栏
+	  	 		rrequest.authorize("report2",Consts.NAVIGATE_PART,null,"disabled","true");//禁用此报表翻页导航栏上所有功能
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+			<report id="report1" parenttitle="隐藏" extends="listpage1.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>隐藏了此报表的翻页导航栏</font>]]></footer>
+			</report>
+			<report id="report2" parenttitle="禁用" extends="listpage1.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>禁用了此报表的翻页导航栏上所有功能</font>]]></footer>
+			</report>
+	  	</tabpanel>
+	</page>
+	
+	<page id="reportpermissionpage52">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.NAVIGATE_PART,"previous","display","false");//隐藏此报表“上一页”按钮
+	  	 		rrequest.authorize("report1",Consts.NAVIGATE_PART,"next","display","false");//隐藏此报表“下一页”按钮
+	  	 		rrequest.authorize("report1",Consts.NAVIGATE_PART,"sequence","display","false");//隐藏此报表页码序列
+	  	 		rrequest.authorize("report1",Consts.NAVIGATE_PART,"recordcount","display","false");//隐藏此报表记录数
+	  	 		
+	  	 		rrequest.authorize("report2",Consts.NAVIGATE_PART,"previous","disabled","true");//禁用此报表“上一页”按钮
+	  	 		rrequest.authorize("report2",Consts.NAVIGATE_PART,"next","disabled","true");//禁用此报表“下一页”按钮
+	  	 		rrequest.authorize("report2",Consts.NAVIGATE_PART,"sequence","disabled","true");//禁用此报表页码序列
+	  	 		rrequest.authorize("report2",Consts.NAVIGATE_PART,"pageno","disabled","true");//禁用此报表页码下拉框
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+			<report id="report1" parenttitle="隐藏" extends="listpage1.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>隐藏了此报表的翻页导航栏上“上一页”、“下一页”、“页码序列”、“记录数”等</font>]]></footer>
+			</report>
+			<report id="report2" parenttitle="禁用" extends="listpage1.report1">
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>禁用了此报表的翻页导航栏上所有翻页功能</font>]]></footer>
+			</report>
+	  	</tabpanel>
+	</page>
+	
+	<page id="reportpermissionpage6">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report2",Consts.HEADER_PART,null,"display","false");//隐藏第二个报表的Header部分
+	  	 		rrequest.authorize("report2",Consts.FOOTER_PART,null,"display","false");//隐藏第二个报表的Footer部分
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+			<report id="report1" parenttitle="显示" extends="listpage1.report1">
+				<header><![CDATA[<font color='#ff0000'>报表Header部分</font>]]></header>
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>报表Footer部分</font>]]></footer>
+			</report>
+			<report id="report2" parenttitle="隐藏" extends="listpage1.report1">
+				<header><![CDATA[<font color='#ff0000'>报表Header部分</font>]]></header>
+				<display>
+					<col column="{sequence:1}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+					<col column="name" label="姓名" clickorderby="true" width="15%"/>
+					<group label="基本信息">
+						<col column="sex" label="性别"/>
+						<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+					</group>
+					<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+				</display>
+				<footer><![CDATA[<font color='#ff0000'>报表Footer部分</font>]]></footer>
+			</report>
+	  	</tabpanel>
+	</page>
+	
+	<page id="reportpermissiontitlepage1">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.TITLE_PART,null,"display","false");//隐藏报表的标题栏部分
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+			<report id="report1" parenttitle="隐藏标题栏" subtitle="副标题" extends="listpage1.report1">
+				<sql>
+					<value>
+						<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+					</value>
+				</sql>
+			</report>
+	  	</tabpanel>
+	</page>
+	
+	<page id="reportpermissiontitlepage2">
+		<interceptor>
+	  		<imports>
+	  	 		<import>com.wabacus.util.*</import>	
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.TITLE_PART,"title","display","false");//隐藏报表的标题栏上的标题
+	  	 		rrequest.authorize("report1",Consts.TITLE_PART,"subtitle","display","false");//隐藏报表的标题栏上的副标题
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="150px">
+			<report id="report1" parenttitle="隐藏标题和副标题" subtitle="副标题" extends="listpage1.report1">
+				<sql>
+					<value>
+						<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+					</value>
+				</sql>
+			</report>
+	  	</tabpanel>
+	</page>
+	
+	<!-- 数据编辑篇报表类型 -->
+	
+	<page id="editablereportpermissionpage11" js="/webresources/script/validate.js">
+		<interceptor>
+			<imports>
+	  	 		<import>com.wabacus.util.*</import>
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.DATA_PART,null,"readonly","true");//将report1可编辑列表报表数据部分设置为只读
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,null,"readonly","true");//将report2可编辑细览报表数据部分设置为只读
+	  	 		rrequest.authorize("report3",Consts.DATA_PART,null,"readonly","true");//将report3可编辑细览报表数据部分设置为只读
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+	  		<vpanel id="vp1" parenttitle="只读">
+	  			<report id="report1" extends="editablelistreportpage1.report1"/>
+	  			<report id="report2" top="20px" extends="editabledetailpage1.report1"/>
+	  			<report id="report3" title="request{dept_name}详细资料2" top="20px" extends="editabledetailpage1.report2">
+	  				<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+							<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+						</col>
+						<col column="deptname" label="部门名"/>
+						<col column="manager" label="部门经理" br="true"/>
+						<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'" datatype="date{yyyy-MM-dd}">
+							<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+						</col>
+						<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true">
+							<inputbox type="selectbox">
+								<option value="优秀" label="优秀"/> 
+								<option value="良好" label="良好" />
+								<option value="较好" label="较好" />
+								<option value="很差" label="很差" />
+							</inputbox>
+						</col>
+						<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+							<inputbox type="textareabox" styleproperty="rows='5'"/>
+						</col>
+					</display>
+					<footer><![CDATA[<font color='#ff0000'>将可编辑报表的数据部分授权为只读后，则只允许进行删除操作，不能进行任何增、改操作，相关按钮也被隐藏</font>]]></footer>
+	  			</report>
+	  		</vpanel>
+	  	</tabpanel>
+	</page>
+	<page id="editablereportpermissionpage12" js="/webresources/script/validate.js">
+		<interceptor>
+			<imports>
+	  	 		<import>com.wabacus.util.*</import>
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.DATA_PART,"builtdate","readonly","true");//将report1的“创建日期”列设置为只读
+	  	 		rrequest.authorize("report1",Consts.DATA_PART,"performance","readonly","true");//将report1的“表现”列设置为只读
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"builtdate","readonly","true");//将report2的“创建日期”列设置为只读
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"performance","readonly","true");//将report2的“表现”列设置为只读
+	  	 		rrequest.authorize("report3",Consts.DATA_PART,"builtdate","readonly","true");//将report3的“创建日期”列设置为只读
+	  	 		rrequest.authorize("report3",Consts.DATA_PART,"performance","readonly","true");//将report3的“表现”列设置为只读
+	  	 		
+	  	 		rrequest.authorize("report4",Consts.DATA_PART,"builtdate","display","false");//将report4的“创建日期”列授权为不显示
+	  	 		rrequest.authorize("report4",Consts.DATA_PART,"performance","display","false");//将report4的“表现”列授权为不显示
+	  	 		rrequest.authorize("report5",Consts.DATA_PART,"builtdate","display","false");//将report5的“创建日期”列授权为不显示
+	  	 		rrequest.authorize("report5",Consts.DATA_PART,"performance","display","false");//将report5的“表现”列授权为不显示
+	  	 		rrequest.authorize("report6",Consts.DATA_PART,"builtdate","display","false");//将report6的“创建日期”列授权为不显示
+	  	 		rrequest.authorize("report6",Consts.DATA_PART,"performance","display","false");//将report6的“表现”列授权为不显示
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+	  		<vpanel id="vp1" parenttitle="只读部分列">
+	  			<report id="report1" extends="editablelistreportpage1.report1"/>
+	  			<report id="report2" top="20px" extends="editabledetailpage1.report1"/>
+	  			<report id="report3" title="request{dept_name}详细资料2" top="20px" extends="editabledetailpage1.report2">
+	  				<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+							<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+						</col>
+						<col column="deptname" label="部门名"/>
+						<col column="manager" label="部门经理" br="true"/>
+						<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'" datatype="date{yyyy-MM-dd}">
+							<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+						</col>
+						<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true">
+							<inputbox type="selectbox">
+								<option value="优秀" label="优秀"/> 
+								<option value="良好" label="良好" />
+								<option value="较好" label="较好" />
+								<option value="很差" label="很差" />
+							</inputbox>
+						</col>
+						<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+							<inputbox type="textareabox" styleproperty="rows='5'"/>
+						</col>
+					</display>
+					<footer><![CDATA[<font color='#ff0000'>将本页面上三个可编辑报表的“创建日期”和“表现”两列都设置为只读权限</font>]]></footer>
+	  			</report>
+	  		</vpanel>
+	  		<vpanel id="vp2" parenttitle="隐藏部分列">
+	  			<report id="report4" extends="editablelistreportpage1.report1"/>
+	  			<report id="report5" top="20px" extends="editabledetailpage1.report1"/>
+	  			<report id="report6" title="request{dept_name}详细资料2" top="20px" extends="editabledetailpage1.report2">
+	  				<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+							<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+						</col>
+						<col column="deptname" label="部门名"/>
+						<col column="manager" label="部门经理" br="true"/>
+						<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'" datatype="date{yyyy-MM-dd}">
+							<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+						</col>
+						<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true">
+							<inputbox type="selectbox">
+								<option value="优秀" label="优秀"/> 
+								<option value="良好" label="良好" />
+								<option value="较好" label="较好" />
+								<option value="很差" label="很差" />
+							</inputbox>
+						</col>
+						<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+							<inputbox type="textareabox" styleproperty="rows='5'"/>
+						</col>
+					</display>
+					<footer><![CDATA[<font color='#ff0000'>将本页面上三个可编辑报表的“创建日期”和“表现”两列授权为不显示</font>]]></footer>
+	  			</report>
+	  		</vpanel>
+	  	</tabpanel>
+	</page>
+	
+	<page id="editablereportpermissionpage13" js="/webresources/script/validate.js">
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+	  		<vpanel id="vp1" parenttitle="设置某些行只读">
+	  			<report id="report1" extends="editablelistreportpage1.report1">
+	  				<interceptor>
+	  					<beforedisplay-perrow><!-- 通过显示每条记录前置动作的返回值控制当前记录行是否只读 -->
+	  					<![CDATA[
+					        if(rowDataBean.getRowindex()%3==0)
+					        {//每隔两行将一行设置为只读
+					        		String style=rowDataBean.getRowstyleproperty();
+					        		if(style==null) style="";
+					        		style+=" bgcolor='#dddddd'";
+					            rowDataBean.setRowstyleproperty(style);
+					            rowDataBean.setReadonly(true);
+					        }
+	  					]]>
+	  					</beforedisplay-perrow>
+	  				</interceptor>
+					<footer><![CDATA[<font color='#ff0000'>说明：</font><font color='#0000ff'>每隔两行将一行设置为只读，并改它它的背景色；针对记录行设置只读只对可编辑列表报表有效，对可编辑细览报表无效</font>]]></footer>
+	  			</report>
+	  			<report id="report2" top="10px" extends="editablelistreportpage1.report2">
+	  				<interceptor>
+	  					<beforedisplay-perrow><!-- 通过显示每条记录前置动作的返回值控制当前记录行是否只读 -->
+	  					<![CDATA[
+					        if(rowDataBean.getRowindex()%3==0)
+					        {//每隔两行将一行设置为只读
+					            rowDataBean.setReadonly(true);
+					        }
+	  					]]>
+	  					</beforedisplay-perrow>
+	  				</interceptor>
+					<footer><![CDATA[<font color='#ff0000'>说明：</font><font color='#0000ff'>每隔两行将一行设置为只读</font>]]></footer>
+	  			</report>
+	  		</vpanel>
+	  		<vpanel id="vp2" parenttitle="设置某些单元格只读">
+	  			<report id="report4" extends="editablelistreportpage1.report1">
+	  				<interceptor>
+	  					<beforedisplay-percol>
+	  					<![CDATA[
+				        //因为用到此拦截器的报表没有<group/>，只有<col/>，所以不用判断displayColBean是否为GroupBean
+				        if(colDataBean.getRowindex()>=0&&((ColBean)colDataBean.getDisplayColBean()).getColumn().equals("performance"))
+				        {//当前在显示“表现”列的数据行
+				            if("良好".equals(colDataBean.getValue()))
+				            {//当前是表现“良好”，则设置为只读
+				                colDataBean.setReadonly(true);
+				                String style=colDataBean.getStyleproperty();
+					        		 if(style==null) style="";
+					        		 style+=" bgcolor='#dddddd'";
+				                colDataBean.setStyleproperty(style);
+				            }
+				        }
+        				]]>
+	  					</beforedisplay-percol>
+	  				</interceptor>
+	  				<footer><![CDATA[<font color='#ff0000'>说明：</font><font color='#0000ff'>将本报表中“表现”列上值为“良好”的单元格设置为只读</font>]]></footer>
+	  			</report>
+	  			<report id="report5" top="20px" extends="editabledetailpage1.report1">
+	  				<interceptor>
+	  					<beforedisplay-percol>
+	  					<![CDATA[
+				        //因为用到此拦截器的报表没有<group/>，只有<col/>，所以不用判断displayColBean是否为GroupBean
+				        if(colDataBean.getRowindex()>=0&&((ColBean)colDataBean.getDisplayColBean()).getColumn().equals("performance"))
+				        {//当前在显示“表现”列的数据
+				           colDataBean.setReadonly(true);
+				           String style=colDataBean.getStyleproperty();
+					        if(style==null) style="";
+					        style+=" bgcolor='#dddddd'";
+				           colDataBean.setStyleproperty(style);
+				        }
+        				]]>
+	  					</beforedisplay-percol>
+	  				</interceptor>
+	  				<footer><![CDATA[<font color='#ff0000'>说明：</font><font color='#0000ff'>将本报表中“表现”列设置为只读</font>]]></footer>
+	  			</report>
+	  			<report id="report6" title="request{dept_name}详细资料2" top="20px" extends="editabledetailpage1.report2">
+	  				<interceptor>
+	  					<beforedisplay-percol>
+	  					<![CDATA[
+				        //因为用到此拦截器的报表没有<group/>，只有<col/>，所以不用判断displayColBean是否为GroupBean
+				        if(colDataBean.getRowindex()>=0&&((ColBean)colDataBean.getDisplayColBean()).getColumn().equals("builtdate"))
+				        {//当前在显示“创建日期”列的数据
+				           colDataBean.setReadonly(true);
+				           String style=colDataBean.getStyleproperty();
+					        if(style==null) style="";
+					        style+=" bgcolor='#dddddd'";
+				           colDataBean.setStyleproperty(style);
+				        }
+        				]]>
+	  					</beforedisplay-percol>
+	  				</interceptor>
+	  				<footer><![CDATA[<font color='#ff0000'>说明：</font><font color='#0000ff'>将本报表中“创建日期”列设置为只读</font>]]></footer>
+	  			</report>
+	  		</vpanel>
+	  	</tabpanel>
+	</page>
+	
+	<page id="editablereportpermissionpage2" js="/webresources/script/validate.js">
+		<interceptor>
+			<imports>
+	  	 		<import>com.wabacus.util.*</import>
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"type{add}","display","false");
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"type{delete}","display","false");
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"type{save}","display","false");
+	  	 		
+	  	 		rrequest.authorize("report2",Consts.BUTTON_PART,"type{delete}","display","false");
+	  	 		rrequest.authorize("report2",Consts.BUTTON_PART,"type{save}","display","false");
+	  	 		
+	  	 		rrequest.authorize("report3",Consts.BUTTON_PART,"type{add}","display","false");
+	  	 		rrequest.authorize("report3",Consts.BUTTON_PART,"type{delete}","display","false");
+	  	 		rrequest.authorize("report3",Consts.BUTTON_PART,"type{modify}","display","false");
+	  	 		
+	  	 		rrequest.authorize("report4",Consts.BUTTON_PART,"type{add}","disabled","true");
+	  	 		rrequest.authorize("report4",Consts.BUTTON_PART,"type{delete}","disabled","true");
+	  	 		rrequest.authorize("report4",Consts.BUTTON_PART,"type{save}","disabled","true");
+	  	 		
+	  	 		rrequest.authorize("report41",Consts.BUTTON_PART,"type{add}","disabled","true");
+	  	 		rrequest.authorize("report41",Consts.DATA_PART,"{editablelist-edit}","disabled","true");
+	  	 		rrequest.authorize("report41",Consts.DATA_PART,"{editablelist-edit}","disabled","true");
+	  	 		rrequest.authorize("report41",Consts.DATA_PART,"{editablelist-edit}","disabled","true");
+	  	 		
+	  	 		rrequest.authorize("report5",Consts.BUTTON_PART,"type{delete}","disabled","true");
+	  	 		rrequest.authorize("report5",Consts.BUTTON_PART,"type{save}","disabled","true");
+	  	 		
+	  	 		rrequest.authorize("report6",Consts.BUTTON_PART,"type{add}","disabled","true");
+	  	 		rrequest.authorize("report6",Consts.BUTTON_PART,"type{delete}","disabled","true");
+	  	 		rrequest.authorize("report6",Consts.BUTTON_PART,"type{modify}","disabled","true");
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+	  		<vpanel id="vp1" parenttitle="隐藏编辑按钮">
+	  			<report id="report1" extends="editablelistreportpage1.report1"/>
+	  			<report id="report2" top="20px" extends="editabledetailpage1.report1"/>
+	  			<report id="report3" title="request{dept_name}详细资料2" top="20px" extends="editabledetailpage1.report2">
+	  				<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+							<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+						</col>
+						<col column="deptname" label="部门名"/>
+						<col column="manager" label="部门经理" br="true"/>
+						<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'" datatype="date{yyyy-MM-dd}">
+							<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+						</col>
+						<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true">
+							<inputbox type="selectbox">
+								<option value="优秀" label="优秀"/> 
+								<option value="良好" label="良好" />
+								<option value="较好" label="较好" />
+								<option value="很差" label="很差" />
+							</inputbox>
+						</col>
+						<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+							<inputbox type="textareabox" styleproperty="rows='5'"/>
+						</col>
+					</display>
+					<footer><![CDATA[<font color='#ff0000'>此页面上所有报表的编辑按钮都隐藏</font>]]></footer>
+	  			</report>
+	  		</vpanel>
+	  		<vpanel id="vp2" parenttitle="禁用编辑按钮">
+	  			<report id="report4" extends="editablelistreportpage1.report1"/>
+	  			<report id="report41" top="20px" extends="editablelistreportpage1.report2"/>
+	  			<report id="report5" top="20px" extends="editabledetailpage1.report1"/>
+	  			<report id="report6" title="request{dept_name}详细资料2" top="20px" extends="editabledetailpage1.report2">
+	  				<display valuetdwidth="100px" labeltdwidth="71px" labelbgcolor="#f0f0f0" labelalign="right" valuealign="left">
+						<col column="guid" displaytype="hidden"/>
+						<col column="deptno" label="部门编号" valuestyleproperty="style='mso-number-format:\@'">
+							<inputbox jsvalidate="isNotEmpty(#label#列不允许为空)"/>
+						</col>
+						<col column="deptname" label="部门名"/>
+						<col column="manager" label="部门经理" br="true"/>
+						<col column="builtdate" label="创建日期" valuestyleproperty="colspan='2'" datatype="date{yyyy-MM-dd}">
+							<inputbox type="datepicker"  jsvalidate="isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+						</col>
+						<col column="performance" label="表现" valuestyleproperty="colspan='2'" br="true">
+							<inputbox type="selectbox">
+								<option value="优秀" label="优秀"/> 
+								<option value="良好" label="良好" />
+								<option value="较好" label="较好" />
+								<option value="很差" label="很差" />
+							</inputbox>
+						</col>
+						<col column="description" label="简介" datatype="clob" valuestyleproperty="colspan='5'">
+							<inputbox type="textareabox" styleproperty="rows='5'"/>
+						</col>
+					</display>
+					<footer><![CDATA[<font color='#ff0000'>此页面上所有报表的编辑按钮都禁用</font>]]></footer>
+	  			</report>
+	  		</vpanel>
+	  	</tabpanel>
+	</page>
+	
+	<!-- 表单篇报表类型 -->
+	
+	<page id="formpermissionpage11" js="/webresources/script/validate.js">
+		<interceptor>
+			<imports>
+	  	 		<import>com.wabacus.util.*</import>
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.DATA_PART,null,"readonly","true");//将report1表单数据部分设置为只读
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,null,"readonly","true");//将report2表单数据部分设置为只读
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+	  		<vpanel id="vp1" parenttitle="只读">
+	  			<report id="report1" extends="detailformpage1.report1"/>
+	  			<report id="report2" top="20px" extends="listformpage1.report1"/>
+	  		</vpanel>
+	  	</tabpanel>
+	</page>
+	
+	<page id="formpermissionpage12" js="/webresources/script/validate.js">
+		<interceptor>
+			<imports>
+	  	 		<import>com.wabacus.util.*</import>
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.DATA_PART,"name","readonly","true");//将report1表单中“中文名”列设置为只读
+	  	 		rrequest.authorize("report1",Consts.DATA_PART,"sex","readonly","true");//将report1表单中“性别”列设置为只读
+	  	 		rrequest.authorize("report1",Consts.DATA_PART,"description","readonly","true");//将report1表单中“评价”列设置为只读
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"name","readonly","true");//将report2表单中“姓名”列设置为只读
+	  	 		rrequest.authorize("report2",Consts.DATA_PART,"sex","readonly","true");//将report2表单中“性别”列设置为只读
+	  	 		
+	  	 		rrequest.authorize("report3",Consts.DATA_PART,"name","display","false");//将report3表单中“中文名”列授权为不显示
+	  	 		rrequest.authorize("report3",Consts.DATA_PART,"sex","display","false");//将report3表单中“性别”列授权为不显示
+	  	 		rrequest.authorize("report3",Consts.DATA_PART,"description","display","false");//将report3表单中“评价”列设置为不显示
+	  	 		rrequest.authorize("report4",Consts.DATA_PART,"name","display","false");//将report4表单中“姓名”列授权为不显示
+	  	 		rrequest.authorize("report4",Consts.DATA_PART,"sex","display","false");//将report4表单中“性别”列授权为不显示
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+	  		<vpanel id="vp1" parenttitle="只读部分列">
+	  			<report id="report1" extends="detailformpage1.report1"/>
+	  			<report id="report2" top="20px" extends="listformpage1.report1">
+	  				<display>
+						<col column="no" label="工号" clickorderby="true" width="60px" valuestyleproperty="style='mso-number-format:\@;'">
+							<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+						</col>
+						<col column="name" label="中文名" clickorderby="true"/>
+						<group label="基本信息" labelstyleproperty="width='260px'">
+							<col column="sex" label="性别">
+								<inputbox type="radiobox">
+									<option value="0" label="女"/> 
+									<option value="1" label="男"/>
+								</inputbox>
+							</col>
+							<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px">
+								<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+							</col>
+							<col column="birthday" label="出生日期" clickorderby="true"  datatype="date{yyyy-MM-dd}">
+								<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+							</col>
+						</group>
+						<col column="salary" label="工资" datatype="float">
+							<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+						</col>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" updatecol="@{deptno}" width="100px">
+							<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+								<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+							</inputbox>
+						</col>
+						<group label="籍贯">
+							<col column="province" label="省">
+								<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+									<option label="请选择" value=""/>
+									<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+								</inputbox>
+							</col>
+							<col column="city" label="市">
+								<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+									<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+								</inputbox>
+							</col>
+							<col column="county" label="县">
+								<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+									<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+								</inputbox>
+							</col>
+						</group>
+						<col column="interest" label="兴趣爱好" width="200px">
+							<inputbox type="popupbox"  width="600" height="400" styleproperty=" size=30">
+								<![CDATA[/wabacusdemo/jsp/testpopupbox.jsp?name=@{name}&no=@{no}]]>
+							</inputbox> 
+						</col>
+					</display>
+					<footer><![CDATA[<font color='#ff0000'>此页面上两个表单的“中文名”、“性别”、“评价”三列都被授只读权限</font>]]></footer>
+	  			</report>
+	  		</vpanel>
+	  		<vpanel id="vp2" parenttitle="隐藏部分列">
+	  			<report id="report3" extends="detailformpage1.report1"/>
+	  			<report id="report4" top="20px" extends="listformpage1.report1">
+	  				<display>
+						<col column="no" label="工号" clickorderby="true" width="60px" valuestyleproperty="style='mso-number-format:\@;'">
+							<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+						</col>
+						<col column="name" label="中文名" clickorderby="true"/>
+						<group label="基本信息" labelstyleproperty="width='260px'">
+							<col column="sex" label="性别">
+								<inputbox type="radiobox">
+									<option value="0" label="女"/> 
+									<option value="1" label="男"/>
+								</inputbox>
+							</col>
+							<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px">
+								<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+							</col>
+							<col column="birthday" label="出生日期" clickorderby="true"  datatype="date{yyyy-MM-dd}">
+								<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+							</col>
+						</group>
+						<col column="salary" label="工资" datatype="float">
+							<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+						</col>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" updatecol="@{deptno}" width="100px">
+							<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+								<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+							</inputbox>
+						</col>
+						<group label="籍贯">
+							<col column="province" label="省">
+								<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+									<option label="请选择" value=""/>
+									<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+								</inputbox>
+							</col>
+							<col column="city" label="市">
+								<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+									<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+								</inputbox>
+							</col>
+							<col column="county" label="县">
+								<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+									<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+								</inputbox>
+							</col>
+						</group>
+						<col column="interest" label="兴趣爱好" width="200px">
+							<inputbox type="popupbox"  width="600" height="400" styleproperty=" size=30">
+								<![CDATA[/wabacusdemo/jsp/testpopupbox.jsp?name=@{name}&no=@{no}]]>
+							</inputbox> 
+						</col>
+					</display>
+					<footer><![CDATA[<font color='#ff0000'>此页面上两个表单的“中文名”、“性别”、“评价”三列都被授不显示权限</font>]]></footer>
+	  			</report>
+	  		</vpanel>
+	  	</tabpanel>
+	</page>
+	
+	<page id="formpermissionpage2" js="/webresources/script/validate.js">
+		<interceptor>
+			<imports>
+	  	 		<import>com.wabacus.util.*</import>
+	  	 	</imports>
+	  	 	<preaction>
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"type{add}","display","false");
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"type{delete}","display","false");
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"type{save}","display","false");
+	  	 		rrequest.authorize("report1",Consts.BUTTON_PART,"type{reset}","display","false");
+	  	 		
+	  	 		rrequest.authorize("report2",Consts.BUTTON_PART,"type{add}","display","false");
+	  	 		rrequest.authorize("report2",Consts.BUTTON_PART,"type{delete}","display","false");
+	  	 		rrequest.authorize("report2",Consts.BUTTON_PART,"type{save}","display","false");
+	  	 		
+	  	 		rrequest.authorize("report3",Consts.BUTTON_PART,"type{add}","disabled","true");
+	  	 		rrequest.authorize("report3",Consts.BUTTON_PART,"type{delete}","disabled","true");
+	  	 		rrequest.authorize("report3",Consts.BUTTON_PART,"type{save}","disabled","true");
+	  	 		rrequest.authorize("report3",Consts.BUTTON_PART,"type{reset}","disabled","true");
+	  	 		
+	  	 		rrequest.authorize("report4",Consts.BUTTON_PART,"type{add}","disabled","true");
+	  	 		rrequest.authorize("report4",Consts.BUTTON_PART,"type{delete}","disabled","true");
+	  	 		rrequest.authorize("report4",Consts.BUTTON_PART,"type{save}","disabled","true");
+	  	 	</preaction>
+	  	</interceptor>
+	  	<tabpanel id="tab1" margin="10px" titlestyle="2" titlewidth="100px">
+	  		<vpanel id="vp1" parenttitle="隐藏编辑按钮">
+	  			<report id="report1" extends="detailformpage1.report1"/>
+	  			<report id="report2" top="20px" extends="listformpage1.report1"/>
+	  		</vpanel>
+	  		<vpanel id="vp2" parenttitle="禁用编辑按钮">
+	  			<report id="report3" extends="detailformpage1.report1"/>
+	  			<report id="report4" top="20px" extends="listformpage1.report1">
+	  				<display>
+						<col column="no" label="工号" clickorderby="true" width="60px" valuestyleproperty="style='mso-number-format:\@;'">
+							<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+						</col>
+						<col column="name" label="中文名" clickorderby="true"/>
+						<group label="基本信息" labelstyleproperty="width='260px'">
+							<col column="sex" label="性别">
+								<inputbox type="radiobox">
+									<option value="0" label="女"/> 
+									<option value="1" label="男"/>
+								</inputbox>
+							</col>
+							<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px">
+								<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(#data#不是合法数字)"/>
+							</col>
+							<col column="birthday" label="出生日期" clickorderby="true"  datatype="date{yyyy-MM-dd}">
+								<inputbox type="datepicker"  jsvalidate="isNotEmpty(${invalid.isnotempty});isDate(#data#格式不对，必须为yyyy-MM-dd格式)"/>
+							</col>
+						</group>
+						<col column="salary" label="工资" datatype="float">
+							<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty})"/>
+						</col>
+						<col column="deptno" label="所属部门" displaytype="hidden"/>
+						<col column="deptname" label="所属部门" updatecol="@{deptno}" width="100px">
+							<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+								<option source="@{select deptno,deptname from tbl_department}" label="deptname" value="deptno"/>
+							</inputbox>
+						</col>
+						<group label="籍贯">
+							<col column="province" label="省">
+								<inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})">
+									<option label="请选择" value=""/>
+									<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+								</inputbox>
+							</col>
+							<col column="city" label="市">
+								<inputbox type="selectbox" depends="province" servervalidate="isNotEmpty(${invalid.isnotempty})">
+									<option source="@{select distinct city from tbl_area where province like '%#province#%'}" label="city" value="city"/>
+								</inputbox>
+							</col>
+							<col column="county" label="县">
+								<inputbox type="selectbox" depends="city" servervalidate="isNotEmpty(${invalid.isnotempty})">
+									<option source="@{select distinct county from tbl_area where city like '%#city#%'}" label="county" value="county"/>
+								</inputbox>
+							</col>
+						</group>
+						<col column="interest" label="兴趣爱好" width="200px">
+							<inputbox type="popupbox"  width="600" height="400" styleproperty=" size=30">
+								<![CDATA[/wabacusdemo/jsp/testpopupbox.jsp?name=@{name}&no=@{no}]]>
+							</inputbox> 
+						</col>
+					</display>
+					<footer><![CDATA[<font color='#ff0000'>此页面上两个表单的编辑按钮都被禁用</font>]]></footer>
+	  			</report>
+	  		</vpanel>
+	  	</tabpanel>
+	 </page>
+</applications>

@@ -1,0 +1,21 @@
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  	<tr><td><b><font color='blue'>测试用html模板控制导出到RICHEXCEL的显示结构</font></b></td></tr>
+	<tr><td><hr></td></tr>
+  	<tr><td><wx:title componentid="report3"/></td></tr><!--标题栏-->
+  	<tr><td><hr></td></tr>
+	<tr><td align='left'><font color='red'>报表一数据：</font></td></tr>
+  	<tr><td><wx:data componentid="report3"/></td></tr><!--数据-->
+  	<tr><td><hr></td></tr>
+	<tr><td align='left'><font color='red'>报表二数据：</font></td></tr>
+	<tr><td align='left'><wx:data componentid="report4" col="no" showlabel="true" showdata="false"/>：<wx:data col="no" componentid="report4" showlabel="false" showdata="true"/></td></tr>
+	<tr><td align='left'>中文名：<wx:data componentid="report4" col="name" showlabel="false" showdata="true"/></td></tr>
+	<tr><td align='left'>英文名：<wx:data componentid="report4" col="ename" showlabel="false" showdata="true"/></td></tr>
+	<tr><td align='left'>性别：<wx:data componentid="report4" col="sex" showlabel="false" showdata="true"/></td></tr>
+	<tr><td align='left'>年龄：<wx:data componentid="report4" col="age" showlabel="false" showdata="true"/></td></tr>
+	<tr><td align='left'>婚否：<wx:data componentid="report4" col="marriage" showlabel="false" showdata="true"/></td></tr>
+	<tr><td align='left'>出生日期：<wx:data componentid="report4" col="birthday" showlabel="false" showdata="true"/></td></tr>
+	<tr><td align='left'>入职日期：<wx:data componentid="report4" col="joinindate" showlabel="false" showdata="true"/></td></tr>
+	<tr><td align='left'>籍贯：<wx:data componentid="report4" col="province" showlabel="false" showdata="true"/></td></tr>
+	<tr><td align='left'>评价：<wx:data componentid="report4" col="description" showlabel="false" showdata="true"/></td></tr>
+  	<tr><td><hr></td></tr>
+</table>

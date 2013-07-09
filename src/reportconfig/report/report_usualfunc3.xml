@@ -1,0 +1,1501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	<local-resources>
+    	<resources>
+    		<resource key="navigate.count.info">
+    			<![CDATA[
+  					当前第#currentpage#页 共#totalpage#页	
+  				]]>
+    		</resource>
+    	</resources>
+    </local-resources>
+	<page id="interceptorpage1">
+		<tabpanel id="tp1" margin="10px" titlestyle="2" titlewidth="180px">
+			<report id="report1" title="员工信息列表" parenttitle="直接配置拦截器" dataexport="richexcel">
+				<interceptor>
+				    <imports>
+	  					<import>com.wabacus.util.*</import>
+	  					<import>java.util.*</import>
+	  				</imports>
+					<preaction>
+						<![CDATA[
+							String age=rrequest.getStringAttribute("txtage","");
+							if(!age.equals(""))
+							{
+								try
+								{
+									int iage=Integer.parseInt(age);
+									if(iage<10||iage>20)
+									{
+										rrequest.getWResponse().getMessageCollector().warn("输入的年龄："+age+"起出范围，只能输入10到20之间的数字",true,Consts.STATECODE_FAILED);
+									}
+								}catch(NumberFormatException nfe)
+								{
+									rrequest.getWResponse().getMessageCollector().warn("输入的年龄："+age+"不是合法数字",true,Consts.STATECODE_FAILED);
+								}
+							}
+							System.out.println(new Date()+":::执行完前置动作------------------");
+						]]>
+					</preaction>
+					<postaction>
+						<![CDATA[
+							System.out.println(new Date()+":::执行完后置动作-------------------");
+						]]>
+					</postaction>
+				</interceptor>	
+				<display>
+					<col column="{sequence:0}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" width="100px" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<group label="姓名">
+						<col column="name" label="中文名" width="100px" clickorderby="true"/>
+						<col column="ename" label="英文名" width="100px" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" width="60px" clickorderby="true"/>
+					<col column="age" label="年龄" width="60px" clickorderby="true"/>
+					<col column="birthday" label="出生日期" clickorderby="true"/>
+					<group label="地区">
+						<col column="province"  label="省份"/>
+						<col column="city"  label="城市"/>
+						<col column="county"  label="县城"/>
+					</group>
+				</display>
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtgonghao" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%')]]>
+						</value>
+					</condition>
+					<condition name="txtage" label="年龄">
+						<value>
+							<![CDATA[(age =#data#)]]>
+						</value>
+					</condition>
+				</sql>
+				<format>
+				  <value>
+						sex=sex==null?"1":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else sex="男";
+						birthday=birthday==null?"":birthday.trim();
+						int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						if(idx>0) birthday=birthday.substring(0,idx);
+				  </value>
+				</format>
+				<footer>${interceptorpage1.footer}</footer>
+			</report>
+			<report id="report2" title="员工信息列表" parenttitle="引用资源文件中的拦截器" dataexport="richexcel" interceptor="${interceptorpage2.report1.interceptor}">
+				<display>
+					<col column="{sequence:0}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" width="100px" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<group label="姓名">
+						<col column="name" label="中文名" width="100px" clickorderby="true"/>
+						<col column="ename" label="英文名" width="100px" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" width="60px" clickorderby="true"/>
+					<col column="age" label="年龄" width="60px" clickorderby="true"/>
+					<col column="birthday" label="出生日期" clickorderby="true"/>
+					<group label="地区">
+						<col column="province"  label="省份"/>
+						<col column="city"  label="城市"/>
+						<col column="county"  label="县城"/>
+					</group>
+				</display>
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtgonghao" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%')]]>
+						</value>
+					</condition>
+					<condition name="txtage" label="年龄">
+						<value>
+							<![CDATA[(age =#data#)]]>
+						</value>
+					</condition>
+				</sql>
+				<format>
+				  <value>
+						sex=sex==null?"1":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else sex="男";
+						birthday=birthday==null?"":birthday.trim();
+						int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						if(idx>0) birthday=birthday.substring(0,idx);
+				  </value>
+				</format>
+				<footer>${interceptorpage2.footer}</footer>
+			</report>
+			<report id="report3" extends="interceptorpage1.report2" parenttitle="开发拦截器JAVA类"
+					interceptor="com.wabacusdemo.Interceptorpage3Report1Interceptor">
+				<display>
+					<col column="{sequence:0}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" width="100px" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<group label="姓名">
+						<col column="name" label="中文名" width="100px" clickorderby="true"/>
+						<col column="ename" label="英文名" width="100px" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" width="60px" clickorderby="true"/>
+					<col column="age" label="年龄" width="60px" clickorderby="true"/>
+					<col column="birthday" label="出生日期" clickorderby="true"/>
+					<group label="地区">
+						<col column="province"  label="省份"/>
+						<col column="city"  label="城市"/>
+						<col column="county"  label="县城"/>
+					</group>
+				</display>
+				<footer>${interceptorpage3.footer}</footer>
+			</report>
+		</tabpanel>
+	</page>
+	<page id="l10npage1" js="/webresources/script/validate.js,/wabacusdemo/js/clientvalidate.js">
+		<report id="report1" title="${title.label}"  dataexport="richexcel">
+			<display>
+				<col column="{sequence:0}" label="${sequence.label}"/>
+				<col column="no" label="${no.label}" clickorderby="true" width="100px" filter="condition{txtno}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="${group.label}">
+					<col column="name" label="${name.label}" width="100px" filter="true" filterwidth="120px" clickorderby="true"/>
+					<col column="sex" label="${sex.label}" width="60px" clickorderby="true"/>
+					<col column="age" label="${age.label}" width="60px" clickorderby="true"/>
+					<col column="birthday" label="${birthday.label}" clickorderby="true"/>
+				</group>
+				<col column="salary" label="${salary.label}" clickorderby="true"/>
+				<col column="joinindate" label="${joinindate.label}" clickorderby="true"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,salary FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtno" label="${condition.txtno.label}">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox jsvalidate="isNotEmpty(${invalid.isnotempty});isNumeric(${invalid.number})"/>
+				</condition>
+				<condition name="txtage" label="${condition.txtage.label}">
+					<value>
+						<![CDATA[(age =#data#)]]>
+					</value>
+					<inputbox jsvalidate="isNumeric(${invalid.number});isValidAge(${invalid.age})"/>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+					joinindate=joinindate==null?"":joinindate.trim();
+					idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) joinindate=joinindate.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+		<footer>${l10npage.report1.footer}</footer>
+	</page>
+	<page id="otherpage2">
+		<report id="report1" title="员工信息列表" dataexport="richexcel">
+			<display>
+				<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}" 
+				     labelstyleproperty="style='background-color:#3399CC'" valuestyleproperty="style='mso-number-format:\@'  bgcolor='#3399CC'"/>
+				<group label="个人资料" labelstyleproperty="style='background-color:#3399CC'">
+					<group label="姓名" labelstyleproperty="style='background-color:#3399CC'">
+						<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true" labelstyleproperty="style='background-color:#3399CC'"/>
+						<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true" labelstyleproperty="style='background-color:#3399CC'"/>
+					</group>
+					<col column="sex" label="性别" clickorderby="true" labelstyleproperty="style='background-color:#3399CC'"/>
+					<col column="age" label="年龄" clickorderby="true" labelstyleproperty="style='background-color:#3399CC'"/>
+				</group>
+				<col column="joinindate" label="入职日期" clickorderby="true" labelstyleproperty="style='background-color:#3399CC'"/>
+				<group label="地区" labelstyleproperty="style='background-color:#3399CC'">
+					<col column="province"  label="省份" filter="condition{txtprovince}" labelstyleproperty="style='background-color:#3399CC'"/>
+					<col column="city"  label="城市" filter="condition{txtcity}" labelstyleproperty="style='background-color:#3399CC'"/>
+					<col column="county"  label="县城" labelstyleproperty="style='background-color:#3399CC'"/>
+				</group>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcity" label="市">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					joinindate=joinindate==null?"":joinindate.trim();
+					int idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) joinindate=joinindate.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+	</page>
+	<page id="otherpage3" js="/wabacusdemo/js/otherpage3.js">
+		<report id="report1" title="员工信息列表" dataexport="richexcel">
+			<header>${otherpage3.report1.header}</header>
+			<display>
+				<col column="no" label="选择一" valuestyleproperty="style='mso-number-format:\@'"/>
+				<col property="chkno" column="{non-fromdb}" label="&lt;input type='checkbox' onclick='selectCheckBoxes(this)' name='chkall'/&gt;&amp;nbsp;&amp;nbsp;选择二"/>
+				<group label="个人资料" >
+					<group label="姓名">
+						<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true" />
+						<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" clickorderby="true"/>
+					<col column="age" label="年龄" clickorderby="true"/>
+				</group>
+				<col column="joinindate" label="入职日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份" filter="condition{txtprovince}"/>
+					<col column="city"  label="城市" filter="condition{txtcity}"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcity" label="市">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			   <imports>
+				<import>com.wabacus.util.*</import>
+				<import>com.wabacus</import>
+			  </imports>
+			  <value>
+			   <![CDATA[
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					joinindate=joinindate==null?"":joinindate.trim();
+					int idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) joinindate=joinindate.substring(0,idx);
+					if(rrequest.getShowtype() == Consts.DISPLAY_ON_PAGE)
+					{//如果是显示在html页面上，则显示输入框
+					 	chkno="<input type='checkbox' name='chkoption' value='"+no+"'>"; 
+					 	no="<input type='radio' name='radiooption' value='"+no+"'>";
+					}
+				  ]]>
+			  </value>
+			</format>
+		</report>
+	</page>
+	<page id="otherpage5">
+		<report id="report1" extends="listpage1.report1">
+			<display  dataheader="" colselect="false">
+				<col column="{sequence:1}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+				<col column="name" label="姓名" clickorderby="true" width="15%"/>
+				<group label="基本信息">
+					<col column="sex" label="性别"/>
+					<col column="age" label="年龄" clickorderby="true" width="100px" filter="true" filterwidth="120px"/>
+					<col column="birthday" label="出生日期" clickorderby="true" width="150px"/>
+				</group>
+				<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+			</display>
+		</report>
+	</page>
+	<page id="rowmouseoverpage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="改变默认滑过背景色" pagesize="20"  dataexport="richexcel">
+			<display mouseoverbgcolor="#ffff00">
+				<col column="{sequence:0}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" width="100px" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="姓名">
+					<col column="name" label="中文名" width="100px" clickorderby="true"/>
+					<col column="ename" label="英文名" width="100px" filter="true" filterwidth="150px" clickorderby="true"/>
+				</group>
+				<col column="sex" label="性别" width="60px" clickorderby="true"/>
+				<col column="age" label="年龄" width="60px" clickorderby="true"/>
+				<col column="birthday" label="出生日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份"/>
+					<col column="city"  label="城市"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+				</condition>
+				<condition name="txtage" label="年龄">
+					<value>
+						<![CDATA[(age =#data#)]]>
+					</value>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+			  </value>
+			</format>
+		</report>
+		<report id="report2" title="滑过时不改变行背景色"  extends="rowmouseoverpage1.report1">
+			<display mouseoverbgcolor="">
+				<col column="{sequence:0}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" width="100px" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="姓名">
+					<col column="name" label="中文名" width="100px" clickorderby="true"/>
+					<col column="ename" label="英文名" width="100px" filter="true" filterwidth="150px" clickorderby="true"/>
+				</group>
+				<col column="sex" label="性别" width="60px" clickorderby="true"/>
+				<col column="age" label="年龄" width="60px" clickorderby="true"/>
+				<col column="birthday" label="出生日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份"/>
+					<col column="city"  label="城市"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+		 </report>
+	  </tabpanel>
+	</page>
+	<page id="onloadpage1" js="/wabacusdemo/js/testcallback.js" onload="testonload">
+		<tabpanel id="tp1" titlestyle="2" margin="10px">
+			<framepanel id="fp1" title="frame容器" parenttitle="组件onload函数" margin="10px" onload="testonload">
+				<report id="report1" title="员工基本信息列表" dataexport="richexcel" onload="testonload">
+					<interceptor>
+						<imports>
+							<import>java.util.*</import>
+							<import>com.wabacus.util.*</import>
+							<import>com.wabacus.system.component.application.report.abstractreport.*</import>
+						</imports>
+						<afterloaddata>
+						<![CDATA[
+							if(typeObj instanceof AbsReportType)
+							{//当前是在加载报表数据，则判断报表是否有数据，并动态添加onload回调函数
+								List lstData=(List)dataObj;//此时dataObj参数存放的就是当前报表加载出的数据列表
+								StringBuffer buf=new StringBuffer();
+		        				if(lstData!=null&&lstData.size()>0)
+		        				{
+		        					String nameTmp;
+		        					AbsReportDataPojo dataObjTmp;
+						         for(int i=0;i<lstData.size();i++)
+						         {//下面将取到的所有name列的值拼凑成name1,name2,...格式
+						         	dataObjTmp=(AbsReportDataPojo)lstData.get(i);
+						         	nameTmp=dataObjTmp.getColStringValue("name");
+						            if(nameTmp==null||nameTmp.trim().equals("")) continue;
+						            buf.append("'").append(nameTmp).append("',");
+						         }
+						         if(buf.length()>0&&buf.charAt(buf.length()-1)==',') buf.deleteCharAt(buf.length()-1);
+		        				}
+		        				StringBuffer paramsBuf=new StringBuffer();
+			               paramsBuf.append("{pageid:\""+rbean.getPageBean().getId()+"\"");
+			               paramsBuf.append(",reportid:\""+rbean.getId()+"\"");
+		        				if(buf.length()>0)
+		        				{
+		        					paramsBuf.append(",message:\""+buf.toString()+"\"");
+		        				}else
+		        				{
+		        					paramsBuf.append(",message:\"无数据\"");
+		        				}
+		        				paramsBuf.append("}");
+		        				rrequest.getWResponse().addOnloadMethod("testDynamicOnload",paramsBuf.toString(),false);//动态添加onload回调函数
+	        				}
+	        				return super.afterLoadData(rrequest,rbean,typeObj,dataObj);//如果当前不是查询报表数据，则不做处理
+						]]>
+						</afterloaddata>
+					</interceptor>
+					<display>
+						<col column="{sequence:1}" label="序号"/>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+						<col column="name" label="姓名" clickorderby="true" width="15%"/>
+						<group label="基本信息">
+							<col column="sex" label="性别"/>
+							<col column="age" label="年龄" clickorderby="true" width="100px" filter="true" filterwidth="120px"/>
+							<col column="birthday" label="出生日期" clickorderby="true" width="150px"/>
+						</group>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+					</display>
+					<sql>
+						<value>
+							<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(no like  '%#data#%' )]]>
+							</value>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+						<condition name="txtsex" label="性别">
+							<value>
+								<![CDATA[(sex =#data#)]]>
+							</value>
+							<inputbox type="selectbox">
+								<option value="" label="性别"/>
+								<option value="1" label="男"/> 
+								<option value="0" label="女" />
+							</inputbox>
+						</condition>
+					</sql>
+					<format>
+					  <value>
+							sex=sex==null?"1":sex.trim();
+							if(sex.equals("0")) sex="女";
+							else sex="男";
+							birthday=birthday==null?"":birthday.trim();
+							int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+							if(idx>0) birthday=birthday.substring(0,idx);
+					  </value>
+					</format>
+				</report>
+			</framepanel>
+			<report id="report2" title="各员工2008、2009年度总工资" parenttitle="图表onload函数&lt;font color='red'&gt;New&lt;/font&gt;" type="fusioncharts" width="1000px" chartheight="300" chartwidth="1000" chartype="MSColumn3D.swf"
+				chartstyleproperty="xAxisName='姓名' yAxisName='总工资' showValues='0' numberPrefix='$' showExportDataMenuItem='1'">
+				<interceptor>
+					<preaction>
+					<![CDATA[
+						rrequest.getWResponse().addChartOnloadMethod("report2","testConfigLinkedChart2","param1:'value1',param2:'value2'",false);
+					]]>
+					</preaction>
+				</interceptor>
+				<display labelcolumn="name">
+					<col column="val1.name" label="姓名"/>
+					<col column="val1.totalsalary8" label="2008年度工资"/>
+					<col column="val2.totalsalary9" label="2009年度工资"/>
+					<col column="year" label="年份" displaytype="hidden"/>
+				</display>
+				<subdisplay>
+				<![CDATA[
+					<trendlines>             
+						<line startValue='200000' color='00cc00' displayValue='平均值' />     
+					</trendlines>     
+				]]>
+				</subdisplay>
+				<sql>
+					<dataset id="ds1">
+						<value id="val1">
+							<![CDATA[SELECT A.no,name,year,sum(salary) as totalsalary8 FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where year=2008 and {#condition#} group by A.no,name,year order by A.no]]>
+						</value>
+					</dataset>
+					<dataset id="ds2" mergetop="true">
+						<value id="val2">
+							<![CDATA[SELECT A.no,name,year,sum(salary) as totalsalary9 FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where year=2009 and {#condition#} group by A.no,name,year order by A.no]]>
+						</value>
+					</dataset>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%')]]>
+						</value>
+					</condition>
+				</sql>
+				<format>
+					<imports>
+						<import>java.util.Map</import>
+					</imports>
+					<value>
+					<![CDATA[
+						if("ds1".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("totalsalary8","seriesName='2008'",false);
+						}else if("ds2".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("totalsalary9","seriesName='2009'",false);
+						}
+					]]>
+					</value>
+				</format>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="commonrowbgcolorpage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="通过行号控制背景色" pagesize="20"  dataexport="richexcel">
+			<interceptor>
+				<beforedisplay-perrow>
+					if(rowDataBean.getRowindex()==-1) return ;//标题行
+					if(rowDataBean.getRowindex()%2==1)
+					{
+						String style=rowDataBean.getRowstyleproperty();
+						if(style==null) style="";
+						style+=" style='background:#CCCAFF'";
+						rowDataBean.setRowstyleproperty(style);
+					}
+				</beforedisplay-perrow>
+			</interceptor>
+			<display>
+				<col column="{sequence:0}" label="序号"/>
+				<col column="no" label="工号" clickorderby="true" width="100px" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="姓名">
+					<col column="name" label="中文名" width="100px" clickorderby="true"/>
+					<col column="ename" label="英文名" width="100px" filter="true" filterwidth="150px" clickorderby="true"/>
+				</group>
+				<col column="sex" label="性别" width="60px" clickorderby="true"/>
+				<col column="age" label="年龄" width="60px" clickorderby="true"/>
+				<col column="birthday" label="出生日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份"/>
+					<col column="city"  label="城市"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+				</condition>
+				<condition name="txtage" label="年龄">
+					<value>
+						<![CDATA[(age =#data#)]]>
+					</value>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+			  </value>
+			</format>
+		 </report>
+		 <report id="report2" title="通过业务数据控制"  extends="commonrowbgcolorpage1.report1" 
+				interceptor="com.wabacusdemo.Interceptor_commonrowbgcolorpage1Report2"/>
+	  </tabpanel>
+	</page>
+	<page id="rowgroupbgcolorpage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="通过记录行控制" dataexport="richexcel" pagesize="20">
+			<interceptor>
+				<imports>
+					<import>com.wabacus.config.component.application.report.*</import><!-- 要用到这个包下的ColBean类 -->
+				</imports>
+				<beforedisplay-percol>
+				<![CDATA[
+					if(colDataBean.getRowindex()<0)
+        			{//当前是在显示标题行
+            			return ;
+        			}
+        			if(!(colDataBean.getDisplayColBean() instanceof ColBean))
+        			{//不是显示列的数据
+            			return ;
+        			}
+        			ColBean cb=(ColBean)colDataBean.getDisplayColBean();
+        			if("province".equals(cb.getColumn())||"city".equals(cb.getColumn())
+                			||"county".equals(cb.getColumn()))
+        			{//如果是分组列，则不改变它的背景色
+            			return;
+        			}
+        			if(colDataBean.getRowindex()%2==0)
+        			{//只改变偶数行的列背景色
+            		String style=colDataBean.getStyleproperty();
+					   if(style==null) style="";
+					   style+=" bgcolor='#CFDFF8'";
+            		colDataBean.setStyleproperty(style);
+        			}
+        		]]>
+				</beforedisplay-percol>
+			</interceptor>
+			<display>
+				<col column="province"  label="省份" filter="condition{txtprovince}" rowgroup="true"/>
+				<col column="city"  label="城市" filter="condition{txtcity}" rowgroup="true"/>
+				<col column="county"  label="县城" rowgroup="true"/>
+				<col column="{sequence:0}" label="序号1"/>
+				<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="个人资料">
+					<group label="姓名">
+						<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true"/>
+						<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" clickorderby="true"/>
+					<col column="age" label="年龄" clickorderby="true"/>
+				</group>
+				<col column="joinindate" label="入职日期" clickorderby="true"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcity" label="市">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					joinindate=joinindate==null?"":joinindate.trim();
+					int idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) joinindate=joinindate.substring(0,idx);
+			  </value>
+			</format>
+		 </report>
+		 <report id="report2" extends="rowgroupbgcolorpage1.report1" title="通过业务数据控制" 
+				interceptor="com.wabacusdemo.Interceptor_rowgroupbgcolorpage1Report2"/>
+	  </tabpanel>
+	</page>
+	
+	<page id="treerowgroupbgcolorpage1">
+	  <tabpanel id="tab1" titlestyle="2" margin="10">
+		 <report id="report1" title="通过行号控制" dataexport="richexcel" pagesize="20"
+				scrollheight="400px" width="800px">
+			<interceptor>
+				<imports>
+					<import>com.wabacus.config.component.application.report.*</import><!-- 要用到这个包下的ColBean类 -->
+				</imports>
+				<beforedisplay-percol>
+				<![CDATA[
+					if(colDataBean.getRowindex()<0)
+        			{//当前是在显示标题行
+            			return;
+        			}
+        			if(!(colDataBean.getDisplayColBean() instanceof ColBean))
+        			{//不是显示列的数据
+            			return;
+        			}
+        			ColBean cb=(ColBean)colDataBean.getDisplayColBean();
+        			if("province".equals(cb.getColumn())||"city".equals(cb.getColumn())
+                			||"county".equals(cb.getColumn()))
+        			{//如果是分组列，则不改变它的背景色
+            			return;
+        			}
+        			if(colDataBean.getRowindex()%2==0)
+        			{//只改变偶数行的列背景色
+            			String style=colDataBean.getStyleproperty();
+						   if(style==null) style="";
+						   style+=" bgcolor='#CFDFF8'";
+            			colDataBean.setStyleproperty(style);
+        			}
+        		]]>
+				</beforedisplay-percol>
+			</interceptor>
+			<display>
+				<col column="province"  label="地区" filter="condition{txtprovince}" treerowgroup="true"/>
+				<col column="city"  label="城市" filter="condition{txtcity}" treerowgroup="true"/>
+				<col column="county"  label="县城" treerowgroup="true"/>
+				<col column="{sequence:0}" label="序号1"/>
+				<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="个人资料">
+					<group label="姓名">
+						<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true"/>
+						<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+					</group>
+					<col column="sex" label="性别" clickorderby="true"/>
+					<col column="age" label="年龄" clickorderby="true"/>
+				</group>
+				<col column="joinindate" label="入职日期" clickorderby="true"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+					<inputbox>
+					  <typeprompt width="-1" count="15">
+						<promptcol label="no" matchmode="anywhere"/>
+						<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+					  </typeprompt>
+					</inputbox>
+				</condition>
+				<condition name="txtprovince" label="省">
+					<value>
+						<![CDATA[(province like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox">
+						<option label="全部" value=""/>
+						<option source="@{select distinct province from tbl_area}" label="province" value="province"/>
+					</inputbox>
+				</condition>
+				<condition name="txtcity" label="市">
+					<value>
+						<![CDATA[(city like %#data#%)]]>
+					</value>
+					<inputbox type="selectbox" depends="txtprovince">
+						<option label="全部" value=""/>
+						<option label="无" value="" type="false"/>
+						<option source="@{select distinct city from tbl_area where province like '%#txtprovince#%'}" label="city" value="city"/>
+					</inputbox>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					joinindate=joinindate==null?"":joinindate.trim();
+					int idx=joinindate.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) joinindate=joinindate.substring(0,idx);
+			  </value>
+			</format>
+		 </report>
+		 <report id="report2" extends="treerowgroupbgcolorpage1.report1" title="通过业务数据控制" 
+				interceptor="com.wabacusdemo.Interceptor_rowgroupbgcolorpage1Report2"/>
+	  </tabpanel>
+	</page>
+	<page id="dyncoltitlepage1">
+		<report id="report1" title="rrequest{txtgonghao}员工信息列表" dataexport="richexcel">
+			<interceptor>
+				<imports>
+					<import>com.wabacus.system.component.application.report.configbean.*</import>
+					<import>com.wabacus.system.intercept.*</import>
+					<import>com.wabacus.system.component.application.report.abstractreport.*</import>
+					<import>com.wabacus.config.component.application.report.*</import>
+				</imports>
+				<preaction>
+				<![CDATA[
+					rrequest.setAttribute("dynamic_value","<font color='#0000ff'>动态</font>");
+				]]>
+				</preaction>
+				<beforedisplay-percol>
+				<![CDATA[
+				  if(colDataBean.getRowindex()>=0) return null;//不是显示标题行的列
+				  System.out.println("colDataBean.getValue():::"+colDataBean.getValue());
+		        if(colDataBean.getDisplayColBean() instanceof UltraListReportGroupBean)
+		        {//是显示<group/>的label
+		            UltraListReportGroupBean groupbean=(UltraListReportGroupBean)colDataBean.getDisplayColBean();
+		            if("姓名".equals(colDataBean.getValue()))
+		            {
+		                colDataBean.setValue("<font color='red'>动态</font>姓名");
+		            }
+		        }else if(colDataBean.getDisplayColBean() instanceof ColBean)
+		        {
+		            ColBean cb=(ColBean)colDataBean.getDisplayColBean();
+		            if("省份".equals(colDataBean.getValue()))
+		            {
+		                colDataBean.setValue("<font color='red'>动态</font>省份");
+		            }else if("城市".equals(colDataBean.getValue()))
+		            {
+		                colDataBean.setValue("<font color='red'>动态</font>城市");
+		            }else if("县城".equals(colDataBean.getValue()))
+		            {
+		                colDataBean.setValue("<font color='red'>动态</font>县城");
+		            }
+		        }
+				]]>
+				</beforedisplay-percol>
+			</interceptor>
+			<display>
+				<col column="{sequence:0}" label="rrequest{dynamic_value}序号"/>
+				<col column="no" label="rrequest{dynamic_value}工号" clickorderby="true" width="100px" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+				<group label="姓名">
+					<col column="name" label="中文名" width="100px" clickorderby="true"/>
+					<col column="ename" label="英文名" width="100px" filter="true" filterwidth="150px" clickorderby="true"/>
+				</group>
+				<col column="sex" label="性别" width="60px" clickorderby="true"/>
+				<col column="age" label="年龄" width="60px" clickorderby="true"/>
+				<col column="birthday" label="出生日期" clickorderby="true"/>
+				<group label="地区">
+					<col column="province"  label="省份"/>
+					<col column="city"  label="城市"/>
+					<col column="county"  label="县城"/>
+				</group>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,joinindate,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+				</value>
+				<condition name="txtgonghao" label="工号">
+					<value>
+						<![CDATA[(A.no like  '%#data#%')]]>
+					</value>
+				</condition>
+				<condition name="txtage" label="年龄">
+					<value>
+						<![CDATA[(age =#data#)]]>
+					</value>
+				</condition>
+			</sql>
+			<format>
+			  <value>
+					sex=sex==null?"1":sex.trim();
+					if(sex.equals("0")) sex="女";
+					else sex="男";
+					birthday=birthday==null?"":birthday.trim();
+					int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+					if(idx>0) birthday=birthday.substring(0,idx);
+			  </value>
+			</format>
+			<footer>
+			<![CDATA[<font colo='red'>说明：</font><font color='#0000ff'>此报表的红色动态和蓝色动态分别通过两种方式动态加入列标题</font>]]>
+			</footer>
+		</report>
+	</page>
+	<page id="filedownloadpage1">
+	  <framepanel id="fp1" title="不改变下载文件名" margin="10"  width="1030px">
+			<report id="report1" title="员工信息列表" type="blocklist" width="1000px"
+					pagesize="15" dataexport="word" template="${articlelist.report.template}"><!-- 指定template为这个内置的静态模板是为了更友好的显示报表标题 -->
+				<display blockwidth="200px" blockheight="200px"><!-- 指定每一块的宽和高 -->
+					<col column="photo" label="照片"/>
+					<col column="no" label="工号" valuestyleproperty="style='mso-number-format:\@;margin-top:10px;'"/><!-- 指定工号与上面照片的垂直距离为10个象素 -->
+					<col column="name" label="姓名"/>
+					<col column="deptname" label="所属部门"/>
+				</display>
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,sex,age,birthday,salary,A.deptno,deptname,province,city,county,photo FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno left join tbl_detailinfo C on A.no=C.no where   {#condition#} order by no]]>
+					</value>
+					<condition name="txtno" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%' )]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%' )]]>
+						</value>
+					</condition>
+				</sql>
+				<format>
+				  <imports>
+						<import>com.wabacus.util.*</import>
+				  </imports>
+				  <value>
+				  <![CDATA[
+				  	if(photo!=null&&!photo.trim().equals(""))
+					{//这里引用资源文件定义的路径
+						String photoname=photo.substring(photo.lastIndexOf("/")+1);//取到照片名
+						photo="<a href=\"/WabacusDemo/ShowReport.wx?ACTIONTYPE=download&serverfilepath=${filedownloadpage1.downloadfilepath}&serverfilename="+photoname+"\"><img border='0' src=\""+photo+"\"></a>";
+					}else
+					{
+						photo="无照片";
+					}
+				  ]]>
+				  </value>
+				</format>
+				<footer>
+					<![CDATA[<font color='red'>说明：</font><font color='blue'>点击图片进行下载，这里下载的图片文件名与服务器端文件名一致</font>]]>
+				</footer>
+			</report>
+		 </framepanel>
+		 <framepanel id="fp2" title="改变下载文件名" margin="10" top="10" width="1030px">
+			<report id="report2" extends="filedownloadpage1.report1">
+				<format>
+				  <imports>
+						<import>com.wabacus.util.*</import>
+				  </imports>
+				  <value>
+				  <![CDATA[
+				  	if(photo!=null&&!photo.trim().equals(""))
+					{
+						String photoname=photo.substring(photo.lastIndexOf("/")+1);//取到照片名
+						String serverfilepathcode=Tools.encodeFilePath("relative{/wabacusdemo/uploadfile}");
+						String newfilename=name+"照片";//新的下载文件名为姓名+照片
+						if(photoname.indexOf(".")>0)
+						{//以前的文件名有扩展名
+							newfilename=newfilename+photoname.substring(photoname.lastIndexOf("."));//将扩展名加到新的文件名中
+						}
+						photo="<a href=\"/WabacusDemo/ShowReport.wx?ACTIONTYPE=download&serverfilepath="+serverfilepathcode+"&serverfilename="+photoname+"&newfilename="+newfilename+"\"><img border='0' src=\""+photo+"\"></a>";
+					}else
+					{
+						photo="无照片";
+					}
+				  ]]>
+				  </value>
+				</format>
+				<footer>
+					<![CDATA[<font color='red'>说明：</font><font color='blue'>点击图片进行下载，这里下载的图片文件名是修改后的文件名</font>]]>
+				</footer>
+			</report>
+		</framepanel>
+	</page>
+	
+	<page id="lazydataloadurlpage1">
+		<report id="report1" extends="listpage1.report1">
+			<footer>
+				<![CDATA[<font color='red'>说明：</font><font color='blue'>点击“查询”按钮即会加载数据</font>]]>
+			</footer>
+		</report>
+	</page>
+	
+	<page id="lazydataloadinterceptorpage1">
+		<framepanel id="fp1" margin="10px" title="延迟加载时不给出提示信息">
+			<report id="report1" extends="listpage1.report1">
+				<interceptor>
+					<preaction>
+					 <![CDATA[
+						String txtno1=rrequest.getStringAttribute("txtno1","");//取出输入的“工号”条件值
+						String txtname1=rrequest.getStringAttribute("txtname1","");//取出输入的“姓名”条件值
+						if(txtno1.equals("")&&txtname1.equals(""))
+						{//如果两个条件框都没有输入值，则延迟加载
+							rrequest.setAttribute("report1_lazyload","true");
+						}
+					 ]]>
+					</preaction>
+				</interceptor>
+				<sql>
+					<value>
+						<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtno1" label="工号">
+						<value>
+							<![CDATA[(no like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtname1" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%' )]]>
+						</value>
+					</condition>
+				</sql>
+			</report>
+		</framepanel>
+		<framepanel id="fp2" margin="10px" top="10px" title="延迟加载时给出提示信息">
+			<report id="report2" extends="listpage1.report1">
+				<interceptor>
+					<preaction>
+					 <![CDATA[
+						String txtno2=rrequest.getStringAttribute("txtno2","");//取出输入的“工号”条件值
+						String txtname2=rrequest.getStringAttribute("txtname2","");//取出输入的“姓名”条件值
+						if(txtno2.equals("")&&txtname2.equals(""))
+						{//如果两个条件框都没有输入值，则延迟加载
+							rrequest.setAttribute("report2_lazyload","true");
+							rrequest.setAttribute("report2_lazyloadmessage","现在是延迟加载，输入条件值后点击查询按钮才加载相应条件的数据");
+						}
+					 ]]>
+					</preaction>
+				</interceptor>
+				<sql>
+					<value>
+						<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtno2" label="工号">
+						<value>
+							<![CDATA[(no like  '%#data#%' )]]>
+						</value>
+					</condition>
+					<condition name="txtname2" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%' )]]>
+						</value>
+					</condition>
+				</sql>
+			</report>
+		</framepanel>
+		<footer>
+			<![CDATA[<br><font color='red'>说明：</font><font color='blue'>输入条件值然后点击“查询”按钮才会加载数据</font>]]>
+		</footer>
+	</page>
+	
+	<page id="htmlapppage1">
+		<tabpanel id="tp1" margin="10px" titlewidth="200px">
+			<html id="htm1" parenttitle="显示普通HTML">
+				<![CDATA[
+					<h1>测试显示HTML代码</h1>
+					<h2>测试显示HTML代码</h2>
+					<h3>测试显示HTML代码</h3>
+					<h4>测试显示HTML代码</h4>
+					<h5>测试显示HTML代码</h5>
+					<h6>测试显示HTML代码</h6>
+				]]>
+			</html>
+			<vpanel id="vp1" parenttitle="在HTML代码中显示报表元素">
+				<framepanel id="fp1" title="HTML应用" margin="10px">
+					<html id="htm2" belongto="report1">
+						<![CDATA[
+							<hr>
+							员工信息列表报表功能按钮：
+							<wx:button type="richexcel"/>&nbsp;&nbsp;<wx:button type="word"/>&nbsp;&nbsp;<wx:button type="search"/>
+							<hr>
+							<br><br>
+							<hr>
+							员工信息列表报表翻页按钮：
+							<wx:navigate type="first"/>&nbsp;&nbsp;<wx:navigate type="previous"/>&nbsp;&nbsp;<wx:navigate type="next"/>&nbsp;&nbsp;<wx:navigate type="last"/>
+							<hr>
+						]]>
+					</html>
+				</framepanel>
+				<report id="report1" title="员工信息列表" dataexport="richexcel|word" top="20px">
+					<display>
+						<col column="{sequence:1}" label="序号"/>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+						<col column="name" label="姓名" clickorderby="true" width="15%"/>
+						<group label="基本信息">
+							<col column="sex" label="性别"/>
+							<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+							<col column="birthday" label="出生日期" clickorderby="true" displaytype="always"/>
+						</group>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+					</display>
+					<sql>
+						<value>
+							<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(no like  '%#data#%' )]]>
+							</value>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+						<condition name="txtsex" label="性别">
+							<value>
+								<![CDATA[(sex =#data#)]]>
+							</value>
+							<inputbox type="selectbox">
+								<option value="" label="性别"/>
+								<option value="1" label="男"/> 
+								<option value="0" label="女" />
+							</inputbox>
+						</condition>
+					</sql>
+					<format>
+					  <value>
+							sex=sex==null?"1":sex.trim();
+							if(sex.equals("0")) sex="女";
+							else sex="男";
+							birthday=birthday==null?"":birthday.trim();
+							int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+							if(idx>0) birthday=birthday.substring(0,idx);
+					  </value>
+					</format>
+				</report>
+			</vpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="jspapppage1">
+		<tabpanel id="tp1" margin="10px" titlewidth="200px">
+			<jsp id="jsp1" parenttitle="显示普通JSP">
+				/wabacusdemo/jsp/tagpages/jspapppage1_jsp1.jsp
+			</jsp>
+			<vpanel id="vp1" parenttitle="在JSP代码中显示报表元素">
+				<framepanel id="fp1" title="JSP应用" margin="10px">
+					<jsp id="jsp2" belongto="report1">
+						/wabacusdemo/jsp/tagpages/jspapppage1_jsp2.jsp
+					</jsp>
+				</framepanel>
+				<report id="report1" title="员工信息列表" dataexport="richexcel|word" top="20px">
+					<display>
+						<col column="{sequence:1}" label="序号"/>
+						<col column="no" label="工号" clickorderby="true" valuestyleproperty="style='mso-number-format:\@' width='15%'"/>
+						<col column="name" label="姓名" clickorderby="true" width="15%"/>
+						<group label="基本信息">
+							<col column="sex" label="性别"/>
+							<col column="age" label="年龄" clickorderby="true" filter="true" filterwidth="120px"/>
+							<col column="birthday" label="出生日期" clickorderby="true" displaytype="always"/>
+						</group>
+						<col column="deptname" label="所属部门" filter="true" filterwidth="120px"/>
+					</display>
+					<sql>
+						<value>
+							<![CDATA[SELECT no,name,sex,age,birthday,deptname FROM tbl_baseinfo A left join tbl_department B on A.deptno=B.deptno where  {#condition#} order by no]]>
+						</value>
+						<condition name="txtno" label="工号">
+							<value>
+								<![CDATA[(no like  '%#data#%' )]]>
+							</value>
+						</condition>
+						<condition name="txtname" label="姓名">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+						<condition name="txtsex" label="性别">
+							<value>
+								<![CDATA[(sex =#data#)]]>
+							</value>
+							<inputbox type="selectbox">
+								<option value="" label="性别"/>
+								<option value="1" label="男"/> 
+								<option value="0" label="女" />
+							</inputbox>
+						</condition>
+					</sql>
+					<format>
+					  <value>
+							sex=sex==null?"1":sex.trim();
+							if(sex.equals("0")) sex="女";
+							else sex="男";
+							birthday=birthday==null?"":birthday.trim();
+							int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+							if(idx>0) birthday=birthday.substring(0,idx);
+					  </value>
+					</format>
+				</report>
+			</vpanel>
+			<jsp id="jsp3" parenttitle="在iframe中显示JSP" iframe="true" iframestyleproperty="frameborder='1' width='100%'" height="100%">
+				/wabacusdemo/jsp/tagpages/jspapppage1_jsp3.jsp
+			</jsp>
+		</tabpanel>
+	</page>
+	
+	<page id="subdisplaypage1">
+		<tabpanel id="tab1" titlestyle="2" margin="10" width="1300px">
+			<report id="report1" title="员工信息列表" parenttitle="普通列表报表" dataexport="richexcel|plainexcel">
+				<display colselect="false">
+					<col column="{sequence:0}" label="序号1"/>
+					<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<group label="个人资料">
+						<group label="姓名">
+							<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true"/>
+							<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+						</group>
+						<col column="sex" label="性别" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true"/>
+					</group>
+					<col column="salary" label="工资" clickorderby="true"/>
+					<group label="地区">
+						<col column="province"  label="省份" filter="true"/>
+						<col column="city"  label="城市" filter="true"/>
+						<col column="county"  label="县城"/>
+					</group>
+				</display>
+				<subdisplay>
+					<subrow displaytype="page|report" displayposition="top">
+						<subcol property="sprop1" colspan="3" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+						<subcol property="sprop2" colspan="3" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+						<subcol property="sprop3" colspan="4" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+					</subrow>
+					<subrow displaytype="page|report" displayposition="bottom">
+						<subcol property="sprop4" colspan="3" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+						<subcol property="sprop5" colspan="3" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+						<subcol property="sprop6" colspan="4" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+					</subrow>
+					<subrow displaytype="page|report" displayposition="top|bottom">
+						<subcol property="sprop7" colspan="3" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+						<subcol property="sprop8" colspan="3" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+						<subcol property="sprop9" colspan="4" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+					</subrow>
+					<subrow displayposition="top|bottom">
+						<subcol property="sprop10" colspan="3" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+						<subcol property="sprop11" colspan="3" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+						<subcol property="sprop12" colspan="4" valuestyleproperty="bgcolor='#eeeeee' align='right'"/>
+					</subrow>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+						</imports>
+						<value>
+						<![CDATA[
+							sprop1="显示在顶部的字段一";
+							sprop2="显示在顶部的字段二";
+							sprop3="显示在顶部的字段三";
+							sprop4="显示在底部的字段一";
+							sprop5="显示在底部的字段二";
+							sprop6="显示在底部的字段三";
+							sprop7="显示在顶底部的字段一";
+							sprop8="显示在顶底部的字段二";
+							sprop9="显示在顶底部的字段三";
+							sprop7="只显示在最后一页的字段一";
+							sprop8="只显示在最后一页的字段二";
+							sprop9="只显示在最后一页的字段三";
+						]]>
+						</value>
+					</format>
+				</subdisplay> 
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,salary,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtgonghao" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%')]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+				</sql>
+				<format>
+				  <value>
+						sex=sex==null?"1":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else sex="男";
+				  </value>
+				</format>
+			</report>
+			<report id="report2" title="员工信息列表" parenttitle="普通行分组报表" dataexport="richexcel|plainexcel|pdf" pagesize="20">
+				<display colselect="false">
+					<col column="province"  label="省份" rowgroup="true"/>
+					<col column="city"  label="城市" rowgroup="true"/>
+					<col column="county"  label="县城" rowgroup="true"/>
+					<col column="{sequence:0}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<group label="个人资料">
+						<col column="sex" label="性别" clickorderby="true"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true"/>
+						<group label="姓名">
+							<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true"/>
+							<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+						</group>
+					</group>
+					<col column="salary" label="工资" clickorderby="true"/>
+				</display>
+				<subdisplay>
+					<rowgroup-subrow column="province"><!-- 针对“省”分组的统计 -->
+						<subcol property="provProp1" colspan="4" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="provProp2" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="provProp3" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+					</rowgroup-subrow>
+					<rowgroup-subrow column="city"><!-- 针对“市”分组的统计 -->
+						<subcol property="cityProp1" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="cityProp2" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="cityProp3" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+					</rowgroup-subrow>
+					<rowgroup-subrow column="county"><!-- 针对“县”分组的统计 -->
+						<subcol property="countyProp1" colspan="2" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="countyProp2" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="countyProp3" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+					</rowgroup-subrow>
+					<!-- 针对整个报表的统计 -->
+					<subrow  displaytype="page|report">
+						<subcol property="sprop1" colspan="4" valuestyleproperty="align='right' bgcolor='#CCFAFF'"/>
+						<subcol property="sprop2" colspan="4" valuestyleproperty="align='right' bgcolor='#CCFAFF'"/>
+						<subcol property="sprop3" colspan="3" valuestyleproperty="align='right' bgcolor='#CCFAFF'"/>
+					</subrow>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+						</imports>
+						<value>
+						<![CDATA[
+							if(type.equals("province"))
+							{//当前正在显示“省”分组数据的辅助行数据
+								provProp1=province+"省辅助列一";
+								provProp2=province+"省辅助列二";
+								provProp3=province+"省辅助列三";
+							}else if(type.equals("city"))
+							{//当前正在显示“市”分组数据的辅助行数据
+								cityProp1=province+"省"+city+"市辅助列一";
+								cityProp2=province+"省"+city+"市辅助列二";
+								cityProp3=province+"省"+city+"市辅助列三";
+							}else if(type.equals("county"))
+							{//当前正在显示“县”分组数据的辅助行数据
+								countyProp1=province+"省"+city+"市"+county+"县辅助列一";
+								countyProp2=province+"省"+city+"市"+county+"县辅助列二";
+								countyProp3=province+"省"+city+"市"+county+"县辅助列三";
+							}else
+							{//当前正在显示整个报表的辅助行数据
+								sprop1="辅助列一";
+								sprop2="辅助列二";
+								sprop3="辅助列三";
+							}
+						]]>
+						</value>
+					</format>
+				</subdisplay> 
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,ename,sex,age,marriage,birthday,salary,province,city,county,description FROM tbl_baseinfo A left join tbl_detailinfo B on A.no=B.no where  {#condition#} order by no]]>
+					</value>
+					<condition name="txtgonghao" label="工号">
+						<value>
+							<![CDATA[(A.no like  '%#data#%')]]>
+						</value>
+						<inputbox>
+						  <typeprompt width="-1" count="15">
+							<promptcol label="no" matchmode="anywhere"/>
+							<datasource><option source="@{select no from tbl_baseinfo where {#matchcondition#}}"/></datasource>
+						  </typeprompt>
+						</inputbox>
+					</condition>
+				</sql>
+				<format>
+				  <value>
+						sex=sex==null?"1":sex.trim();
+						if(sex.equals("0")) sex="女";
+						else sex="男";
+						birthday=birthday==null?"":birthday.trim();
+						int idx=birthday.indexOf(" ");//判断是否有时间，有的话就去掉时间，只显示日期
+						if(idx>0) birthday=birthday.substring(0,idx);
+				  </value>
+				</format>
+			</report>
+			<report id="report3" title="员工信息列表" parenttitle="树形行分组报表" extends="subdisplaypage1.report2">
+				<display>
+					<col column="province"  label="籍贯" treerowgroup="true"/>
+					<col column="city"  label="城市" treerowgroup="true"/>
+					<col column="county"  label="县城" treerowgroup="true"/>
+					<col column="{sequence:0}" label="序号"/>
+					<col column="no" label="工号" clickorderby="true" filter="condition{txtgonghao}"  valuestyleproperty="style='mso-number-format:\@'"/>
+					<group label="个人资料">
+						<col column="sex" label="性别" clickorderby="true"/>
+						<col column="birthday" label="出生日期" clickorderby="true"/>
+						<col column="age" label="年龄" clickorderby="true"/>
+						<group label="姓名">
+							<col column="name" label="中文名" filter="true" filterwidth="120px" clickorderby="true"/>
+							<col column="ename" label="英文名" filter="true" filterwidth="150px" clickorderby="true"/>
+						</group>
+					</group>
+					<col column="salary" label="工资" clickorderby="true"/>
+				</display>
+				<subdisplay>
+					<treerowgroup-subrow column="province"><!-- 针对“省”分组的统计 -->
+						<subcol property="provProp1" colspan="2" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="provProp2" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="provProp3" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+					</treerowgroup-subrow>
+					<treerowgroup-subrow column="city"><!-- 针对“市”分组的统计 -->
+						<subcol property="cityProp1" colspan="2" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="cityProp2" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="cityProp3" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+					</treerowgroup-subrow>
+					<treerowgroup-subrow column="county"><!-- 针对“县”分组的统计 -->
+						<subcol property="countyProp1" colspan="2" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="countyProp2" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+						<subcol property="countyProp3" colspan="3" valuestyleproperty="align='right' bgcolor='#eeeeee'"/>
+					</treerowgroup-subrow>
+					<!-- 针对整个报表的统计 -->
+					<subrow  displaytype="page|report">
+						<subcol property="sprop1" colspan="3" valuestyleproperty="align='right' bgcolor='#CCFAFF'"/>
+						<subcol property="sprop2" colspan="3" valuestyleproperty="align='right' bgcolor='#CCFAFF'"/>
+						<subcol property="sprop3" colspan="3" valuestyleproperty="align='right' bgcolor='#CCFAFF'"/>
+					</subrow>
+					<format>
+						<imports>
+							<import>com.wabacus.util.*</import>
+						</imports>
+						<value>
+						<![CDATA[
+							if(type.equals("province"))
+							{//当前正在显示“省”分组数据的辅助行数据
+								provProp1=province+"省辅助列一";
+								provProp2=province+"省辅助列二";
+								provProp3=province+"省辅助列三";
+							}else if(type.equals("city"))
+							{//当前正在显示“市”分组数据的辅助行数据
+								cityProp1=province+"省"+city+"市辅助列一";
+								cityProp2=province+"省"+city+"市辅助列二";
+								cityProp3=province+"省"+city+"市辅助列三";
+							}else if(type.equals("county"))
+							{//当前正在显示“县”分组数据的辅助行数据
+								countyProp1=province+"省"+city+"市"+county+"县辅助列一";
+								countyProp2=province+"省"+city+"市"+county+"县辅助列二";
+								countyProp3=province+"省"+city+"市"+county+"县辅助列三";
+							}else
+							{//当前正在显示整个报表的辅助行数据
+								sprop1="辅助列一";
+								sprop2="辅助列二";
+								sprop3="辅助列三";
+							}
+						]]>
+						</value>
+					</format>
+				</subdisplay> 
+			</report>
+		</tabpanel>
+	</page>
+	
+</applications>

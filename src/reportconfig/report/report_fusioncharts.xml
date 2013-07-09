@@ -1,0 +1,883 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	<page id="singleserieschartpage1">
+		<tabpanel id="tp1" titlestyle="2" margin="10px">
+			<report id="report1" title="各员工年度总工资" parenttitle="横向数据集" type="fusioncharts" width="1000px" 
+				chartstyleproperty="showValues='0'" chartheight="300" chartwidth="1000" chartype="Column3D.swf">
+				<display labelcolumn="name">
+					<col column="name" label="姓名"/>
+					<col column="totalsalary" label="总工资"/>
+				</display>
+				<subdisplay>
+				<![CDATA[
+					<trendlines>
+						<line startValue='200000' color='00cc00' displayValue='平均值' />   
+					</trendlines>     
+				]]>
+				</subdisplay>
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,sum(salary) as totalsalary FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where {#condition#} group by A.no,name order by A.no]]>
+					</value>
+					<condition name="txtname" label="姓名">
+					<value>
+						<![CDATA[(name like  '%#data#%')]]>
+					</value>
+				</condition>
+				</sql>
+			</report>
+			<report id="report2" title="2008年度各月总工资" parenttitle="纵向数据集" type="fusioncharts" width="1000px" 
+				chartstyleproperty="showValues='0'" chartheight="300" chartwidth="1000" chartype="Column3D.swf">
+				<display>
+					<col column="jan" label="一月"/>
+					<col column="feb" label="二月"/>
+					<col column="mar" label="三月"/>
+					<col column="apr" label="四月"/>
+					<col column="may" label="五月"/>
+					<col column="june" label="六月"/>
+					<col property="constant1" column="{non-fromdb}">
+					<![CDATA[
+						 <vLine color='FF5904' thickness='2'/>
+					]]>
+					</col>
+					<col column="july" label="七月"/>
+					<col column="aug" label="八月"/>
+					<col column="sep" label="九月"/>
+					<col column="oct" label="十月"/>
+					<col column="nov" label="十一月"/>
+					<col column="dece" label="十二月"/>
+				</display>
+				<subdisplay>
+				<![CDATA[
+					<trendlines>             
+						<line startValue='40000' color='00cc00' displayValue='平均值' />     
+					</trendlines>     
+				]]>
+				</subdisplay>
+				<sql>
+					<value>
+						<![CDATA[SELECT sum(jan) as jan,sum(feb) as feb,sum(mar) as mar,sum(apr) as apr,sum(may) as may,sum(june) as june,sum(july) as july,sum(aug) as aug,sum(sep) as sep,sum(oct) as oct,sum(nov) as nov,sum(dece) as dece FROM tbl_salary2 where year=2008]]>
+					</value>
+				</sql>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="multiserieschartpage1">
+		<tabpanel id="tp1" titlestyle="2" margin="10px">
+			<report id="report1" title="各员工2008、2009年度总工资" parenttitle="横向数据集" type="fusioncharts" width="1000px" chartheight="300" chartwidth="1000" chartype="MSColumn3D.swf"
+				chartstyleproperty="xAxisName='姓名' yAxisName='总工资' showValues='0' numberPrefix='$' showExportDataMenuItem='1'">
+				<display labelcolumn="name">
+					<col column="val1.name" label="姓名"/>
+					<col column="val1.totalsalary8" label="2008年度工资"/>
+					<col column="val2.totalsalary9" label="2009年度工资"/>
+					<col column="year" label="年份" displaytype="hidden"/>
+				</display>
+				<subdisplay>
+				<![CDATA[
+					<trendlines>             
+						<line startValue='200000' color='00cc00' displayValue='平均值' />     
+					</trendlines>     
+				]]>
+				</subdisplay>
+				<sql>
+					<dataset id="ds1">
+						<value id="val1">
+							<![CDATA[SELECT A.no,name,year,sum(salary) as totalsalary8 FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where year=2008 and {#condition#} group by A.no,name,year order by A.no]]>
+						</value>
+					</dataset>
+					<dataset id="ds2" mergetop="true">
+						<value id="val2">
+							<![CDATA[SELECT A.no,name,year,sum(salary) as totalsalary9 FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where year=2009 and {#condition#} group by A.no,name,year order by A.no]]>
+						</value>
+					</dataset>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%')]]>
+						</value>
+					</condition>
+				</sql>
+				<format>
+					<imports>
+						<import>java.util.Map</import>
+					</imports>
+					<value>
+					<![CDATA[
+						if("ds1".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("totalsalary8","seriesName='2008'",false);
+						}else if("ds2".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("totalsalary9","seriesName='2009'",false);
+						}
+						if(this.getPositionIndex()==5)
+						{
+							Map mNewDataColValues=new HashMap();
+							mNewDataColValues.put("name","{non-fromdb}<vLine color='FF5904' thickness='2'/>");
+							this.append(mNewDataColValues,false); 
+						}
+					]]>
+					</value>
+				</format>
+			</report>
+			<report id="report2" title="2008、2009年度各月总工资" parenttitle="纵向数据集" type="fusioncharts" 
+					width="1000px" chartheight="300" chartwidth="1000" chartype="MSColumn3D.swf"
+				chartstyleproperty="xAxisName='月份' yAxisName='总工资' showValues='0' numberPrefix='$'">
+				<display>
+					<col column="jan" label="一月"/>
+					<col column="feb" label="二月"/>
+					<col column="mar" label="三月"/>
+					<col column="apr" label="四月"/>
+					<col column="may" label="五月"/>
+					<col column="june" label="六月"/>
+					<col property="constant1" column="{non-fromdb}">
+					<![CDATA[
+						 <vLine color='FF5904' thickness='2'/>
+					]]>
+					</col>
+					<col column="july" label="七月"/>
+					<col column="aug" label="八月"/>
+					<col column="sep" label="九月"/>
+					<col column="oct" label="十月"/>
+					<col column="nov" label="十一月"/>
+					<col column="dece" label="十二月"/>
+				</display>
+				<subdisplay>
+				<![CDATA[
+					<trendlines>             
+						<line startValue='70000' color='00cc00' displayValue='平均值' />     
+					</trendlines>     
+				]]>
+				</subdisplay>
+				<sql>
+					<dataset id="ds2008">
+						<value>
+							<![CDATA[SELECT sum(jan) as jan,sum(feb) as feb,sum(mar) as mar,sum(apr) as apr,sum(may) as may,sum(june) as june,sum(july) as july,sum(aug) as aug,sum(sep) as sep,sum(oct) as oct,sum(nov) as nov,sum(dece) as dece FROM tbl_salary2 where year=2008]]>
+						</value>
+					</dataset>
+					<dataset id="ds2009" mergetop="true">
+						<value>
+							<![CDATA[SELECT sum(jan) as jan,sum(feb) as feb,sum(mar) as mar,sum(apr) as apr,sum(may) as may,sum(june) as june,sum(july) as july,sum(aug) as aug,sum(sep) as sep,sum(oct) as oct,sum(nov) as nov,sum(dece) as dece FROM tbl_salary2 where year=2009]]>
+						</value>
+					</dataset>
+				</sql>
+				<format>
+					<imports>
+						<import>java.util.Map</import>
+					</imports>
+					<value>
+					<![CDATA[
+						if("ds2008".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("seriesName='2008'",false);
+						}else if("ds2009".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("seriesName='2009'",false);
+						}
+					]]>
+					</value>
+				</format>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="combinationchartpage1">
+		<tabpanel id="tp1" titlestyle="2" margin="10px">
+			<vpanel id="vp1" parenttitle="横向数据集">
+				<framepanel id="fp1" title="单Y轴组合图" margin="10px">
+					<report id="report1" title="各员工2008、2009年度总工资" type="fusioncharts" width="1000px" chartheight="300" chartwidth="1000" chartype="MSCombi2D.swf"
+						chartstyleproperty="xAxisName='姓名' yAxisName='总工资' showValues='0' numberPrefix='$' chartOrder='area,column' ">
+						<display labelcolumn="name">
+							<col column="val1.name" label="姓名"/>
+							<col column="val1.totalsalary8" label="2008年度工资"/>
+							<col column="val2.totalsalary9" label="2009年度工资"/>
+							<col column="year" label="年份" displaytype="hidden"/>
+						</display>
+						<subdisplay>
+						<![CDATA[
+							<trendlines>             
+								<line startValue='200000' color='00cc00' displayValue='平均值' />     
+							</trendlines>     
+						]]>
+						</subdisplay>
+						<sql>
+							<dataset id="ds1">
+								<value id="val1">
+									<![CDATA[SELECT A.no,name,year,sum(salary) as totalsalary8 FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where year=2008 and {#condition#} group by A.no,name,year order by A.no]]>
+								</value>
+							</dataset>
+							<dataset id="ds2" mergetop="true">
+								<value id="val2">
+									<![CDATA[SELECT A.no,name,year,sum(salary) as totalsalary9 FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where year=2009 and {#condition#} group by A.no,name,year order by A.no]]>
+								</value>
+							</dataset>
+							<condition name="txtname" label="姓名">
+								<value>
+									<![CDATA[(name like  '%#data#%')]]>
+								</value>
+							</condition>
+						</sql>
+						<format>
+							<imports>
+								<import>java.util.Map</import>
+							</imports>
+							<value>
+							<![CDATA[
+								if("ds1".equals(wx_belongto_datasetid))
+								{
+									this.setRowValuestyleproperty("totalsalary8","seriesName='2008' renderAs='Area'",false);
+								}else if("ds2".equals(wx_belongto_datasetid))
+								{
+									this.setRowValuestyleproperty("totalsalary9","seriesName='2009'",false);
+								}
+								if(this.getPositionIndex()==5)
+								{
+									Map mNewDataColValues=new HashMap();
+									mNewDataColValues.put("name","{non-fromdb}<vLine color='FF5904' thickness='2'/>");
+									this.append(mNewDataColValues,false); 
+								}
+							]]>
+							</value>
+						</format>
+					</report>
+				</framepanel>
+				<framepanel id="fp2" title="双Y轴组合图" margin="10px">
+					<report id="report2" title="员工年龄工资表" parenttitle="双Y轴组合图" type="fusioncharts" width="1000px" chartheight="300" chartwidth="1000" chartype="MSCombiDY2D.swf"
+						chartstyleproperty="PYAxisName='年龄' SYAxisName='工资' showValues='0'">
+						<display labelcolumn="name">
+							<col column="val1.name" label="中文名"/>
+							<col column="val1.age" label="年龄"/>
+							<col column="val2.salary" label="工资"/>
+						</display>
+						<sql>
+							<dataset id="ds1">
+								<value id="val1">
+									<![CDATA[SELECT name,age FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no  where  {#condition#} order by A.no]]>
+								</value>
+							</dataset>
+							<dataset id="ds2" mergetop="true">
+								<value id="val2">
+									<![CDATA[SELECT name,salary FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no  where  {#condition#} order by A.no]]>
+								</value>
+							</dataset>
+						</sql>
+						<format>
+							<imports>
+								<import>java.util.Map</import>
+							</imports>
+							<value>
+							<![CDATA[
+								if("ds1".equals(wx_belongto_datasetid))
+								{//当前是年龄记录行
+									this.setRowValuestyleproperty("age","seriesName='年龄' parentYAxis='P'",false);
+								}else if("ds2".equals(wx_belongto_datasetid))
+								{//当前是工资记录行
+									this.setRowValuestyleproperty("salary","seriesName='工资' renderAs='Line' parentYAxis='S'",false);
+								}
+								if(this.getPositionIndex()==5)
+								{
+									Map mNewDataColValues=new HashMap();
+									mNewDataColValues.put("name","{non-fromdb}<vLine color='FF5904' thickness='2'/>");
+									this.append(mNewDataColValues,false); 
+								}
+							]]>
+							</value>
+						</format>
+					</report>
+				</framepanel>
+			</vpanel>
+			<vpanel id="vp2" parenttitle="纵向数据集">
+				<framepanel id="fp3" title="单Y轴组合图" margin="10px">
+					<report id="report3" title="2008、2009年度各月总工资" type="fusioncharts" 
+						 chartheight="300" chartwidth="1000" chartype="MSCombi2D.swf"
+						chartstyleproperty="xAxisName='月份' yAxisName='总工资' showValues='0' numberPrefix='$' chartOrder='line,column' ">
+						<display>
+							<col column="jan" label="一月"/>
+							<col column="feb" label="二月"/>
+							<col column="mar" label="三月"/>
+							<col column="apr" label="四月"/>
+							<col column="may" label="五月"/>
+							<col column="june" label="六月"/>
+							<col property="constant1" column="{non-fromdb}">
+							<![CDATA[
+								 <vLine color='FF5904' thickness='2'/>
+							]]>
+							</col>
+							<col column="july" label="七月"/>
+							<col column="aug" label="八月"/>
+							<col column="sep" label="九月"/>
+							<col column="oct" label="十月"/>
+							<col column="nov" label="十一月"/>
+							<col column="dece" label="十二月"/>
+						</display>
+						<subdisplay>
+						<![CDATA[
+							<trendlines>             
+								<line startValue='70000' color='00cc00' displayValue='平均值' />     
+							</trendlines>     
+						]]>
+						</subdisplay>
+						<sql>
+							<dataset id="ds2008">
+								<value>
+									<![CDATA[SELECT sum(jan) as jan,sum(feb) as feb,sum(mar) as mar,sum(apr) as apr,sum(may) as may,sum(june) as june,sum(july) as july,sum(aug) as aug,sum(sep) as sep,sum(oct) as oct,sum(nov) as nov,sum(dece) as dece FROM tbl_salary2 where year=2008]]>
+								</value>
+							</dataset>
+							<dataset id="ds2009" mergetop="true">
+								<value>
+									<![CDATA[SELECT sum(jan) as jan,sum(feb) as feb,sum(mar) as mar,sum(apr) as apr,sum(may) as may,sum(june) as june,sum(july) as july,sum(aug) as aug,sum(sep) as sep,sum(oct) as oct,sum(nov) as nov,sum(dece) as dece FROM tbl_salary2 where year=2009]]>
+								</value>
+							</dataset>
+						</sql>
+						<format>
+							<imports>
+								<import>java.util.Map</import>
+							</imports>
+							<value>
+							<![CDATA[
+								if("ds2008".equals(wx_belongto_datasetid))
+								{
+									this.setRowValuestyleproperty("seriesName='2008'",false);
+								}else if("ds2009".equals(wx_belongto_datasetid))
+								{
+									this.setRowValuestyleproperty("seriesName='2009' renderAs='Line'",false);
+								}
+							]]>
+							</value>
+						</format>
+					</report>
+				</framepanel>
+				<framepanel id="fp4" title="双Y轴组合图" margin="10px">
+					<report id="report4" title="员工总工资/平均工资表" parenttitle="双Y轴组合图" type="fusioncharts" width="1000px" chartheight="300" chartwidth="1000" chartype="MSCombiDY2D.swf"
+						chartstyleproperty="PYAxisName='总工资' SYAxisName='平均工资' showValues='0'">
+						<display>
+							<col column="jan" label="一月"/>
+							<col column="feb" label="二月"/>
+							<col column="mar" label="三月"/>
+							<col column="apr" label="四月"/>
+							<col column="may" label="五月"/>
+							<col column="june" label="六月"/>
+							<col property="constant1" column="{non-fromdb}">
+							<![CDATA[
+								 <vLine color='FF5904' thickness='2'/>
+							]]>
+							</col>
+							<col column="july" label="七月"/>
+							<col column="aug" label="八月"/>
+							<col column="sep" label="九月"/>
+							<col column="oct" label="十月"/>
+							<col column="nov" label="十一月"/>
+							<col column="dece" label="十二月"/>
+						</display>
+						<subdisplay>
+						<![CDATA[
+							<trendlines>             
+								<line startValue='70000' color='00cc00' displayValue='平均值' />     
+							</trendlines>     
+						]]>
+						</subdisplay>
+						<sql>
+							<dataset id="ds1">
+								<value>
+									<![CDATA[SELECT sum(jan) as jan,sum(feb) as feb,sum(mar) as mar,sum(apr) as apr,sum(may) as may,sum(june) as june,sum(july) as july,sum(aug) as aug,sum(sep) as sep,sum(oct) as oct,sum(nov) as nov,sum(dece) as dece FROM tbl_salary2]]>
+								</value>
+							</dataset>
+							<dataset id="ds2" mergetop="true">
+								<value>
+									<![CDATA[SELECT avg(jan) as jan,avg(feb) as feb,avg(mar) as mar,avg(apr) as apr,avg(may) as may,avg(june) as june,avg(july) as july,avg(aug) as aug,avg(sep) as sep,avg(oct) as oct,avg(nov) as nov,avg(dece) as dece FROM tbl_salary2]]>
+								</value>
+							</dataset>
+						</sql>
+						<format>
+							<imports>
+								<import>java.util.Map</import>
+							</imports>
+							<value>
+							<![CDATA[
+								if("ds1".equals(wx_belongto_datasetid))
+								{
+									this.setRowValuestyleproperty("seriesName='总工资' parentYAxis='P'",false);
+								}else if("ds2".equals(wx_belongto_datasetid))
+								{
+									this.setRowValuestyleproperty("seriesName='平均工资' renderAs='Area' parentYAxis='S'",false);
+								}
+							]]>
+							</value>
+						</format>
+					</report>
+				</framepanel>
+			</vpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="xychartpage1">
+		<report id="report1" title="员工年龄与工资关系表" type="fusioncharts" chartype="Scatter.swf"
+			chartstyleproperty="yAxisName='工资' xAxisName='年龄' xAxisMaxValue='100'" chartheight="500" chartwidth="1000">
+			<display>
+				<col property="col0" column="{non-value}" label="0" labelstyleproperty="x='0' showVerticalLine='1'"/>
+				<col property="col10" column="{non-value}" label="10" labelstyleproperty="x='10' showVerticalLine='1'"/>
+				<col property="col20" column="{non-value}" label="20" labelstyleproperty="x='20' showVerticalLine='1'"/>
+				<col property="x" column="age" label="30" labelstyleproperty="x='30' showVerticalLine='1'"/>
+				<col property="y" column="salary" label="40" labelstyleproperty="x='40' showVerticalLine='1'"/>
+				<col property="col50" column="{non-value}" label="50" labelstyleproperty="x='50' showVerticalLine='1'"/>
+				<col property="col60" column="{non-value}" label="60" labelstyleproperty="x='60' showVerticalLine='1'"/>
+				<col property="col70" column="{non-value}" label="70" labelstyleproperty="x='70' showVerticalLine='1'"/>
+				<col property="col80" column="{non-value}" label="80" labelstyleproperty="x='80' showVerticalLine='1'"/>
+				<col property="col90" column="{non-value}" label="90" labelstyleproperty="x='90' showVerticalLine='1'"/>
+				<col property="col100" column="{non-value}" label="100" labelstyleproperty="x='100' showVerticalLine='1'"/>
+			</display>
+			<sql>
+				<dataset styleproperty="color='0000FF'">
+					<value id="val1">
+						<![CDATA[SELECT name,age,salary FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no  where  {#condition#} order by A.no]]>
+					</value>
+				</dataset>
+			</sql>
+		</report>
+	</page>
+	
+	<page id="multiseriesstatckchartpage1">
+		<tabpanel id="tp1" titlestyle="2" margin="10px">
+			<report id="report1" title="各员工2008、2009年度工资统计表"  parenttitle="横向数据集" type="fusioncharts" width="1000px" chartheight="300" chartwidth="1000" chartype="MSStackedColumn2D.swf"
+			chartstyleproperty="xAxisName='姓名' yaxisname='工资' showValues='0'">
+				<display labelcolumn="name">
+					<col column="val1.name" label="姓名"/>
+					<col column="val1.totalsalary8" label="2008年度总工资"/>
+					<col column="val2.totalsalary9" label="2009年度总工资"/>
+					<col column="val3.avgsalary8" label="2008年度平均工资"/>
+					<col column="val4.avgsalary9" label="2009年度平均工资"/>
+				</display>
+				<subdisplay>
+				<![CDATA[
+					<trendlines>             
+						<line startValue='200000' color='00cc00' displayValue='平均值' />     
+					</trendlines>     
+				]]>
+				</subdisplay>
+				<sql>
+					<dataset id="ds1">
+						<value id="val1">
+							<![CDATA[SELECT A.no,name,sum(salary) as totalsalary8 FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where year=2008 and {#condition#} group by A.no,name order by A.no]]>
+						</value>
+					</dataset>
+					<dataset id="ds2" mergetop="true">
+						<value id="val2">
+							<![CDATA[SELECT A.no,name,sum(salary) as totalsalary9 FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where year=2009 and {#condition#} group by A.no,name order by A.no]]>
+						</value>
+					</dataset>
+					<dataset id="ds3">
+						<value id="val3">
+							<![CDATA[SELECT A.no,name,avg(salary) as avgsalary8 FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where year=2008 and {#condition#} group by A.no,name order by A.no]]>
+						</value>
+					</dataset>
+					<dataset id="ds4" mergetop="true">
+						<value id="val4">
+							<![CDATA[SELECT A.no,name,avg(salary) as avgsalary9 FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where year=2009 and {#condition#} group by A.no,name order by A.no]]>
+						</value>
+					</dataset>
+					<condition name="txtname" label="姓名">
+						<value>
+							<![CDATA[(name like  '%#data#%')]]>
+						</value>
+					</condition>
+				</sql>
+				<format>
+					<imports>
+						<import>java.util.Map</import>
+					</imports>
+					<value>
+					<![CDATA[
+						if("ds1".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("totalsalary8","seriesName='2008总工资'",false);
+						}else if("ds2".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("totalsalary9","seriesName='2009总工资'",false);
+						}else if("ds3".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("avgsalary8","seriesName='2008平均工资'",false);
+						}else if("ds4".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("avgsalary9","seriesName='2009平均工资'",false);
+						}
+					]]>
+					</value>
+				</format>
+			</report>
+			<report id="report4" title="员工总工资/平均工资表" parenttitle="纵向数据集" type="fusioncharts" width="1000px" chartheight="300" chartwidth="1000" chartype="MSStackedColumn2D.swf"
+			chartstyleproperty="xAxisName='姓名' yaxisname='工资' showValues='0'">
+				<display>
+					<col column="jan" label="一月"/>
+					<col column="feb" label="二月"/>
+					<col column="mar" label="三月"/>
+					<col column="apr" label="四月"/>
+					<col column="may" label="五月"/>
+					<col column="june" label="六月"/>
+					<col property="constant1" column="{non-fromdb}">
+					<![CDATA[
+						 <vLine color='FF5904' thickness='2'/>
+					]]>
+					</col>
+					<col column="july" label="七月"/>
+					<col column="aug" label="八月"/>
+					<col column="sep" label="九月"/>
+					<col column="oct" label="十月"/>
+					<col column="nov" label="十一月"/>
+					<col column="dece" label="十二月"/>
+				</display>
+				<subdisplay>
+				<![CDATA[
+					<trendlines>             
+						<line startValue='70000' color='00cc00' displayValue='平均值' />     
+					</trendlines>     
+				]]>
+				</subdisplay>
+				<sql>
+					<dataset id="ds1">
+						<value>
+							<![CDATA[SELECT sum(jan) as jan,sum(feb) as feb,sum(mar) as mar,sum(apr) as apr,sum(may) as may,sum(june) as june,sum(july) as july,sum(aug) as aug,sum(sep) as sep,sum(oct) as oct,sum(nov) as nov,sum(dece) as dece FROM tbl_salary2 where year=2008]]>
+						</value>
+					</dataset>
+					<dataset id="ds2" mergetop="true">
+						<value>
+							<![CDATA[SELECT sum(jan) as jan,sum(feb) as feb,sum(mar) as mar,sum(apr) as apr,sum(may) as may,sum(june) as june,sum(july) as july,sum(aug) as aug,sum(sep) as sep,sum(oct) as oct,sum(nov) as nov,sum(dece) as dece FROM tbl_salary2 where year=2009]]>
+						</value>
+					</dataset>
+					<dataset id="ds3">
+						<value>
+							<![CDATA[SELECT avg(jan) as jan,avg(feb) as feb,avg(mar) as mar,avg(apr) as apr,avg(may) as may,avg(june) as june,avg(july) as july,avg(aug) as aug,avg(sep) as sep,avg(oct) as oct,avg(nov) as nov,avg(dece) as dece FROM tbl_salary2 where year=2008]]>
+						</value>
+					</dataset>
+					<dataset id="ds4" mergetop="true">
+						<value>
+							<![CDATA[SELECT avg(jan) as jan,avg(feb) as feb,avg(mar) as mar,avg(apr) as apr,avg(may) as may,avg(june) as june,avg(july) as july,avg(aug) as aug,avg(sep) as sep,avg(oct) as oct,avg(nov) as nov,avg(dece) as dece FROM tbl_salary2 where year=2009]]>
+						</value>
+					</dataset>
+				</sql>
+				<format>
+					<imports>
+						<import>java.util.Map</import>
+					</imports>
+					<value>
+					<![CDATA[
+						if("ds1".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("seriesName='2008年总工资' ",false);
+						}else if("ds2".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("seriesName='2009年总工资' ",false);
+						}else if("ds3".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("seriesName='2008年平均工资'",false);
+						}else if("ds4".equals(wx_belongto_datasetid))
+						{
+							this.setRowValuestyleproperty("seriesName='2009年平均工资'",false);
+						}
+					]]>
+					</value>
+				</format>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="scrollchartpage1">
+		<report id="report1" title="员工年龄工资表" type="fusioncharts" chartype="ScrollCombiDY2D.swf" chartheight="300" chartwidth="1000"
+			chartstyleproperty="showValues='0'">
+			<display labelcolumn="name">
+				<col column="val1.name" label="中文名"/>
+				<col column="val1.age" label="年龄"/>
+				<col column="val2.salary" label="工资"/>
+			</display>
+			<sql>
+				<dataset id="ds1">
+					<value id="val1">
+						<![CDATA[SELECT name,age FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no  where  {#condition#} order by A.no]]>
+					</value>
+				</dataset>
+				<dataset id="ds2" mergetop="true">
+					<value id="val2">
+						<![CDATA[SELECT name,salary FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no  where  {#condition#} order by A.no]]>
+					</value>
+				</dataset>
+			</sql>
+			<format>
+				<imports>
+					<import>java.util.Map</import>
+				</imports>
+				<value>
+				<![CDATA[
+					if("ds1".equals(wx_belongto_datasetid))
+					{//当前是年龄记录行
+						this.setRowValuestyleproperty("age","seriesName='年龄' parentYAxis='P'",false);
+					}else if("ds2".equals(wx_belongto_datasetid))
+					{//当前是工资记录行
+						this.setRowValuestyleproperty("salary","seriesName='工资' renderAs='Line' parentYAxis='S'",false);
+					}
+				]]>
+				</value>
+			</format>
+		</report>
+	</page>
+	
+	<page id="customizedchartpage1">
+		<report id="report1" title="员工年龄工资表" type="fusioncharts" width="1000px" chartheight="300" chartwidth="1000" chartype="MSStackedColumn2DLineDY.swf " 
+				interceptor="com.wabacusdemo.Interceptor_customizedchartpage1_report1">
+			<display labelcolumn="name">
+				<col column="name" label="中文名"/>
+				<col column="age" label="年龄"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT name,age FROM tbl_baseinfo A left join tbl_detailinfo B  on A.no=B.no  where  {#condition#} order by A.no]]>
+				</value>
+			</sql>
+		</report>
+	</page>
+	
+	<page id="linkcharts1page1">
+		<tabpanel id="tp1" titlestyle="2" margin="10px">
+			<report id="report1" title="各员工年度总工资" parenttitle="为整张图表添加链接" type="fusioncharts" width="1000px" chartheight="500" chartwidth="1000" chartype="Bar2D.swf"
+				chartstyleproperty="clickURL='n-http://code.google.com/p/wabacus' showValues='0'">
+				<display labelcolumn="name">
+					<col column="name" label="姓名"/>
+					<col column="totalsalary" label="总工资"/>
+				</display>
+				<subdisplay>
+				<![CDATA[
+					<trendlines>             
+						<line startValue='200000' color='00cc00' displayValue='平均值' />     
+					</trendlines>     
+				]]>
+				</subdisplay>
+				<sql>
+					<value>
+						<![CDATA[SELECT A.no,name,sum(salary) as totalsalary FROM tbl_salary A left join tbl_baseinfo B on A.no=B.no where {#condition#} group by A.no,name order by A.no]]>
+					</value>
+				</sql>
+			</report>
+			<report id="report2" title="各员工年度总工资" parenttitle="为每条数据添加链接" extends="linkcharts1page1.report1" chartstyleproperty="">
+				<format>
+					<value>
+					<![CDATA[
+						this.setColValuestyleproperty("totalsalary","link='P-detailsPopUp,width=800,height=600,toolbar=no,resizable=no-/WabacusDemo/ShowReport.wx?PAGEID=listpage1&txtname="+name+"'",true);
+					]]>
+					</value>
+				</format>
+			</report>
+			<report id="report3" title="各员工年度总工资" parenttitle="为每条数据添加JS事件" extends="linkcharts1page1.report1" chartstyleproperty="">
+				<format>
+					<value>
+					<![CDATA[
+						this.setColValuestyleproperty("totalsalary","link=\"javascript:wx_alert('"+name+","+totalsalary+"');\"",true);
+					]]>
+					</value>
+				</format>
+			</report>
+		</tabpanel>
+	</page>
+	
+	<page id="linkcharts2page1" js="/wabacusdemo/js/demo.js">
+		<tabpanel id="tp1" titlestyle="2" margin="10px" titlewidth="160px">
+			<vpanel id="vp1" parenttitle="链接到本页图表">
+				<report id="report1" title="员工2008年度总工资" type="fusioncharts" width="1000px" chartheight="500" chartwidth="1000" chartype="Column2D.swf"
+					chartstyleproperty="showValues='0'">
+					<display labelcolumn="name">
+						<col column="no" label="工号" displaytype="hidden"/>
+						<col column="name" label="姓名"/>
+						<col column="jan" label="一月" datatype="double"/>
+						<col column="feb" label="二月" datatype="double" displaytype="hidden"/>
+						<col column="mar" label="三月" datatype="double" displaytype="hidden"/>
+						<col column="apr" label="四月" datatype="double" displaytype="hidden"/>
+						<col column="may" label="五月" datatype="double" displaytype="hidden"/>
+						<col column="june" label="六月" datatype="double" displaytype="hidden"/>
+						<col column="july" label="七月" datatype="double" displaytype="hidden"/>
+						<col column="aug" label="八月" datatype="double" displaytype="hidden"/>
+						<col column="sep" label="九月" datatype="double" displaytype="hidden"/>
+						<col column="oct" label="十月" datatype="double" displaytype="hidden"/>
+						<col column="nov" label="十一月" datatype="double" displaytype="hidden"/>
+						<col column="dece" label="十二月" datatype="double" displaytype="hidden"/>
+					</display>
+					<subdisplay>
+					<![CDATA[
+						<trendlines>             
+							<line startValue='40000' color='00cc00' displayValue='平均值' />     
+						</trendlines>     
+					]]>
+					</subdisplay>
+					<sql>
+						<value>
+							<![CDATA[SELECT A.no,name,jan,feb,mar,apr,may,june,july,aug,sep,oct,nov,dece FROM tbl_salary2 A left join tbl_baseinfo B on A.no=B.no where year=2008]]>
+						</value>
+					</sql>
+					<format>
+						<value>
+						<![CDATA[
+							if(jan==null) jan=new Double(0d);
+							double djan=jan.doubleValue();
+							if(feb!=null) djan+=feb.doubleValue();
+							if(mar!=null) djan+=mar.doubleValue();
+							if(apr!=null) djan+=apr.doubleValue();
+							if(may!=null) djan+=may.doubleValue();
+							if(june!=null) djan+=june.doubleValue();
+							if(july!=null) djan+=july.doubleValue();
+							if(aug!=null) djan+=aug.doubleValue();
+							if(sep!=null) djan+=sep.doubleValue();
+							if(oct!=null) djan+=oct.doubleValue();
+							if(nov!=null) djan+=nov.doubleValue();
+							if(dece!=null) djan+=dece.doubleValue();
+							jan=new Double(djan);
+							this.setColValuestyleproperty("jan","link='"+this.getLinkChartUrl("xml","linkid_"+no,"report2","currentName="+name)+"'",true);
+						]]>
+						</value>
+					</format>
+				</report>
+				<report id="report2" title="rrequest{currentName}2008年各月工资" type="fusioncharts" width="1000px" 
+					chartstyleproperty="showValues='0'" chartheight="500" chartwidth="1000" linkchart="true" chartype="Column2D.swf">
+					<display>
+						<col column="jan" label="一月"/>
+						<col column="feb" label="二月"/>
+						<col column="mar" label="三月"/>
+						<col column="apr" label="四月"/>
+						<col column="may" label="五月"/>
+						<col column="june" label="六月"/>
+						<col property="constant1" column="{non-fromdb}">
+						<![CDATA[
+							 <vLine color='FF5904' thickness='2'/>
+						]]>
+						</col>
+						<col column="july" label="七月"/>
+						<col column="aug" label="八月"/>
+						<col column="sep" label="九月"/>
+						<col column="oct" label="十月"/>
+						<col column="nov" label="十一月"/>
+						<col column="dece" label="十二月"/>
+					</display>
+					<subdisplay>
+					<![CDATA[
+						<trendlines>             
+							<line startValue='40000' color='00cc00' displayValue='平均值' />     
+						</trendlines>     
+					]]>
+					</subdisplay>
+					<sql>
+						<value>
+							<![CDATA[SELECT B.name,jan,feb,mar,apr,may,june,july,aug,sep,oct,nov,dece FROM tbl_salary2 A left join tbl_baseinfo B on A.no=B.no where year=2008 and {#condition#}]]>
+						</value>
+						<condition name="currentName" hidden="true">
+							<value>
+								<![CDATA[(name like  '%#data#%' )]]>
+							</value>
+						</condition>
+					</sql>
+				</report>
+			</vpanel>
+			<report id="report3" parenttitle="链接到其它页图表" chartype="Column3D.swf" extends="linkcharts2page1.report1">
+				<format>
+					<value>
+					<![CDATA[
+						if(jan==null) jan=new Double(0d);
+						double djan=jan.doubleValue();
+						if(feb!=null) djan+=feb.doubleValue();
+						if(mar!=null) djan+=mar.doubleValue();
+						if(apr!=null) djan+=apr.doubleValue();
+						if(may!=null) djan+=may.doubleValue();
+						if(june!=null) djan+=june.doubleValue();
+						if(july!=null) djan+=july.doubleValue();
+						if(aug!=null) djan+=aug.doubleValue();
+						if(sep!=null) djan+=sep.doubleValue();
+						if(oct!=null) djan+=oct.doubleValue();
+						if(nov!=null) djan+=nov.doubleValue();
+						if(dece!=null) djan+=dece.doubleValue();
+						jan=new Double(djan);
+						this.setColValuestyleproperty("jan","link='"+this.getLinkChartUrl("xmlurl","linkedchartpage1","report1","currentNo="+no)+"'",true);
+					]]>
+					</value>
+				</format>
+			</report>
+			<vpanel id="vp2">
+				<report id="report4" title="员工2008年度总工资" parenttitle="控制链接图表的行为样式" extends="linkcharts2page1.report1">
+					<format>
+						<value>
+						<![CDATA[
+							if(jan==null) jan=new Double(0d);
+							double djan=jan.doubleValue();
+							if(feb!=null) djan+=feb.doubleValue();
+							if(mar!=null) djan+=mar.doubleValue();
+							if(apr!=null) djan+=apr.doubleValue();
+							if(may!=null) djan+=may.doubleValue();
+							if(june!=null) djan+=june.doubleValue();
+							if(july!=null) djan+=july.doubleValue();
+							if(aug!=null) djan+=aug.doubleValue();
+							if(sep!=null) djan+=sep.doubleValue();
+							if(oct!=null) djan+=oct.doubleValue();
+							if(nov!=null) djan+=nov.doubleValue();
+							if(dece!=null) djan+=dece.doubleValue();
+							jan=new Double(djan);
+							this.setColValuestyleproperty("jan","link='"+this.getLinkChartUrl("xml","linkid_"+no,"report2","currentName="+name)+"'",true);
+							if(rrequest.getStringAttribute("flag","").equals(""))
+							{//还没添加控制图表样式的onload函数，则添加进去
+								rrequest.getWResponse().addChartOnloadMethod("report4","testConfigLinkedChart","swfUrl:'/WabacusDemo/webresources/component/FusionCharts/swf/Doughnut2D.swf',targetId:'linkedchart-container'",false);
+								rrequest.setAttribute("flag","true");
+							}
+						]]>
+						</value>
+					</format>
+				</report>
+				<html id="html1" top="10px">
+				<![CDATA[<div id="linkedchart-container" ></div>]]><!-- 用来显示链接图表 -->
+				</html>
+			</vpanel>
+		</tabpanel>
+	</page>
+	
+	<page id="linkedchartpage1">
+		<report id="report1" title="request{currentName}2008年各月工资" type="fusioncharts" width="1000px" 
+			chartstyleproperty="showValues='0'" chartheight="500" chartwidth="1000" linkchart="true" chartype="Column2D.swf">
+			<display>
+				<col column="no" displaytype="hidden"/>
+				<col column="name" displaytype="hidden"/>
+				<col column="jan" label="一月"/>
+				<col column="feb" label="二月"/>
+				<col column="mar" label="三月"/>
+				<col column="apr" label="四月"/>
+				<col column="may" label="五月"/>
+				<col column="june" label="六月"/>
+				<col property="constant1" column="{non-fromdb}">
+				<![CDATA[
+					 <vLine color='FF5904' thickness='2'/>
+				]]>
+				</col>
+				<col column="july" label="七月"/>
+				<col column="aug" label="八月"/>
+				<col column="sep" label="九月"/>
+				<col column="oct" label="十月"/>
+				<col column="nov" label="十一月"/>
+				<col column="dece" label="十二月"/>
+			</display>
+			<subdisplay>
+			<![CDATA[
+				<trendlines>             
+					<line startValue='40000' color='00cc00' displayValue='平均值' />     
+				</trendlines>     
+			]]>
+			</subdisplay>
+			<sql>
+				<value>
+					<![CDATA[SELECT A.no,B.name,jan,feb,mar,apr,may,june,july,aug,sep,oct,nov,dece FROM tbl_salary2 A left join tbl_baseinfo B on A.no=B.no where year=2008 and {#condition#}]]>
+				</value>
+				<condition name="currentNo" hidden="true">
+					<value>
+						<![CDATA[(A.no like  '%#data#%' )]]>
+					</value>
+				</condition>
+			</sql>
+			<format>
+				<value>
+					rrequest.getRequest().setAttribute("currentName",name);
+				</value>
+			</format>
+		</report>
+	</page>
+</applications>
